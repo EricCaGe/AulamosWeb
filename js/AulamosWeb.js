@@ -1,12 +1,6 @@
-// ==========================================
-// AulamosWeb.js - JS DE LA PÁGINA DE INICIO
-// ==========================================
-
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ==========================================
     // BOTÓN DE ACCESIBILIDAD
-    // ==========================================
     const accessibilityBtn = document.querySelector('.btn-accessibility');
     
     if (accessibilityBtn) {
@@ -17,25 +11,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ==========================================
     // BOTÓN INICIAR SESIÓN
-    // ==========================================
     const loginBtn = document.querySelector('.btn-login');
     if (loginBtn) {
         loginBtn.addEventListener('click', function() {
             console.log('Redirigir a login');
-            // window.location.href = 'login.html';
         });
     }
     
-    // ==========================================
     // BOTÓN CREAR CUENTA
-    // ==========================================
     const registerBtn = document.querySelector('.btn-register');
     if (registerBtn) {
         registerBtn.addEventListener('click', function() {
             console.log('Redirigir a registro');
-            // window.location.href = 'registro.html';
         });
     }
     
