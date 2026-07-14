@@ -5,43 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AulamosWeb - Inicio</title>
     
-    <!-- CSS PROPIO DE ESTA PÁGINA -->
     <link rel="stylesheet" href="styles/AulamosWeb.css">
     
 </head>
 <body>
-    <!-- ==========================================
-    HEADER
-    ========================================== -->
+    <!-- HEADER -->
     <header class="header">
-        <!-- LOGO -->
         <div class="logo-container">
-        
-            <div class="logo-placeholder">
-                <img src="img/logogeneral.png" alt="Logo AulamosWeb"> 
-            </div>
+            <img src="img/logogeneral.png" alt="Logo AulamosWeb" class="logo">
         </div>
         
-        <!-- BOTONES -->
         <div class="btn-group">
             <button class="btn btn-login">Iniciar Sesión</button>
             <button class="btn btn-register">Crear Cuenta</button>
-            
-            <!-- 
-                ==========================================
-                BOTÓN DE ACCESIBILIDAD (RECTANGULAR)
-                Estará en TODAS las pantallas
-                ==========================================
-            -->
-            <button class="btn btn-accessibility" aria-label="Accesibilidad">
-                ♿ Accesibilidad
-            </button>
+            <button class="btn btn-accessibility">♿ Accesibilidad</button>
         </div>
     </header>
 
-    <!-- ==========================================
-    SECCIÓN PRINCIPAL (HERO)
-    ========================================== -->
+    <!-- HERO -->
     <section class="hero">
         <div class="hero-content">
             <h1>
@@ -52,19 +33,14 @@
                 El conocimiento es el único límite. Explora nuestros cursos hoy.
             </p>
             
-            
-          
-                <img src="img/principal.png" alt="Estudiantes aprendiendo">
+            <div class="hero-image">
+                <img src="img/principal.png" alt="Estudiantes aprendiendo" class="imagen-hero">
             </div>
         </div>
     </section>
 
-    <!-- ==========================================
-    CONTENEDOR PRINCIPAL (DOS COLUMNAS HORIZONTALES)
-    ========================================== -->
+    <!-- CONTENEDOR PRINCIPAL (DOS COLUMNAS) -->
     <section class="main-container">
-        
-        <!-- COLUMNA IZQUIERDA -->
         <div class="col-left">
             <h2>Centro de Información</h2>
             <p>
@@ -72,7 +48,6 @@
             </p>
         </div>
         
-        <!-- COLUMNA DERECHA -->
         <div class="col-right">
             <h2>¿Tienes preguntas?</h2>
             <p class="contact-label">Contáctanos vía</p>
@@ -90,19 +65,13 @@
                 cipatrimonio@itsoeh.edu.mx
             </p>
         </div>
-        
     </section>
 
-    <!-- ==========================================
-    FOOTER
-    ========================================== -->
+    <!-- FOOTER -->
     <footer class="footer">
         <p>&copy; 2026 AulamosWeb - Todos los derechos reservados</p>
     </footer>
 
-    <!-- ==========================================
-    JS PROPIO DE ESTA PÁGINA
-    ========================================== -->
     <script src="js/AulamosWeb.js"></script>
     
 </body>
