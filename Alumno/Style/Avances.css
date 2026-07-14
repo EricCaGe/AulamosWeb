@@ -1,0 +1,189 @@
+/* ----- ESTILOS ESPECÍFICOS PARA AVANCES ----- */
+
+/* Menú de materias (tabs) */
+.materias-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+.materias-tabs a {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #1e293b;
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+.materias-tabs a:hover {
+    background-color: #e2e8f0;
+}
+.materias-tabs a.activo {
+    background-color: #1e3a8a;
+    color: white;
+    border-color: #1e3a8a;
+}
+
+/* Grid de estadísticas */
+.stats-grid-avances {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e9edf2;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+.stat-card.racha .stat-icon { color: #f97316; }
+.stat-card.completadas .stat-icon { color: #10b981; }
+.stat-card.lector .stat-icon { color: #8b5cf6; }
+
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.stat-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1e293b;
+    margin-top: 4px;
+}
+.stat-sub {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Resumen general (porcentaje circular) */
+.resumen-general {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e9edf2;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.porcentaje-circular {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+.porcentaje-circular svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+.porcentaje-circular circle:last-child {
+    stroke: #3b82f6;
+    transition: stroke-dasharray 0.8s ease;
+}
+.porcentaje-texto {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.porcentaje-texto .numero {
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.porcentaje-texto .mensaje {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Modo oscuro */
+body.modo-oscuro .stat-card,
+body.modo-oscuro .resumen-general {
+    background-color: #1e1e32;
+    border-color: #2d2d44;
+}
+body.modo-oscuro .stat-number {
+    color: #f1f5f9;
+}
+body.modo-oscuro .materias-tabs a {
+    background-color: #2d2d44;
+    color: #cbd5e1;
+    border-color: #4a4a6a;
+}
+body.modo-oscuro .materias-tabs a.activo {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: white;
+}
+body.modo-oscuro .porcentaje-texto .numero {
+    color: #f1f5f9;
+}
+
+/* Alto contraste */
+body.alto-contraste .stat-card,
+body.alto-contraste .resumen-general {
+    background-color: #1a1a1a !important;
+    border: 2px solid #ffff00 !important;
+}
+body.alto-contraste .materias-tabs a {
+    background-color: #222 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+body.alto-contraste .materias-tabs a.activo {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+body.alto-contraste .porcentaje-circular circle:last-child {
+    stroke: #ffff00 !important;
+}
+
+/* Texto grande */
+body.texto-grande .materias-tabs a {
+    font-size: 1.2rem !important;
+    padding: 10px 24px !important;
+}
+body.texto-grande .stat-number {
+    font-size: 2.8rem !important;
+}
+body.texto-grande .porcentaje-texto .numero {
+    font-size: 3rem !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid-avances {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 480px) {
+    .stats-grid-avances {
+        grid-template-columns: 1fr;
+    }
+    .materias-tabs {
+        justify-content: center;
+    }
+}

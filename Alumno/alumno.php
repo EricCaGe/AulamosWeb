@@ -36,9 +36,9 @@ $racha_dias = 5;
             
             <nav class="menu">
                 <a href="#" class="menu-item active"><i class="fa-solid fa-house"></i> Inicio</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-cubes"></i> Mis actividades</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
+              <a href="actividades.php" class="menu-item"><i class="fa-solid fa-cubes"></i> Mis actividades</a>
+                <a href="biblioteca.php" class="menu-item"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
+                <a href="avances.php" class="menu-item"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-circle-question"></i> Ayuda</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración accesible</a>
             </nav>
