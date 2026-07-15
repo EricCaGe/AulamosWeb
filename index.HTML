@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AULAMOS - Aprendemos juntos</title>
+    <!-- Vinculación del CSS de esta página -->
+    <link rel="stylesheet" href="styles/index.css">
+    <!-- Iconos para los botones (Accesibilidad, ubicación, teléfono, etc.) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- BLOQUE 1: BARRA DE NAVEGACIÓN (HEADER)     -->
+    <!-- ========================================== -->
+    <header class="main-header">
+       <!-- Logo y Eslogan -->
+<div class="logo-container">
+    <img src="img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
+</div>
+
+        <!-- Botones de Acción y Accesibilidad -->
+        <div class="nav-buttons">
+            <a href="iniciosesion/login.php" class="btn btn-primary">Iniciar Sesión</a>
+            <a href="iniciosesion/registro.php" class="btn btn-secondary">Crear Cuenta</a>
+            
+            <!-- BOTÓN GLOBAL DE ACCESIBILIDAD -->
+            <button class="btn btn-accessibility" id="global-accessibility-btn">
+                <i class="fa-solid fa-universal-access"></i> Accesibilidad
+            </button>
+            
+            <!-- ICONO FLOTANTE MORADO DE ACCESIBILIDAD -->
+            <button class="btn-accessibility-round" id="global-accessibility-round" aria-label="Opciones de accesibilidad">
+                <i class="fa-solid fa-child-accessibility"></i>
+            </button>
+        </div>
+    </header>
+
+    
+    <!-- ========================================== -->
+<!-- ========================================== -->
+<!-- BLOQUE 1.5: BARRA DE ACCESIBILIDAD (VISTA) -->
+<!-- ========================================== -->
+<div id="contenedor-barra-accesibilidad" class="barra-acc-oculta">
+    <div class="barra-acc-interna">
+        <!-- Izquierda: Mensaje -->
+        <div class="acc-mensaje">
+            <div class="acc-icono-home"><i class="fa-solid fa-house-medical-flag"></i></div>
+            <div class="acc-texto">
+                <h4>Accesibilidad siempre disponible</h4>
+                <p>Personaliza tu experiencia en cualquier momento.</p>
+            </div>
+        </div>
+
+        <!-- Centro: Botones de opciones (Pura Vista) -->
+        <div class="acc-opciones-botones">
+            <button class="acc-btn-opcion"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
+            <button class="acc-btn-opcion"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
+            <button class="acc-btn-opcion"><i class="fa-solid fa-text-height"></i><span>Texto grande</span></button>
+            <button class="acc-btn-opcion"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
+            <button class="acc-btn-opcion"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
+            <button class="acc-btn-opcion"><i class="fa-solid fa-keyboard"></i><span>Navegación por teclado</span></button>
+        </div>
+
+        <!-- Derecha: Botón de configuración -->
+        <div class="acc-config">
+            <button class="btn-abrir-config">Abrir configuración</button>
+        </div>
+    </div>
+</div>
+<!-- ========================================== -->
+
+    <!-- ========================================== -->
+    <!-- BLOQUE 2: SECCIÓN DE BIENVENIDA (HERO)     -->
+    <!-- ========================================== -->
+    <main class="hero-section">
+        <h2 class="hero-title">Bienvenido</h2>
+        <p class="hero-subtitle">a tu espacio de crecimiento. El conocimiento es el único límite. Explora nuestros cursos hoy.</p>
+        
+        <!-- Ilustración Central -->
+        <div class="hero-image-container">
+            <img src="img/Principal.png" alt="Estudiante flotando con laptop y libros" class="hero-img">
+        </div>
+    </main>
+    <!-- ========================================== -->
+
+
+    <!-- ========================================== -->
+    <!-- BLOQUE 3: PIE DE PÁGINA (FOOTER RECUADROS) -->
+    <!-- ========================================== -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            
+            <!-- Recuadro Izquierdo: Centro de Información -->
+            <div class="footer-card">
+                <h3>Centro de Información</h3>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab fuga repellendus suscipit amet ea aspernatur cum architecto harum possimus dicta excepturi obcaecati debitis similique eum error maxime, officiis enim consequatur.</p>
+            </div>
+
+            <!-- Recuadro Derecho: Contacto -->
+            <div class="footer-card">
+                <h3>¿Tienes preguntas?</h3>
+                <p class="contact-sub">Contáctanos vía</p>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-location-dot"></i> Instituto Tecnológico Superior del Estado de Hidalgo, ubicado en Paseo del agrarismo 2000. Carr. Mixquiahuala - Tula, km 2.5.</p>
+                    <p><i class="fa-solid fa-phone"></i> (738) 73 54 000 ext. 240</p>
+                    <p><i class="fa-solid fa-envelope"></i> cipatrimonio@itsoeh.edu.mx</p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+    <!-- ========================================== -->
+
+
+    <!-- ========================================== -->
+    <!-- BLOQUE 4: SCRIPTS (JAVASCRIPT)             -->
+    <!-- ========================================== -->
+    <script src="js/index.js"></script>
+    <!-- ========================================== -->
+
+    
+
+</body>
+</html>
