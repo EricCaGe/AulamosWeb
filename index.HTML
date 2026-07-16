@@ -16,9 +16,9 @@
     <!-- ========================================== -->
     <header class="main-header">
        <!-- Logo y Eslogan -->
-<div class="logo-container">
-    <img src="img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
-</div>
+        <div class="logo-container">
+            <img src="img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
+        </div>
 
         <!-- Botones de Acción y Accesibilidad -->
         <div class="nav-buttons">
@@ -26,50 +26,61 @@
             <a href="iniciosesion/registro.php" class="btn btn-secondary">Crear Cuenta</a>
             
             <!-- BOTÓN GLOBAL DE ACCESIBILIDAD -->
-            <button class="btn btn-accessibility" id="global-accessibility-btn">
-                <i class="fa-solid fa-universal-access"></i> Accesibilidad
+            <button class="btn btn-accessibility" id="global-accessibility-btn" type="button">
+                <i class="fa-solid fa-universal-access" aria-hidden="true"></i> Accesibilidad
             </button>
             
             <!-- ICONO FLOTANTE MORADO DE ACCESIBILIDAD -->
-            <button class="btn-accessibility-round" id="global-accessibility-round" aria-label="Opciones de accesibilidad">
-                <i class="fa-solid fa-child-accessibility"></i>
+            <button class="btn-accessibility-round" id="global-accessibility-round" aria-label="Opciones de accesibilidad" type="button">
+                <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
             </button>
         </div>
     </header>
 
     
     <!-- ========================================== -->
-<!-- ========================================== -->
-<!-- BLOQUE 1.5: BARRA DE ACCESIBILIDAD (VISTA) -->
-<!-- ========================================== -->
-<div id="contenedor-barra-accesibilidad" class="barra-acc-oculta">
-    <div class="barra-acc-interna">
-        <!-- Izquierda: Mensaje -->
-        <div class="acc-mensaje">
-            <div class="acc-icono-home"><i class="fa-solid fa-house-medical-flag"></i></div>
-            <div class="acc-texto">
-                <h4>Accesibilidad siempre disponible</h4>
-                <p>Personaliza tu experiencia en cualquier momento.</p>
+    <!-- BLOQUE 1.5: BARRA DE ACCESIBILIDAD (VISTA) -->
+    <!-- ========================================== -->
+    <div id="contenedor-barra-accesibilidad" class="barra-acc-oculta" role="region" aria-label="Barra de herramientas de accesibilidad">
+        <div class="barra-acc-interna">
+            <!-- Izquierda: Mensaje -->
+            <div class="acc-mensaje">
+                <div class="acc-icono-home" aria-hidden="true"><i class="fa-solid fa-house-medical-flag"></i></div>
+                <div class="acc-texto">
+                    <h4>Accesibilidad siempre disponible</h4>
+                    <p>Personaliza tu experiencia en cualquier momento.</p>
+                </div>
+            </div>
+
+            <!-- Centro: Botones de opciones (Navegables limpiamente con teclado) -->
+            <div class="acc-opciones-botones">
+                <button class="acc-btn-opcion" type="button" id="btn-alto-contraste">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i><span>Alto contraste</span>
+                </button>
+                <button class="acc-btn-opcion" type="button" id="btn-modo-oscuro">
+                    <i class="fa-solid fa-moon" aria-hidden="true"></i><span>Modo oscuro</span>
+                </button>
+                <button class="acc-btn-opcion" type="button" id="btn-texto-grande">
+                    <i class="fa-solid fa-text-height" aria-hidden="true"></i><span>Texto grande</span>
+                </button>
+                <button class="acc-btn-opcion" type="button" id="btn-leer-pantalla">
+                    <i class="fa-solid fa-volume-high" aria-hidden="true"></i><span>Leer pantalla</span>
+                </button>
+                <button class="acc-btn-opcion" type="button" id="btn-subtitulos">
+                    <i class="fa-solid fa-closed-captioning" aria-hidden="true"></i><span>Subtítulos</span>
+                </button>
+                <button class="acc-btn-opcion" type="button" id="btn-teclado">
+                    <i class="fa-solid fa-keyboard" aria-hidden="true"></i><span>Navegación por teclado</span>
+                </button>
+            </div>
+
+            <!-- Derecha: Botón de configuración -->
+            <div class="acc-config">
+                <button class="btn-abrir-config" type="button">Abrir configuración</button>
             </div>
         </div>
-
-        <!-- Centro: Botones de opciones (Pura Vista) -->
-        <div class="acc-opciones-botones">
-            <button class="acc-btn-opcion"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-            <button class="acc-btn-opcion"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-            <button class="acc-btn-opcion"><i class="fa-solid fa-text-height"></i><span>Texto grande</span></button>
-            <button class="acc-btn-opcion"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-            <button class="acc-btn-opcion"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-            <button class="acc-btn-opcion"><i class="fa-solid fa-keyboard"></i><span>Navegación por teclado</span></button>
-        </div>
-
-        <!-- Derecha: Botón de configuración -->
-        <div class="acc-config">
-            <button class="btn-abrir-config">Abrir configuración</button>
-        </div>
     </div>
-</div>
-<!-- ========================================== -->
+    <!-- ========================================== -->
 
     <!-- ========================================== -->
     <!-- BLOQUE 2: SECCIÓN DE BIENVENIDA (HERO)     -->
@@ -103,9 +114,9 @@
                 <h3>¿Tienes preguntas?</h3>
                 <p class="contact-sub">Contáctanos vía</p>
                 <div class="contact-info">
-                    <p><i class="fa-solid fa-location-dot"></i> Instituto Tecnológico Superior del Estado de Hidalgo, ubicado en Paseo del agrarismo 2000. Carr. Mixquiahuala - Tula, km 2.5.</p>
-                    <p><i class="fa-solid fa-phone"></i> (738) 73 54 000 ext. 240</p>
-                    <p><i class="fa-solid fa-envelope"></i> cipatrimonio@itsoeh.edu.mx</p>
+                    <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Instituto Tecnológico Superior del Estado de Hidalgo, ubicado en Paseo del agrarismo 2000. Carr. Mixquiahuala - Tula, km 2.5.</p>
+                    <p><i class="fa-solid fa-phone" aria-hidden="true"></i> (738) 73 54 000 ext. 240</p>
+                    <p><i class="fa-solid fa-envelope" aria-hidden="true"></i> cipatrimonio@itsoeh.edu.mx</p>
                 </div>
             </div>
 
@@ -119,8 +130,6 @@
     <!-- ========================================== -->
     <script src="js/index.js"></script>
     <!-- ========================================== -->
-
-    
 
 </body>
 </html>

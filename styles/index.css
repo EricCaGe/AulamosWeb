@@ -8,12 +8,20 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Regla WCAG: Contorno claro y visible al navegar con teclado */
+*:focus-visible {
+    outline: 3px solid #2563eb !important;
+    outline-offset: 3px !important;
+    border-radius: inherit; /* Hace que el anillo de enfoque tome la forma redondeada del botón */
+}
+
 body {
     background-color: #ffffff;
     color: #333333;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    position: relative; /* Necesario para que la barra absoluta se posicione correctamente */
 }
 
 /* ========================================== */
@@ -106,11 +114,12 @@ body {
     font-size: 20px;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    transition: transform 0.2s, background-color 0.2s;
 }
 
 .btn-accessibility-round:hover {
     transform: scale(1.1);
+    background-color: #7b2cbf; /* Un poco más claro al hacer hover */
 }
 
 /* ========================================== */
@@ -214,13 +223,28 @@ body {
     width: 100%;
     padding: 10px 40px;
     background-color: #ffffff;
-    display: none; /* Controlado por JS para mostrar/ocultar */
-    transition: all 0.3s ease;
+    
+    /* MODIFICACIONES CLAVE PARA FLOTAR (WCAG / NO AFECTAR DISEÑO) */
+    position: absolute;
+    top: 90px; /* Se sitúa justo debajo de la barra de navegación estándar */
+    left: 0;
+    z-index: 9999; /* Se superpone a las imágenes y textos del fondo */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Sombra para dar efecto de capa flotante */
+
+    /* Animación de opacidad y visibilidad ideal para lectores de pantalla */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; 
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
 }
 
-/* Clase para mostrar cuando se haga clic */
+/* Clase para mostrar cuando se active */
 #contenedor-barra-accesibilidad.mostrar-barra {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
 }
 
 .barra-acc-interna {
@@ -280,6 +304,16 @@ body {
     font-size: 11px;
     color: #111827;
     font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+/* WCAG: Feedback visual al pasar el cursor o enfocarlos */
+.acc-btn-opcion:hover {
+    background-color: #e5e7eb;
+}
+
+.acc-btn-opcion:active {
+    transform: scale(0.95);
 }
 
 .acc-btn-opcion i {
@@ -298,4 +332,9 @@ body {
     font-size: 15px;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    transition: background-color 0.2s ease;
+}
+
+.btn-abrir-config:hover {
+    background-color: #1d4ed8;
 }

@@ -15,7 +15,8 @@ body {
     flex-direction: column;
 }
 
-.login-header {
+/* Header idéntico al index */
+.main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -23,6 +24,11 @@ body {
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     width: 100%;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
 }
 
 .logo-img {
@@ -35,7 +41,7 @@ body {
     align-items: center;
 }
 
-/* Botón de accesibilidad rectangular del Header */
+/* Botón rectangular de accesibilidad del Header */
 .btn-accessibility {
     padding: 10px 24px;
     border-radius: 8px;
@@ -56,16 +62,16 @@ body {
 }
 
 /* ========================================== */
-/* BLOQUE 2: BARRA DE ACCESIBILIDAD PROPIA    */
+/* BLOQUE 2: BARRA DE ACCESIBILIDAD           */
 /* ========================================== */
 #barra-accesibilidad-login {
     width: 100%;
     padding: 10px 40px;
     background-color: #ffffff;
-    display: none; /* Oculta por defecto */
+    display: none; /* Oculto por defecto */
 }
 
-/* Si el checkbox oculto está marcado, se muestra la barra */
+/* Mostrar la barra al activar el checkbox */
 #toggle-barra-acc:checked ~ #barra-accesibilidad-login {
     display: block;
 }
@@ -144,7 +150,7 @@ body {
 }
 
 /* ========================================== */
-/* BLOQUE 3: ESTRUCTURA PRINCIPAL DEL LOGIN   */
+/* BLOQUE 3: DISTRIBUCIÓN DEL CONTENIDO       */
 /* ========================================== */
 .login-page-container {
     flex: 1;
@@ -172,7 +178,7 @@ body {
     max-width: 650px;
 }
 
-/* Tarjeta del Formulario */
+/* Tarjeta de Formulario */
 .login-card {
     border: 3px solid #b79ced;
     border-radius: 30px;
@@ -200,7 +206,7 @@ body {
     margin-top: 5px;
 }
 
-/* Icono redondo morado de la tarjeta */
+/* Botón redondo morado */
 .btn-accessibility-round {
     background-color: #5a189a;
     color: white;
@@ -216,7 +222,7 @@ body {
 }
 
 /* ========================================== */
-/* BLOQUE 4: SELECTOR DE ROL E INPUTS         */
+/* BLOQUE 4: INTERFAZ DE FORMULARIO           */
 /* ========================================== */
 .role-selector {
     display: flex;
@@ -310,7 +316,7 @@ body {
 }
 
 /* ========================================== */
-/* BLOQUE 5: DIVISOR Y ENLACE DE REGISTRO     */
+/* BLOQUE 5: DIVISORES E INVITACIÓN           */
 /* ========================================== */
 .form-divider {
     position: relative;
@@ -347,4 +353,15 @@ body {
     text-decoration: none;
     margin-left: 5px;
     font-weight: bold;
+}
+
+/* Estado activo para los botones de opciones de accesibilidad al darles clic */
+.acc-btn-opcion.active-option {
+    background-color: #f3e8ff; /* Fondo morado clarito */
+    border-color: #5a189a;     /* Borde morado oscuro */
+    color: #5a189a;            /* Texto morado */
+}
+
+.acc-btn-opcion.active-option i {
+    color: #5a189a;            /* Icono morado */
 }
