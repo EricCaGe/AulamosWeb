@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AULAMOS - Aprendemos juntos</title>
     <!-- Vinculación del CSS de esta página -->
-    <link rel="stylesheet" href="styles/index.css">
-    <!-- Iconos para los botones (Accesibilidad, ubicación, teléfono, etc.) -->
+    <link rel="stylesheet" href="inicioSesion/styles/index.css">
+    <!-- Iconos para los botones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -15,72 +15,27 @@
     <!-- BLOQUE 1: BARRA DE NAVEGACIÓN (HEADER)     -->
     <!-- ========================================== -->
     <header class="main-header">
-       <!-- Logo y Eslogan -->
+        <!-- Logo -->
         <div class="logo-container">
             <img src="img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
         </div>
 
-        <!-- Botones de Acción y Accesibilidad -->
+        <!-- Botones de Acción -->
         <div class="nav-buttons">
-            <a href="iniciosesion/login.php" class="btn btn-primary">Iniciar Sesión</a>
-            <a href="iniciosesion/registro.php" class="btn btn-secondary">Crear Cuenta</a>
+            <a href="inicioSesion/login.php" class="btn btn-primary">Iniciar Sesión</a>
+            <a href="inicioSesion/registro.php" class="btn btn-secondary">Crear Cuenta</a>
             
-            <!-- BOTÓN GLOBAL DE ACCESIBILIDAD -->
-            <button class="btn btn-accessibility" id="global-accessibility-btn" type="button">
-                <i class="fa-solid fa-universal-access" aria-hidden="true"></i> Accesibilidad
-            </button>
+            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) -->
+            <button class="btn-chatbot" type="button" aria-label="Abrir chatbot">
+    <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
+</button>
             
-            <!-- ICONO FLOTANTE MORADO DE ACCESIBILIDAD -->
-            <button class="btn-accessibility-round" id="global-accessibility-round" aria-label="Opciones de accesibilidad" type="button">
+            <!-- BOTÓN REDONDO MORADO (SOLO VISTA, NO HACE NADA) -->
+            <button class="btn-accessibility-round" type="button" aria-label="Opciones de accesibilidad">
                 <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
             </button>
         </div>
     </header>
-
-    
-    <!-- ========================================== -->
-    <!-- BLOQUE 1.5: BARRA DE ACCESIBILIDAD (VISTA) -->
-    <!-- ========================================== -->
-    <div id="contenedor-barra-accesibilidad" class="barra-acc-oculta" role="region" aria-label="Barra de herramientas de accesibilidad">
-        <div class="barra-acc-interna">
-            <!-- Izquierda: Mensaje -->
-            <div class="acc-mensaje">
-                <div class="acc-icono-home" aria-hidden="true"><i class="fa-solid fa-house-medical-flag"></i></div>
-                <div class="acc-texto">
-                    <h4>Accesibilidad siempre disponible</h4>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-
-            <!-- Centro: Botones de opciones (Navegables limpiamente con teclado) -->
-            <div class="acc-opciones-botones">
-                <button class="acc-btn-opcion" type="button" id="btn-alto-contraste">
-                    <i class="fa-solid fa-eye" aria-hidden="true"></i><span>Alto contraste</span>
-                </button>
-                <button class="acc-btn-opcion" type="button" id="btn-modo-oscuro">
-                    <i class="fa-solid fa-moon" aria-hidden="true"></i><span>Modo oscuro</span>
-                </button>
-                <button class="acc-btn-opcion" type="button" id="btn-texto-grande">
-                    <i class="fa-solid fa-text-height" aria-hidden="true"></i><span>Texto grande</span>
-                </button>
-                <button class="acc-btn-opcion" type="button" id="btn-leer-pantalla">
-                    <i class="fa-solid fa-volume-high" aria-hidden="true"></i><span>Leer pantalla</span>
-                </button>
-                <button class="acc-btn-opcion" type="button" id="btn-subtitulos">
-                    <i class="fa-solid fa-closed-captioning" aria-hidden="true"></i><span>Subtítulos</span>
-                </button>
-                <button class="acc-btn-opcion" type="button" id="btn-teclado">
-                    <i class="fa-solid fa-keyboard" aria-hidden="true"></i><span>Navegación por teclado</span>
-                </button>
-            </div>
-
-            <!-- Derecha: Botón de configuración -->
-            <div class="acc-config">
-                <button class="btn-abrir-config" type="button">Abrir configuración</button>
-            </div>
-        </div>
-    </div>
-    <!-- ========================================== -->
 
     <!-- ========================================== -->
     <!-- BLOQUE 2: SECCIÓN DE BIENVENIDA (HERO)     -->
@@ -94,11 +49,9 @@
             <img src="img/Principal.png" alt="Estudiante flotando con laptop y libros" class="hero-img">
         </div>
     </main>
-    <!-- ========================================== -->
-
 
     <!-- ========================================== -->
-    <!-- BLOQUE 3: PIE DE PÁGINA (FOOTER RECUADROS) -->
+    <!-- BLOQUE 3: PIE DE PÁGINA (FOOTER)           -->
     <!-- ========================================== -->
     <footer class="main-footer">
         <div class="footer-container">
@@ -122,14 +75,11 @@
 
         </div>
     </footer>
-    <!-- ========================================== -->
-
 
     <!-- ========================================== -->
     <!-- BLOQUE 4: SCRIPTS (JAVASCRIPT)             -->
     <!-- ========================================== -->
-    <script src="js/index.js"></script>
-    <!-- ========================================== -->
+    <script src="inicioSesion/js/index.js"></script>
 
 </body>
 </html>

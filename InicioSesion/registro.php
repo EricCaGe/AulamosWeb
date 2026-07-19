@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - AULAMOS</title>
+    <title>Crea tu cuenta - AULAMOS</title>
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -33,22 +33,27 @@
     <!-- ========================================== -->
     <div class="login-page-container">
         
-        <!-- Columna Izquierda: Ilustración -->
+        <!-- Columna Izquierda -->
         <div class="login-left-side">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-family: Georgia, serif; font-size: 32px; color: #111827; font-weight: bold; margin-bottom: 10px;">Crea tu cuenta</h2>
+                <p style="font-size: 15px; color: #4b5563; line-height: 1.4;">Únete a Aulamos y comienza tu<br>experiencia de aprendizaje</p>
+            </div>
+
             <div class="illustration-container">
-                <img src="../img/login.png" alt="Estudiante en laptop" class="login-illustration">
+                <img src="../img/login.png" alt="Estudiantes usando laptop" class="login-illustration">
             </div>
         </div>
 
-        <!-- Columna Derecha: Tarjeta de Login -->
+        <!-- Columna Derecha: Tarjeta de Registro -->
         <div class="login-right-side">
             <div class="login-card">
                 
                 <!-- Encabezado de Tarjeta -->
                 <div class="card-header">
                     <div class="header-text">
-                        <h2>Iniciar Sesión</h2>
-                        <p>Ingresa tus datos para acceder a tu cuenta</p>
+                        <h2>Crea tu cuenta</h2>
+                        <p>Selecciona tu rol para continuar</p>
                     </div>
                     <!-- BOTÓN REDONDO MORADO (SOLO VISTA, NO HACE NADA) -->
                     <button type="button" class="btn-accessibility-round" aria-label="Opciones de accesibilidad">
@@ -58,10 +63,10 @@
 
                 <!-- Selector de Rol -->
                 <div class="role-selector">
-                    <button type="button" class="btn-role active" aria-label="Seleccionar rol alumno">
+                    <button type="button" class="btn-role active" id="btn-registro-alumno" aria-label="Seleccionar rol alumno">
                         <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
                     </button>
-                    <button type="button" class="btn-role" aria-label="Seleccionar rol docente">
+                    <button type="button" class="btn-role" id="btn-registro-docente" aria-label="Seleccionar rol docente">
                         <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
                     </button>
                 </div>
@@ -69,27 +74,24 @@
                 <!-- Formulario -->
                 <form class="login-form" onsubmit="return false;" novalidate>
                     <div class="input-group">
-                        <label for="login-email">Correo electrónico</label>
+                        <label for="registro-email">Correo electrónico</label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
-                            <input type="email" id="login-email" placeholder="ejemplo@correo.com">
+                            <input type="email" id="registro-email" placeholder="ejemplo@correo.com" required>
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <label for="login-password">Contraseña</label>
+                        <label for="registro-password">Contraseña</label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
-                            <input type="password" id="login-password" placeholder="••••••••••••••••">
-                            <i class="fa-regular fa-eye toggle-password-icon" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
+                            <input type="password" id="registro-password" placeholder="••••••••••••••••" required>
+                            <i class="fa-regular fa-eye toggle-password-icon" id="btn-ver-password" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
                         </div>
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 2px;">La contraseña debe tener al menos 8 caracteres.</p>
                     </div>
 
-                    <div class="forgot-password-container">
-                        <a href="recuperar.php" class="link-forgot">¿Olvidaste tu contraseña?</a>
-                    </div>
-
-                    <button type="submit" class="btn-submit-login">Iniciar Sesión</button>
+                    <button type="submit" class="btn-submit-login">Crear Cuenta</button>
                 </form>
 
                 <!-- Divisor -->
@@ -97,20 +99,21 @@
                     <span class="divider-circle">o</span>
                 </div>
 
-                <!-- Enlace a Registro -->
+                <!-- Enlace a Iniciar Sesión -->
                 <div class="register-redirect">
-                    <span>¿No tienes cuenta?</span>
-                    <a href="registro.php" class="link-register">Crear cuenta</a>
+                    <span>¿Ya tienes una cuenta?</span>
+                    <a href="login.php" class="link-register">Iniciar Sesión</a>
                 </div>
 
             </div>
         </div>
+
     </div>
 
     <!-- ========================================== -->
     <!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
     <!-- ========================================== -->
-    <script src="js/login.js"></script>
+    <script src="js/registro.js"></script>
 
 </body>
 </html>
