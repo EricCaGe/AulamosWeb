@@ -1,0 +1,369 @@
+/* ============================================
+   BARRA DE ACCESIBILIDAD - AULAMOS
+   ============================================ */
+
+/* Contenedor flotante */
+.accesibilidad-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accesibilidad-toggle:hover {
+    transform: scale(1.1);
+    background: #1a252f;
+}
+
+/* Panel de accesibilidad */
+.accesibilidad-panel {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    z-index: 9998;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    display: none;
+    animation: slideUp 0.3s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.accesibilidad-panel.active {
+    display: block;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.accesibilidad-panel h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.accesibilidad-panel .cerrar-panel {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #95a5a6;
+}
+
+.accesibilidad-panel .cerrar-panel:hover {
+    color: #e74c3c;
+}
+
+/* Grupos de opciones */
+.accesibilidad-grupo {
+    margin-bottom: 15px;
+}
+
+.accesibilidad-grupo label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.accesibilidad-opcion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.accesibilidad-opcion:last-child {
+    border-bottom: none;
+}
+
+.accesibilidad-opcion span {
+    font-size: 13px;
+    color: #34495e;
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #bdc3c7;
+    transition: 0.3s;
+    border-radius: 22px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+    background-color: #3498db;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+/* Selectores de tamaño */
+.tamano-opciones {
+    display: flex;
+    gap: 6px;
+}
+
+.tamano-opciones button {
+    flex: 1;
+    padding: 4px 8px;
+    border: 2px solid #bdc3c7;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.tamano-opciones button:hover {
+    border-color: #3498db;
+}
+
+.tamano-opciones button.activo {
+    border-color: #3498db;
+    background: #3498db;
+    color: white;
+}
+
+/* Selector de contraste */
+.contraste-opciones {
+    display: flex;
+    gap: 6px;
+}
+
+.contraste-opciones button {
+    flex: 1;
+    padding: 4px 8px;
+    border: 2px solid #bdc3c7;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.contraste-opciones button:hover {
+    border-color: #3498db;
+}
+
+.contraste-opciones button.activo {
+    border-color: #3498db;
+    background: #3498db;
+    color: white;
+}
+
+/* ============================================
+   MODOS DE ACCESIBILIDAD (clases aplicadas al body)
+   ============================================ */
+
+/* --- MODO OSCURO --- */
+body.modo-oscuro {
+    background-color: #1a1a2e !important;
+    color: #e0e0e0 !important;
+}
+
+body.modo-oscuro .navbar,
+body.modo-oscuro .header,
+body.modo-oscuro .footer {
+    background-color: #16213e !important;
+}
+
+body.modo-oscuro .card,
+body.modo-oscuro .panel,
+body.modo-oscuro .modal-content {
+    background-color: #2d2d44 !important;
+    color: #e0e0e0 !important;
+    border-color: #444466 !important;
+}
+
+body.modo-oscuro .btn-primary {
+    background-color: #4a6fa5 !important;
+    border-color: #4a6fa5 !important;
+}
+
+body.modo-oscuro .btn-secondary {
+    background-color: #3d3d5c !important;
+    border-color: #3d3d5c !important;
+}
+
+body.modo-oscuro input,
+body.modo-oscuro textarea,
+body.modo-oscuro select {
+    background-color: #2d2d44 !important;
+    color: #e0e0e0 !important;
+    border-color: #444466 !important;
+}
+
+body.modo-oscuro a {
+    color: #7eb8ff !important;
+}
+
+/* --- ALTO CONTRASTE --- */
+body.alto-contraste {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste .navbar,
+body.alto-contraste .header,
+body.alto-contraste .footer {
+    background-color: #000000 !important;
+    border-bottom: 3px solid #ffff00 !important;
+}
+
+body.alto-contraste .card,
+body.alto-contraste .panel,
+body.alto-contraste .modal-content {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffff00 !important;
+}
+
+body.alto-contraste .btn-primary {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border: 3px solid #ffff00 !important;
+}
+
+body.alto-contraste .btn-secondary {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+}
+
+body.alto-contraste input,
+body.alto-contraste textarea,
+body.alto-contraste select {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffff00 !important;
+}
+
+body.alto-contraste a {
+    color: #ffff00 !important;
+    text-decoration: underline !important;
+}
+
+/* --- TAMAÑO DE TEXTO --- */
+body.texto-grande {
+    font-size: 1.25rem !important;
+}
+
+body.texto-muy-grande {
+    font-size: 1.5rem !important;
+}
+
+body.texto-grande p,
+body.texto-grande li,
+body.texto-grande span:not(.badge):not(.label) {
+    font-size: 1.25rem !important;
+}
+
+body.texto-muy-grande p,
+body.texto-muy-grande li,
+body.texto-muy-grande span:not(.badge):not(.label) {
+    font-size: 1.5rem !important;
+}
+
+/* --- FUENTE DISLEXIA --- */
+body.fuente-dislexia {
+    font-family: 'Comic Sans MS', 'OpenDyslexic', Arial, sans-serif !important;
+}
+
+/* --- SUBTÍTULOS --- */
+body.subtitulos .video-container {
+    position: relative;
+}
+
+body.subtitulos .video-container::after {
+    content: "🔊 Subtítulos disponibles";
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Indicador de accesibilidad activa */
+.accesibilidad-indicador {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #27ae60;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 10000;
+    display: none;
+}
+
+.accesibilidad-indicador.active {
+    display: block;
+}
