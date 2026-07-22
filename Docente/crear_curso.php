@@ -36,11 +36,11 @@ $rol = "Docente";
             </div>
             
             <nav class="menu">
-                <!-- Nota: Quité el 'active' de Dashboard y lo pasé a Crear Curso -->
+                
                 <a href="docente.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
                 <a href="crear_curso.php" class="menu-item active"><i class="fa-solid fa-medal"></i> Crear Curso</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
+                <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
+                <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 

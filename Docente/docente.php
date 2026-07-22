@@ -32,25 +32,12 @@ $estudiantes_total = 128;
             </div>
             
             <nav class="menu">
-    <!-- El dashboard lleva a docente.php -->
-    <a href="docente.php" class="menu-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
-    
-    <!-- Crear curso lleva a tu nuevo archivo -->
-    <a href="crear_curso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Curso</a>
-    
-    <!-- Aquí conectamos los demás archivos que vi en tu carpeta -->
-    <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
-    <a href="crear_evaluacio.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
-    
-    <!-- Este se queda con # porque aún no tienes un archivo de estudiantes -->
-    <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
-    
-    <!-- Conectamos el de reportes -->
-    <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-    
-    <div class="menu-spacer"></div>
-    
-    <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="docente.php" class="menu-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="crear_curso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Curso</a>
+                <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
+                <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a> 
 </nav>
             
             <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
