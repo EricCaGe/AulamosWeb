@@ -1,161 +1,323 @@
 <?php
-// Enrutador básico de vistas
-$page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-
-$allowed_pages = [
-    'dashboard' => 'dashboard.php',
-    'crear_curso' => 'crear_curso.php',
-    'crear_actividad' => 'crear_actividad.php',
-    'crear_evaluacion' => 'crear_evaluacio.php',
-    'ver_estudiantes' => 'ver_estudiantes.php',
-    'reporte' => 'reporte.php'
-];
-
-$content_file = isset($allowed_pages[$page]) ? $allowed_pages[$page] : 'dashboard.php';
+// Simulación de datos dinámicos del docente
+$usuario = "Profesora Ana"; 
+$rol = "Docente";
+$clases_activas = 6;
+$actividades_pendientes = 12;
+$evaluaciones_pendientes = 3;
+$estudiantes_total = 128;
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aulamos - Panel Docente</title>
+    <title>Aulamos - Dashboard Docente</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="styles/docente.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="styles/docente-layout.css">
 </head>
 <body>
 
-    <div class="layout-grid">
+    <div class="dashboard-container">
         
-        <aside class="layout-sidebar" aria-label="Menú de navegación">
-            <div class="sidebar-top">
-                <div class="brand-container">
-                    <img src="../img/logo-buho.png" alt="Logotipo Aulamos" class="brand-logo">
-                    <div class="brand-meta">
-                        <h2>AULAMOS</h2>
-                        <span>Aprendemos juntos</span>
-                    </div>
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="https://placehold.co/50x50/ffffff/3b71f3?text=🦉" alt="Búho Aulamos" class="logo-img">
+                <div>
+                    <h2>AULAMOS</h2>
+                    <p>Aprendemos juntos</p>
                 </div>
-
-                <nav class="sidebar-nav">
-                    <a href="docente.php?page=dashboard" class="nav-link <?php echo $page === 'dashboard' ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-house"></i> Dashboard
-                    </a>
-                    <a href="docente.php?page=crear_curso" class="nav-link <?php echo $page === 'crear_curso' ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-graduation-cap"></i> Crear Curso
-                    </a>
-                    <a href="docente.php?page=crear_actividad" class="nav-link <?php echo $page === 'crear_actividad' ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-file-signature"></i> Crear Actividad
-                    </a>
-                    <a href="docente.php?page=crear_evaluacion" class="nav-link <?php echo $page === 'crear_evaluacion' ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-book-open"></i> Crear Evaluación
-                    </a>
-                    <a href="docente.php?page=ver_estudiantes" class="nav-link <?php echo $page === 'ver_estudiantes' ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-user-group"></i> Ver Estudiantes
-                    </a>
-                    <a href="docente.php?page=reporte" class="nav-link <?php echo $page === 'reporte' ? 'active' : ''; ?>">
-                        <i class="fa-solid fa-chart-line"></i> Reportes
-                    </a>
-                </nav>
             </div>
-
-            <div class="sidebar-bottom">
-                <a href="#configuracion" class="nav-link">
-                    <i class="fa-solid fa-gear"></i> Configuración
-                </a>
-               
-            </div>
+            
+            <nav class="menu">
+                <a href="#" class="menu-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Curso</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
+                
+                <div class="menu-spacer"></div>
+                
+                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
+            </nav>
+            
+            <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         </aside>
 
-        <div class="workspace-container">
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
             
-            <header class="workspace-header">
-                <div class="header-welcome">
+            <!-- ENCABEZADO -->
+            <header class="content-header">
+                <div class="welcome-text">
                     <h1>Dashboard Docente</h1>
-                    <p>¡Hola Profesora Ana! 👋 <span>Bienvenida a tu espacio docente.</span></p>
+                    <h2>¡Hola <?php echo $usuario; ?>! 👋</h2>
+                    <p>Bienvenida a tu espacio docente.</p>
                 </div>
-                
-                <div class="header-widgets">
-                    <button class="btn-assistant" id="btnOpenAssistant">
-                        <span>Asistente Virtual</span>
-                        <img src="../img/asistente-bot.png" alt="Icono Asistente" class="assistant-icon">
-                    </button>
-                    
-                    <button class="btn-notification" aria-label="Notificaciones">
+                <div class="header-actions">
+                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                    <div class="icon-bell-container">
                         <i class="fa-regular fa-bell"></i>
-                    </button>
-                    
-                    <div class="profile-widget">
-                        <img src="../img/profesora-ana.png" alt="Avatar" class="profile-avatar">
-                        <div class="profile-meta">
-                            <span class="profile-name">Profesora Ana!</span>
-                            <span class="profile-role">Docente <i class="fa-solid fa-chevron-down"></i></span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $usuario; ?>!</span>
+                            <span class="user-role"><?php echo $rol; ?></span>
                         </div>
+                        <i class="fa-solid fa-chevron-down drop-icon"></i>
                     </div>
                 </div>
             </header>
 
-            <main class="workspace-content">
-                <?php 
-                    if (file_exists($content_file)) {
-                        include $content_file;
-                    } else {
-                        echo "<div class='error-view'><h2>Próximamente</h2><p>Esta sección está en desarrollo.</p></div>";
-                    }
-                ?>
-            </main>
+            <!-- GRID PRINCIPAL (2 COLUMNAS) -->
+            <div class="main-grid">
+                
+                <!-- COLUMNA IZQUIERDA (Ancha) -->
+                <div class="left-column">
+                    
+                    <!-- Resumen del día -->
+                    <section class="section-container">
+                        <h3 class="section-title">Resumen del día</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box bg-purple-light">
+                                <div class="stat-icon-top"><i class="fa-solid fa-chalkboard-user"></i></div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Clases activas</p>
+                                    <h4 class="stat-number"><?php echo $clases_activas; ?></h4>
+                                    <p class="stat-sub">Hoy</p>
+                                </div>
+                            </div>
+                            <div class="stat-box bg-green-light">
+                                <div class="stat-icon-top text-green"><i class="fa-regular fa-square-check"></i></div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Actividades pendientes</p>
+                                    <h4 class="stat-number"><?php echo $actividades_pendientes; ?></h4>
+                                    <p class="stat-sub">Por revisar</p>
+                                </div>
+                            </div>
+                            <div class="stat-box bg-yellow-light">
+                                <div class="stat-icon-top text-yellow"><i class="fa-regular fa-file-lines"></i></div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Evaluaciones pendientes</p>
+                                    <h4 class="stat-number"><?php echo $evaluaciones_pendientes; ?></h4>
+                                    <p class="stat-sub">Por calificar</p>
+                                </div>
+                            </div>
+                            <div class="stat-box bg-blue-light">
+                                <div class="stat-icon-top text-blue"><i class="fa-solid fa-user-group"></i></div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Estudiantes en total</p>
+                                    <h4 class="stat-number"><?php echo $estudiantes_total; ?></h4>
+                                    <p class="stat-sub">En la plataforma</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
+                    <!-- Accesos rápidos -->
+                    <section class="section-container">
+                        <h3 class="section-title">Accesos rápidos</h3>
+                        <div class="quick-access-grid">
+                            <button class="quick-btn bg-purple-solid">
+                                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                <span>Crear curso</span>
+                            </button>
+                            <button class="quick-btn bg-green-solid">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                                <span>Crear actividad</span>
+                            </button>
+                            <button class="quick-btn bg-yellow-solid text-dark-yellow">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                                <span>Crear evaluación</span>
+                            </button>
+                            <button class="quick-btn bg-blue-solid">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Ver estudiantes</span>
+                            </button>
+                            <button class="quick-btn bg-gray-solid">
+                                <i class="fa-solid fa-chart-column"></i>
+                                <span>Reportes</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Contenido reciente -->
+                    <section class="section-container border-container">
+                        <div class="section-header">
+                            <h3 class="section-title">Contenido recien</h3>
+                            <a href="#" class="link-blue">Ver todo</a>
+                        </div>
+                        
+                        <div class="content-list">
+                            <div class="list-item">
+                                <div class="item-main">
+                                    <div class="icon-box bg-blue-icon"><i class="fa-solid fa-play"></i></div>
+                                    <div>
+                                        <h4 class="item-title">Ecosistema acuaticos</h4>
+                                        <p class="item-desc">Video • Publicado hoy</p>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <span class="badge badge-publicado">Publicado</span>
+                                    <i class="fa-solid fa-ellipsis-vertical menu-dots"></i>
+                                </div>
+                            </div>
+
+                            <div class="list-item">
+                                <div class="item-main">
+                                    <div class="icon-box bg-red-icon"><i class="fa-regular fa-file-pdf"></i></div>
+                                    <div>
+                                        <h4 class="item-title">Guía de lectura: La célula</h4>
+                                        <p class="item-desc">PDF • Publicado ayer</p>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <span class="badge badge-publicado">Publicado</span>
+                                    <i class="fa-solid fa-ellipsis-vertical menu-dots"></i>
+                                </div>
+                            </div>
+
+                            <div class="list-item">
+                                <div class="item-main">
+                                    <div class="icon-box bg-blue-doc-icon"><i class="fa-regular fa-file-lines"></i></div>
+                                    <div>
+                                        <h4 class="item-title">Instrucciones proyecto final</h4>
+                                        <p class="item-desc">Documento • Hace 2 días</p>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <span class="badge badge-publicado">Publicado</span>
+                                    <i class="fa-solid fa-ellipsis-vertical menu-dots"></i>
+                                </div>
+                            </div>
+
+                            <div class="list-item">
+                                <div class="item-main">
+                                    <div class="icon-box bg-green-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                                    <div>
+                                        <h4 class="item-title">Actividad: Lectura comprensiva</h4>
+                                        <p class="item-desc">Actividad • Hace 2 días</p>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <span class="badge badge-pendiente">Pendiente</span>
+                                    <i class="fa-solid fa-ellipsis-vertical menu-dots"></i>
+                                </div>
+                            </div>
+
+                            <div class="list-item">
+                                <div class="item-main">
+                                    <div class="icon-box bg-purple-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                                    <div>
+                                        <h4 class="item-title">Evaluación: Ecosistemas</h4>
+                                        <p class="item-desc">Evaluacion • Hace 5 días</p>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <span class="badge badge-pendiente">Pendiente</span>
+                                    <i class="fa-solid fa-ellipsis-vertical menu-dots"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-15">
+                            <a href="#" class="link-blue view-all-link">Ver todo mi contenido</a>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- COLUMNA DERECHA (Estrecha) -->
+                <div class="right-column">
+                    
+                    <!-- Calendario -->
+                    <aside class="calendar-widget border-container">
+                        <div class="calendar-header">
+                            <h3 class="section-title">Calendario</h3>
+                            <a href="#" class="link-blue"><i class="fa-regular fa-calendar-days"></i> Ver calendario</a>
+                        </div>
+                        <div class="calendar-month">
+                            <span class="month-title">Mayo 2024</span>
+                            <div class="calendar-nav">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="cal-day-header">LUN</div><div class="cal-day-header">MAR</div><div class="cal-day-header">MIE</div><div class="cal-day-header">JUE</div><div class="cal-day-header">VIE</div><div class="cal-day-header">SAB</div><div class="cal-day-header">DOM</div>
+                            <div class="cal-day disabled">29</div><div class="cal-day disabled">30</div><div class="cal-day dot">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div>
+                            <div class="cal-day">6</div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day dot">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div>
+                            <div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day dot">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div>
+                            <div class="cal-day active">20</div><div class="cal-day dot">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day double-dot">24</div><div class="cal-day">25</div><div class="cal-day">26</div>
+                            <div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day">31</div><div class="cal-day disabled">1</div><div class="cal-day disabled">2</div>
+                        </div>
+                    </aside>
+
+                    <!-- Próximas actividades -->
+                    <aside class="upcoming-activities border-container">
+                        <h3 class="section-title">Próximas actividades</h3>
+                        
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="act-icon text-green"><i class="fa-solid fa-clipboard-check"></i></div>
+                                <div class="act-details">
+                                    <h5>Revisión de actividades</h5>
+                                    <p>21 de mayo, 2026 • 10:00 AM</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="act-icon text-yellow"><i class="fa-solid fa-clipboard-list"></i></div>
+                                <div class="act-details">
+                                    <h5>Evaluación: Ecosistemas</h5>
+                                    <p>25 de mayo, 2026 • 08:00 AM</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="act-icon text-blue"><i class="fa-regular fa-file-lines"></i></div>
+                                <div class="act-details">
+                                    <h5>Entrega proyecto final</h5>
+                                    <p>29 de mayo, 2026 • 11:59 PM</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-15">
+                            <a href="#" class="link-blue view-all-link">Ver todas mis actividades</a>
+                        </div>
+                    </aside>
+
+                </div>
+            </div>
+
+            <!-- BARRA DE ACCESIBILIDAD INFERIOR -->
             <footer class="accessibility-bar">
                 <div class="acc-info">
-                    <i class="fa-solid fa-universal-access"></i>
+                    <div class="acc-icon-box">
+                        <i class="fa-solid fa-universal-access acc-icon-main"></i>
+                    </div>
                     <div>
                         <strong>Accesibilidad siempre disponible</strong>
-                        <span>Personaliza tu experiencia en cualquier momento.</span>
+                        <p>Personaliza tu experiencia en cualquier momento.</p>
                     </div>
                 </div>
-                <div class="acc-controls">
-                    <button class="acc-option-btn"><i class="fa-regular fa-eye"></i> Alto contraste</button>
-                    <button class="acc-option-btn"><i class="fa-regular fa-moon"></i> Modo oscuro</button>
-                    
-                    <div class="acc-slider-container">
-                        <i class="fa-solid fa-text-height"></i>
-                        <span>Letra:</span>
-                        <input type="range" id="fontSizeSlider" min="13" max="21" value="16" step="1" aria-label="Ajustar tamaño de letra">
-                        <span id="fontSizeVal">16px</span>
-                    </div>
-
-                    <button class="acc-option-btn"><i class="fa-solid fa-volume-high"></i> Leer pantalla</button>
-                    <button class="acc-option-btn"><i class="fa-regular fa-closed-captioning"></i> Subtítulos</button>
-                    <button class="acc-option-btn"><i class="fa-solid fa-keyboard"></i> Navegación por teclado</button>
-                    
+                <div class="acc-options">
+                    <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
+                    <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
+                    <button class="acc-opt-btn" id="btn-text-size"><span class="font-icon">Aa</span><span>Texto grande</span></button>
+                    <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
+                    <button class="acc-opt-btn"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
+                    <button class="acc-opt-btn"><i class="fa-solid fa-keyboard"></i><span>Navegación<br>por teclado</span></button>
                 </div>
+                <button class="btn-open-config">Abrir configuración</button>
             </footer>
 
-        </div>
+        </main>
     </div>
 
-    <div class="chatbot-container" id="chatbot">
-        <div class="chatbot-header">
-            <div class="chatbot-title">
-                <img src="../img/asistente-bot.png" alt="Bot Icon" style="height:24px;">
-                <span>Asistente Aulamos</span>
-            </div>
-            <button class="btn-close-chat" id="btnCloseChat" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>
-        </div>
-        <div class="chatbot-body">
-            <div class="msg bot">¡Hola! Soy tu asistente virtual. ¿En qué te puedo ayudar hoy?</div>
-        </div>
-        <div class="chatbot-footer">
-            <input type="text" placeholder="Escribe tu mensaje aquí...">
-            <button class="btn-send"><i class="fa-regular fa-paper-plane"></i></button>
-        </div>
-    </div>
-
-    <script src="js/docente.js" defer></script>
+    <script src="jss/docente.js"></script>
 </body>
 </html>
