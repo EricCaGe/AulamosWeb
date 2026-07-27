@@ -97,3 +97,28 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+// ========================================== //
+// SELECCIONAR ROL - ACTUALIZAR CAMPO OCULTO  //
+// ========================================== //
+
+document.addEventListener('DOMContentLoaded', function() {
+    const roleButtons = document.querySelectorAll('.btn-role');
+    const rolInput = document.getElementById('rol-input');
+    
+    if (roleButtons.length > 0 && rolInput) {
+        roleButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Quitar active de todos
+                roleButtons.forEach(function(btn) {
+                    btn.classList.remove('active');
+                });
+                // Activar el seleccionado
+                this.classList.add('active');
+                // Actualizar campo oculto
+                const rol = this.getAttribute('data-rol');
+                rolInput.value = rol;
+            });
+        });
+    }
+});

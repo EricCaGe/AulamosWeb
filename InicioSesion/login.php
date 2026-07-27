@@ -55,42 +55,44 @@
                         <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
                     </button>
                 </div>
+<!-- Selector de Rol -->
+<div class="role-selector">
+    <button type="button" class="btn-role active" data-rol="alumno" aria-label="Seleccionar rol alumno">
+        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
+    </button>
+    <button type="button" class="btn-role" data-rol="docente" aria-label="Seleccionar rol docente">
+        <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
+    </button>
+</div>
 
-                <!-- Selector de Rol -->
-                <div class="role-selector">
-                    <button type="button" class="btn-role active" aria-label="Seleccionar rol alumno">
-                        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
-                    </button>
-                    <button type="button" class="btn-role" aria-label="Seleccionar rol docente">
-                        <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
-                    </button>
-                </div>
+<!-- Campo oculto para el rol -->
+<input type="hidden" name="rol" id="rol-input" value="alumno">
 
-                <!-- Formulario -->
-                <form class="login-form" onsubmit="return false;" novalidate>
-                    <div class="input-group">
-                        <label for="login-email">Correo electrónico</label>
-                        <div class="input-wrapper">
-                            <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
-                            <input type="email" id="login-email" placeholder="ejemplo@correo.com">
-                        </div>
-                    </div>
+<!-- Formulario -->
+<form class="login-form" action="procesar_login.php" method="POST" novalidate>
+    <div class="input-group">
+        <label for="login-email">Correo electrónico</label>
+        <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
+            <input type="email" id="login-email" name="correo" placeholder="ejemplo@correo.com" required>
+        </div>
+    </div>
 
-                    <div class="input-group">
-                        <label for="login-password">Contraseña</label>
-                        <div class="input-wrapper">
-                            <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
-                            <input type="password" id="login-password" placeholder="••••••••••••••••">
-                            <i class="fa-regular fa-eye toggle-password-icon" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
-                        </div>
-                    </div>
+    <div class="input-group">
+        <label for="login-password">Contraseña</label>
+        <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
+            <input type="password" id="login-password" name="password" placeholder="••••••••••••••••" required>
+            <i class="fa-regular fa-eye toggle-password-icon" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
+        </div>
+    </div>
 
-                    <div class="forgot-password-container">
-                        <a href="recuperar.php" class="link-forgot">¿Olvidaste tu contraseña?</a>
-                    </div>
+    <div class="forgot-password-container">
+        <a href="recuperar.php" class="link-forgot">¿Olvidaste tu contraseña?</a>
+    </div>
 
-                    <button type="submit" class="btn-submit-login">Iniciar Sesión</button>
-                </form>
+    <button type="submit" class="btn-submit-login">Iniciar Sesión</button>
+</form>
 
                 <!-- Divisor -->
                 <div class="form-divider">
