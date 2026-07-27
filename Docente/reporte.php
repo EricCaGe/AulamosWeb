@@ -37,9 +37,8 @@ $rol = "Docente";
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
-                
-                <!-- La clase active ahora está aquí -->
                 <a href="reporte.php" class="menu-item active"><i class="fa-solid fa-chart-column"></i> Reportes</a>
+                <a href="mas.php" class="menu-item"><i class="fa-solid fa-bars"></i> Mas</a>
                 
                 <div class="menu-spacer"></div>
                 
@@ -217,6 +216,7 @@ $rol = "Docente";
 
         </main>
     </div>
+
 
     <!-- Archivos JS -->
     <script src="jss/docente_dashboard.js"></script>
