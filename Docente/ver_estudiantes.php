@@ -8,24 +8,20 @@ $rol = "Docente";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Curso - Aulamos</title>
+    <title>Ver Estudiantes - Aulamos</title>
     
-    <!-- 1. CSS Base (Diseño general y colores) -->
+    <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">
+    <!-- CSS Específico para esta pantalla -->
+    <link rel="stylesheet" href="styles/estudiantes.css">
     
-    <!-- 2. CSS Específico (Diseño del formulario de esta página) -->
-    <link rel="stylesheet" href="styles/curso.css">
-    
-    <!-- 3. Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <div class="dashboard-container">
         
-        <!-- =====================================
-             BARRA LATERAL (RECICLADA)
-        ====================================== -->
+        <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="https://placehold.co/50x50/ffffff/3b71f3?text=🦉" alt="Búho Aulamos" class="logo-img">
@@ -36,12 +32,11 @@ $rol = "Docente";
             </div>
             
             <nav class="menu">
-                
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-                <a href="crear_curso.php" class="menu-item active"><i class="fa-solid fa-medal"></i> Crear Curso</a>
+                <a href="crear_curso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Curso</a>
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
                 <a href="crear_evaluacio.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
-                <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
+                <a href="ver_estudiantes.php" class="menu-item active"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 
                 <div class="menu-spacer"></div>
@@ -55,11 +50,11 @@ $rol = "Docente";
         <!-- CONTENIDO PRINCIPAL -->
         <main class="main-content">
             
-            <!-- ENCABEZADO MODIFICADO -->
+            <!-- ENCABEZADO -->
             <header class="content-header">
                 <div class="welcome-text">
-                    <h1>Crear curso</h1>
-                    <p>Comparte material con tus estudiantes</p>
+                    <h1>Ver estudiantes</h1>
+                    <p>Gestiona tu lista de estudiantes</p>
                 </div>
                 <div class="header-actions">
                     <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
@@ -77,76 +72,155 @@ $rol = "Docente";
                 </div>
             </header>
 
-            <!-- =====================================
-                 NUEVO RELLENO (FORMULARIO)
-            ====================================== -->
-            <div class="main-grid">
-                
-                <!-- COLUMNA IZQUIERDA -->
-                <div class="left-column">
-                    
-                    <!-- 1. Tipo de curso -->
-                    <section class="section-container">
-                        <h3 class="section-title">Tipo de curso</h3>
-                        <div class="course-types-grid">
-                            <button class="type-card">
-                                <div class="type-icon text-purple"><i class="fa-solid fa-play"></i></div>
-                                <h4>Video</h4>
-                                <p>Sube un video</p>
-                            </button>
-                            <button class="type-card">
-                                <div class="type-icon text-red"><i class="fa-regular fa-file-pdf"></i></div>
-                                <h4>PDF</h4>
-                                <p>Sube un archivo PDF</p>
-                            </button>
-                            <button class="type-card">
-                                <div class="type-icon text-blue"><i class="fa-regular fa-file-lines"></i></div>
-                                <h4>Documento</h4>
-                                <p>Sube un documento</p>
-                            </button>
-                        </div>
-                    </section>
+            <!-- BARRA DE BÚSQUEDA Y PESTAÑAS (TABS) -->
+<div class="students-header-tools">
+    <div class="search-bar-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" class="student-search-input" placeholder="Buscar estudiante">
+    </div>
+    
+    <!-- AGREGAMOS data-filter A CADA BOTÓN -->
+    <div class="group-tabs" id="filter-tabs">
+        <button class="tab-btn active" data-filter="todos">Todos</button>
+        <button class="tab-btn" data-filter="1A">1º A</button>
+        <button class="tab-btn" data-filter="1B">1º B</button>
+        <button class="tab-btn" data-filter="2A">2º A</button>
+        <button class="tab-btn" data-filter="2B">2º B</button>
+        <button class="tab-btn" data-filter="3A">3º A</button>
+        <button class="tab-btn" data-filter="3B">3º B</button>
+    </div>
+</div>
 
-                    <!-- 2. Información del curso -->
-                    <section class="section-container border-container">
-                        <h3 class="section-title">Información el curso</h3>
-                        
-                        <form class="course-form">
-                            <div class="form-group">
-                                <label>Titulo del curso</label>
-                                <input type="text" placeholder="Ej. La fotosintesis">
-                            </div>
+<!-- RELLENO: LISTA DE ESTUDIANTES Y CALENDARIO -->
+<div class="main-grid mt-20">
+    <div class="left-column">
+        <div class="students-list-container" id="students-list">
+    
+    <!-- 1. Estudiante original -->
+    <div class="student-card" data-group="1A">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Ana López</h4>
+                <p>1° A</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
 
-                            <div class="form-group">
-                                <label>Descripción <span class="text-muted">(opcional)</span></label>
-                                <input type="text" placeholder="Describe brevemente el contenido">
-                            </div>
+    <!-- 2. Estudiante original -->
+    <div class="student-card" data-group="1A">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Carlos Martínez</h4>
+                <p>1° A</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
 
-                            <div class="form-group">
-                                <label>Selecionar materia</label>
-                                <select>
-                                    <option>Elige una materia</option>
-                                    <option>Ciencias Naturales</option>
-                                    <option>Matemáticas</option>
-                                </select>
-                            </div>
+    <!-- 3. Estudiante original -->
+    <div class="student-card" data-group="1B">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>José Ramírez</h4>
+                <p>1° B</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
 
-                            <div class="upload-area">
-                                <i class="fa-solid fa-cloud-arrow-up"></i>
-                                <p>Toca para selecionar o arrastrar tu archivo aquí</p>
-                            </div>
+    <!-- 4. Estudiante nuevo -->
+    <div class="student-card" data-group="1B">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Valentina Ruiz</h4>
+                <p>1° B</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
 
-                            <div class="form-actions-row">
-                                <button type="button" class="btn-cancelar">Cancelar</button>
-                                <button type="submit" class="btn-publicar">Publicar curso</button>
-                            </div>
-                        </form>
-                    </section>
-                </div>
+    <!-- 5. Estudiante nuevo -->
+    <div class="student-card" data-group="2A">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Mateo Castro</h4>
+                <p>2° A</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
 
-                <!-- =====================================
-                     COLUMNA DERECHA (CALENDARIO RECICLADO)
-                ====================================== -->
+    <!-- 6. Estudiante nuevo -->
+    <div class="student-card" data-group="2A">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Sofía Gómez</h4>
+                <p>2° A</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
+
+    <!-- 7. Estudiante original -->
+    <div class="student-card" data-group="2B">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Eduardo Sanchez</h4>
+                <p>2° B</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
+
+    <!-- 8. Estudiante nuevo -->
+    <div class="student-card" data-group="2B">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Luis Fernando</h4>
+                <p>2° B</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
+
+    <!-- 9. Estudiante nuevo -->
+    <div class="student-card" data-group="3A">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Camila Torres</h4>
+                <p>3° A</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
+
+    <!-- 10. Estudiante nuevo -->
+    <div class="student-card" data-group="3B">
+        <div class="student-info-left">
+            <i class="fa-solid fa-circle-user avatar-icon"></i>
+            <div class="student-details">
+                <h4>Diego Herrera</h4>
+                <p>3° B</p>
+            </div>
+        </div>
+        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+    </div>
+
+</div>
+    </div>
+    <!-- (Tu calendario sigue aquí sin cambios...) -->
+
+                <!-- COLUMNA DERECHA: CALENDARIO -->
                 <div class="right-column">
                     <aside class="calendar-widget border-container">
                         <div class="calendar-header">
@@ -172,10 +246,8 @@ $rol = "Docente";
                 </div>
             </div>
 
-            <!-- =====================================
-                 BARRA ACCESIBILIDAD (RECICLADA)
-            ====================================== -->
-            <footer class="accessibility-bar">
+            <!-- BARRA ACCESIBILIDAD -->
+            <footer class="accessibility-bar" style="margin-top: 30px;">
                 <div class="acc-info">
                     <div class="acc-icon-box">
                         <i class="fa-solid fa-universal-access acc-icon-main"></i>
@@ -198,8 +270,7 @@ $rol = "Docente";
 
         </main>
     </div>
-
-    <!-- EL MISMO JS QUE YA TIENES SIRVE AQUÍ -->
+    <script src="jss/ver_estudiantes_ocultos.js?v=2"></script>
     <script src="jss/docente_dashboard.js"></script>
 </body>
 </html>
