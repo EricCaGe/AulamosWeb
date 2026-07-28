@@ -1,0 +1,158 @@
+/* =========================================
+   ESTILOS ESPECÍFICOS: CREAR EVALUACIÓN
+========================================= */
+
+.eval-layout {
+    margin-top: 20px;
+}
+
+/* Campos de texto generales (Mismo estilo que actividad para mantener consistencia) */
+.form-group-clean {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.form-group-clean label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.text-normal {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.clean-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+    font-family: inherit;
+}
+
+.clean-input:focus {
+    border-color: var(--primary-blue);
+}
+
+/* Contenedor de Fecha con Ícono */
+.date-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-input-container i {
+    position: absolute;
+    right: 15px;
+    color: #64748b;
+    font-size: 18px;
+}
+
+/* =========================================
+   DISEÑO DE OPCIONES (RADIO BUTTONS)
+========================================= */
+.eval-type-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.eval-radio-card {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #fff;
+    transition: all 0.2s;
+}
+
+.eval-radio-card:hover {
+    background-color: #f8fafc;
+}
+
+/* Ocultamos el circulito feo por defecto de HTML */
+.eval-radio-card input {
+    display: none; 
+}
+
+/* Creamos nuestro propio circulito */
+.custom-radio {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #94a3b8;
+    margin-right: 15px;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.radio-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Lo que pasa cuando seleccionamos una opción (Se pinta de verde) */
+.eval-radio-card input:checked + .custom-radio {
+    border-color: #16a34a; /* Verde oscuro */
+    background-color: #22c55e; /* Verde claro */
+}
+
+/* =========================================
+   BOTONES DE ACCIÓN (Derecha Abajo)
+========================================= */
+.eval-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    justify-content: space-between;
+}
+
+.btn-outline-blue {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid var(--primary-blue);
+    background-color: transparent;
+    color: var(--primary-blue);
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s;
+}
+
+.btn-outline-blue:hover {
+    background-color: #f1f5f9;
+}
+
+.btn-light-blue {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid var(--primary-blue);
+    background-color: #eff6ff; /* Azul muy clarito */
+    color: var(--primary-blue);
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s;
+}
+
+.btn-light-blue:hover {
+    background-color: #dbeafe;
+}
+
+/* Utilidades */
+.mt-20 { margin-top: 20px; }
+.mt-10 { margin-top: 10px; }
+.small-cal .cal-day {
+    height: 30px;
+    font-size: 12px;
+}

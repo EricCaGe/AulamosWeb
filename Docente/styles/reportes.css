@@ -1,0 +1,232 @@
+/* =========================================
+   ESTILOS ESPECÍFICOS: REPORTES
+========================================= */
+
+/* Utilidades rápidas */
+.mt-10 { margin-top: 10px; }
+.mt-5 { margin-top: 5px; }
+.d-block { display: block; }
+.section-title { font-size: 16px; color: #1e293b; margin-bottom: 15px; }
+
+/* Barra de Filtros Superior */
+.reports-filter-bar {
+    display: flex;
+    gap: 30px;
+    padding: 20px 25px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #fff;
+    margin-top: 20px;
+    margin-bottom: 25px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1; /* Para que ambos tomen el mismo ancho */
+}
+
+.filter-group label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.custom-select {
+    padding: 10px 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 15px;
+    color: #475569;
+    outline: none;
+    font-family: inherit;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Disposición principal (Izquierda resumen, Derecha lista) */
+.reports-main-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Izquierda un poco más grande que derecha */
+    gap: 20px;
+}
+
+/* =========================================
+   TARJETAS DE RESUMEN GENERAL (IZQUIERDA)
+========================================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card.center-content {
+    align-items: center;
+    text-align: center;
+}
+
+.stat-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 5px;
+}
+
+.stat-value-box {
+    margin-top: 10px;
+}
+
+.stat-big {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.stat-small {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.stat-small-text {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Gráfica de línea (SVG) */
+.mini-chart-container {
+    margin-top: 15px;
+    width: 100%;
+    height: 40px;
+}
+
+.line-chart {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Gráfica de dona (Círculo 92%) */
+.donut-chart-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.donut-chart {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    /* El truco: dibuja un círculo con verde hasta el 92%, y gris el resto */
+    background: conic-gradient(#14b8a6 0% 92%, #e2e8f0 92% 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.donut-inner {
+    width: 60px; /* Tamaño del hueco interior */
+    height: 60px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.donut-inner span {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Barra de progreso horizontal */
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #0ea5e9; /* Color azul claro */
+    border-radius: 10px;
+}
+
+/* =========================================
+   LISTA DE REPORTES DISPONIBLES (DERECHA)
+========================================= */
+.reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.report-list-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #fff;
+    text-decoration: none;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.report-list-item:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Cajas de íconos de colores */
+.report-icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.purple-box {
+    background-color: #f3e8ff;
+    color: #a855f7;
+}
+
+.orange-box {
+    background-color: #ffedd5;
+    color: #f97316;
+}
+
+.green-box {
+    background-color: #dcfce7;
+    color: #22c55e;
+}
+
+.report-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #334155;
+    flex: 1; /* Toma todo el espacio disponible empujando la flecha a la derecha */
+}
+
+.report-arrow {
+    font-size: 16px;
+    color: #475569;
+}

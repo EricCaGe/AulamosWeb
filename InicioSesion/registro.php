@@ -21,7 +21,6 @@
 
         <!-- Botones a la derecha -->
         <div class="nav-buttons">
-            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) -->
             <button type="button" class="btn btn-chatbot" aria-label="Abrir chatbot">
                 <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
             </button>
@@ -55,37 +54,95 @@
                         <h2>Crea tu cuenta</h2>
                         <p>Selecciona tu rol para continuar</p>
                     </div>
-                    <!-- BOTÓN REDONDO MORADO (SOLO VISTA, NO HACE NADA) -->
                     <button type="button" class="btn-accessibility-round" aria-label="Opciones de accesibilidad">
                         <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
                     </button>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- MOSTRAR ERRORES                           -->
+                <!-- ========================================== -->
+                <?php if (isset($_GET['error'])): ?>
+                    <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc2626;">
+                        <?php 
+                            $error = $_GET['error'];
+                            if ($error === 'campos_vacios') {
+                                echo '❌ Todos los campos son obligatorios.';
+                            } elseif ($error === 'correo_existe') {
+                                echo '❌ Este correo ya está registrado.';
+                            } elseif ($error === 'correo_invalido') {
+                                echo '❌ El correo no es válido.';
+                            } elseif ($error === 'password_corta') {
+                                echo '❌ La contraseña debe tener al menos 8 caracteres.';
+                            } elseif ($error === 'rol_invalido') {
+                                echo '❌ Rol no válido.';
+                            } else {
+                                echo '❌ Error al registrar. Intenta de nuevo.';
+                            }
+                        ?>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Selector de Rol -->
                 <div class="role-selector">
-                    <button type="button" class="btn-role active" id="btn-registro-alumno" aria-label="Seleccionar rol alumno">
+                    <button type="button" class="btn-role active" id="btn-registro-alumno" data-rol="alumno" aria-label="Seleccionar rol alumno">
                         <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
                     </button>
-                    <button type="button" class="btn-role" id="btn-registro-docente" aria-label="Seleccionar rol docente">
+                    <button type="button" class="btn-role" id="btn-registro-docente" data-rol="docente" aria-label="Seleccionar rol docente">
                         <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
                     </button>
                 </div>
 
-                <!-- Formulario -->
-                <form class="login-form" onsubmit="return false;" novalidate>
+                <!-- Campo oculto para el rol -->
+                <input type="hidden" name="rol" id="rol-input" value="alumno">
+
+                <!-- ========================================== -->
+                <!-- FORMULARIO                                -->
+                <!-- ========================================== -->
+                <form class="login-form" action="procesar_registro.php" method="POST" novalidate>
+                    
+                    <!-- Nombre -->
+                    <div class="input-group">
+                        <label for="registro-nombre">Nombre(s)</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-user input-icon" aria-hidden="true"></i>
+                            <input type="text" id="registro-nombre" name="nombre" placeholder="Tu nombre" required>
+                        </div>
+                    </div>
+
+                    <!-- Apellido Paterno -->
+                    <div class="input-group">
+                        <label for="registro-apellido-paterno">Apellido Paterno</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-user input-icon" aria-hidden="true"></i>
+                            <input type="text" id="registro-apellido-paterno" name="apellido_paterno" placeholder="Tu apellido paterno" required>
+                        </div>
+                    </div>
+
+                    <!-- Apellido Materno -->
+                    <div class="input-group">
+                        <label for="registro-apellido-materno">Apellido Materno</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-user input-icon" aria-hidden="true"></i>
+                            <input type="text" id="registro-apellido-materno" name="apellido_materno" placeholder="Tu apellido materno" required>
+                        </div>
+                    </div>
+
+                    <!-- Correo -->
                     <div class="input-group">
                         <label for="registro-email">Correo electrónico</label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
-                            <input type="email" id="registro-email" placeholder="ejemplo@correo.com" required>
+                            <input type="email" id="registro-email" name="correo" placeholder="ejemplo@correo.com" required>
                         </div>
                     </div>
 
+                    <!-- Contraseña -->
                     <div class="input-group">
                         <label for="registro-password">Contraseña</label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
-                            <input type="password" id="registro-password" placeholder="••••••••••••••••" required>
+                            <input type="password" id="registro-password" name="password" placeholder="••••••••••••••••" required>
                             <i class="fa-regular fa-eye toggle-password-icon" id="btn-ver-password" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
                         </div>
                         <p style="font-size: 12px; color: #6b7280; margin-top: 2px;">La contraseña debe tener al menos 8 caracteres.</p>

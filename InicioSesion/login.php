@@ -55,44 +55,71 @@
                         <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
                     </button>
                 </div>
-<!-- Selector de Rol -->
-<div class="role-selector">
-    <button type="button" class="btn-role active" data-rol="alumno" aria-label="Seleccionar rol alumno">
-        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
-    </button>
-    <button type="button" class="btn-role" data-rol="docente" aria-label="Seleccionar rol docente">
-        <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
-    </button>
-</div>
 
-<!-- Campo oculto para el rol -->
-<input type="hidden" name="rol" id="rol-input" value="alumno">
+                <!-- MOSTRAR ERRORES -->
+                <?php if (isset($_GET['error'])): ?>
+                    <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc2626;">
+                        <?php 
+                            $error = $_GET['error'];
+                            if ($error === 'credenciales') {
+                                echo '❌ Correo o contraseña incorrectos.';
+                            } elseif ($error === 'inactivo') {
+                                echo '⚠️ Tu cuenta está inactiva. Contacta al administrador.';
+                            } elseif ($error === 'bloqueado') {
+                                echo '⚠️ Tu cuenta está bloqueada. Contacta al administrador.';
+                            } elseif ($error === 'sesion') {
+                                echo '❌ Error al iniciar sesión. Intenta de nuevo.';
+                            } else {
+                                echo '❌ Error al iniciar sesión.';
+                            }
+                        ?>
+                    </div>
+                <?php endif; ?>
 
-<!-- Formulario -->
-<form class="login-form" action="procesar_login.php" method="POST" novalidate>
-    <div class="input-group">
-        <label for="login-email">Correo electrónico</label>
-        <div class="input-wrapper">
-            <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
-            <input type="email" id="login-email" name="correo" placeholder="ejemplo@correo.com" required>
-        </div>
-    </div>
+                <?php if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso'): ?>
+                    <div style="background: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #22c55e;">
+                        ✅ ¡Cuenta creada exitosamente! Ahora inicia sesión.
+                    </div>
+                <?php endif; ?>
 
-    <div class="input-group">
-        <label for="login-password">Contraseña</label>
-        <div class="input-wrapper">
-            <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
-            <input type="password" id="login-password" name="password" placeholder="••••••••••••••••" required>
-            <i class="fa-regular fa-eye toggle-password-icon" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
-        </div>
-    </div>
+                <!-- Selector de Rol -->
+                <div class="role-selector">
+                    <button type="button" class="btn-role active" data-rol="alumno" aria-label="Seleccionar rol alumno">
+                        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
+                    </button>
+                    <button type="button" class="btn-role" data-rol="docente" aria-label="Seleccionar rol docente">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
+                    </button>
+                </div>
 
-    <div class="forgot-password-container">
-        <a href="recuperar.php" class="link-forgot">¿Olvidaste tu contraseña?</a>
-    </div>
+                <!-- Campo oculto para el rol -->
+                <input type="hidden" name="rol" id="rol-input" value="alumno">
 
-    <button type="submit" class="btn-submit-login">Iniciar Sesión</button>
-</form>
+                <!-- Formulario -->
+                <form class="login-form" action="procesar_login.php" method="POST" novalidate>
+                    <div class="input-group">
+                        <label for="login-email">Correo electrónico</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
+                            <input type="email" id="login-email" name="correo" placeholder="ejemplo@correo.com" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="login-password">Contraseña</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
+                            <input type="password" id="login-password" name="password" placeholder="••••••••••••••••" required>
+                            <i class="fa-regular fa-eye toggle-password-icon" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
+                        </div>
+                    </div>
+
+                    <div class="forgot-password-container">
+                        <a href="recuperar.php" class="link-forgot">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit-login">Iniciar Sesión</button>
+                </form>
 
                 <!-- Divisor -->
                 <div class="form-divider">
@@ -113,6 +140,18 @@
     <!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
     <!-- ========================================== -->
     <script src="js/login.js"></script>
+    <script>
+        // Actualizar campo oculto al seleccionar rol
+        document.querySelectorAll('.btn-role').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-role').forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                document.getElementById('rol-input').value = this.getAttribute('data-rol');
+            });
+        });
+    </script>
 
 </body>
 </html>

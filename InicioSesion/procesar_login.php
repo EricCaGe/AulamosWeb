@@ -29,8 +29,8 @@ if (!in_array($rol, ['alumno', 'docente'])) {
 }
 
 try {
-    // Buscar usuario por correo
-    $stmt = $pdo->prepare("
+    // Buscar usuario por correo y rol
+    $stmt = $conexion->prepare("
         SELECT 
             u.id_usuario,
             u.nombre,
@@ -43,15 +43,14 @@ try {
         FROM usuarios u
         INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
         INNER JOIN roles r ON ur.id_rol = r.id_rol
-        WHERE u.correo = :correo AND r.nombre = :rol
+        WHERE u.correo = ? AND r.nombre = ?
     ");
     
-    $stmt->execute([
-        ':correo' => $correo,
-        ':rol' => $rol
-    ]);
-    
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->bind_param("ss", $correo, $rol);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $usuario = $resultado->fetch_assoc();
+    $stmt->close();
     
     // Verificar si el usuario existe
     if (!$usuario) {
@@ -80,6 +79,11 @@ try {
     // INICIAR SESIÓN                            */
     // ========================================== */
     
+    // Iniciar sesión si no está iniciada
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
     $_SESSION['usuario'] = [
         'id_usuario' => $usuario['id_usuario'],
         'nombre' => $usuario['nombre'],
@@ -90,18 +94,20 @@ try {
     ];
     
     // Actualizar último acceso
-    $stmt = $pdo->prepare("UPDATE usuarios SET ultimo_acceso = NOW() WHERE id_usuario = :id");
-    $stmt->execute([':id' => $usuario['id_usuario']]);
+    $stmt = $conexion->prepare("UPDATE usuarios SET ultimo_acceso = NOW() WHERE id_usuario = ?");
+    $stmt->bind_param("i", $usuario['id_usuario']);
+    $stmt->execute();
+    $stmt->close();
     
     // Redirigir según el rol
     if ($rol === 'alumno') {
-        header('Location: ../alumno/alumno.php');
+        header('Location: ../Alumno/alumno.php');
     } else {
-        header('Location: ../docente/docente.php');
+        header('Location: ../Docente/docente.php');
     }
     exit;
     
-} catch(PDOException $e) {
+} catch(Exception $e) {
     // Error de base de datos
     error_log("Error en login: " . $e->getMessage());
     header('Location: login.php?error=sesion');
