@@ -9,12 +9,12 @@ $grupo_alumno = "1° A";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resumen del Estudiante - Aulamos</title>
+    <title>Detalle de Actividades - Aulamos</title>
     
     <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">
     <!-- CSS Específico para esta pantalla -->
-    <link rel="stylesheet" href="styles/resumen.css">
+    <link rel="stylesheet" href="styles/detalle.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -39,6 +39,8 @@ $grupo_alumno = "1° A";
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
+                
+                <!-- "Mas" Activo -->
                 <a href="mas.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Mas</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
@@ -46,7 +48,6 @@ $grupo_alumno = "1° A";
                 <div class="menu-spacer"></div>
                 <a href="login.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
-                
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
@@ -56,11 +57,10 @@ $grupo_alumno = "1° A";
             <header class="content-header header-with-back">
                 <div class="welcome-text">
                     <h1>
-                        <a href="mas.php" class="back-arrow"><i class="fa-solid fa-arrow-left"></i></a> 
-                        Resumen del estudiante
+                        <a href="resumen_estudiante.php" class="back-arrow"><i class="fa-solid fa-arrow-left"></i></a> 
+                        Detalle de actividades
                     </h1>
                 </div>
-                
                 <div class="header-actions">
                     <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
                     <div class="icon-bell-container">
@@ -86,62 +86,115 @@ $grupo_alumno = "1° A";
                 </div>
             </div>
 
-            <!-- CONTENEDOR PRINCIPAL A DOS COLUMNAS -->
-            <div class="resumen-layout">
-                
-                <!-- COLUMNA IZQUIERDA: Tarjetas de resumen -->
-                <div class="resumen-left">
-                    <h3 class="section-title">Resumen de actividades</h3>
-                    <div class="cards-grid">
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Total de actividades</span>
-                            <div class="card-value">12</div>
-                            <span class="card-subtext gray">Asignadas</span>
-                        </div>
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Completadas</span>
-                            <div class="card-value">9</div>
-                            <span class="card-subtext green">75%</span>
-                        </div>
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Pendientes</span>
-                            <div class="card-value">2</div>
-                            <span class="card-subtext yellow">16.1%</span>
-                        </div>
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Atrasadas</span>
-                            <div class="card-value">1</div>
-                            <span class="card-subtext red">8.3%</span>
-                        </div>
+            <!-- FILTROS -->
+            <div class="filters-container">
+                <button class="filter-btn active" data-filter="todos">Todos (12)</button>
+                <button class="filter-btn" data-filter="completada">Completadas (9)</button>
+                <button class="filter-btn" data-filter="pendiente">Pendientes (2)</button>
+                <button class="filter-btn" data-filter="atrasada">Atrasadas (1)</button>
+            </div>
 
+            <!-- LISTA DE ACTIVIDADES -->
+            <div class="activities-list">
+                
+                <!-- Mapa conceptual -->
+                <div class="activity-row" data-status="completada">
+                    <div class="activity-left">
+                        <div class="icon-box purple"><i class="fa-brands fa-youtube"></i></div>
+                        <div class="activity-text">
+                            <h4>Mapa conceptual</h4>
+                            <span>Ciencias Naturales</span>
+                        </div>
+                    </div>
+                    <div class="activity-center">Entrega: 12/05/2026</div>
+                    <div class="activity-right">
+                        <span class="status-badge completada">Completada</span>
                     </div>
                 </div>
 
-                <!-- COLUMNA DERECHA: Proceso y Botón -->
-                <div class="resumen-right">
-                    <div class="progress-card">
-                        <h3 class="progress-title">Proceso General</h3>
-                        
-                        <!-- Gráfico Circular -->
-                        <div class="circular-progress">
-                            <div class="inner-circle">75%</div>
+                <!-- Ejercicio de matemáticas -->
+                <div class="activity-row" data-status="completada">
+                    <div class="activity-left">
+                        <div class="icon-box red"><i class="fa-solid fa-file-pdf"></i></div>
+                        <div class="activity-text">
+                            <h4>Ejercicio de matemáticas</h4>
+                            <span>Matemáticas</span>
                         </div>
-                        
-                        <h4>Buen Trabajo 🥳</h4>
-                        <p>Ana a completado el 75% de sus actividades asignadas</p>
                     </div>
-                    
-                    <!-- CÁMBIALO EN resumen_estudiante.php -->
-                    <a href="detalle_actividades.php" class="btn-ver-detalles" style="text-align: center; text-decoration: none; display: block;">Ver detalles de actividades</a>  
+                    <div class="activity-center">Entrega: 10/05/2026</div>
+                    <div class="activity-right">
+                        <span class="status-badge completada">Completada</span>
+                    </div>
+                </div>
+
+                <!-- Lectura y resumen -->
+                <div class="activity-row" data-status="completada">
+                    <div class="activity-left">
+                        <div class="icon-box blue"><i class="fa-solid fa-file-lines"></i></div>
+                        <div class="activity-text">
+                            <h4>Lectura y resumen</h4>
+                            <span>Lengua y Literatura</span>
+                        </div>
+                    </div>
+                    <div class="activity-center">Entrega: 08/05/2026</div>
+                    <div class="activity-right">
+                        <span class="status-badge completada">Completada</span>
+                    </div>
+                </div>
+
+                <!-- Examen de historia -->
+                <div class="activity-row" data-status="pendiente">
+                    <div class="activity-left">
+                        <div class="icon-box green"><i class="fa-solid fa-clipboard-check"></i></div>
+                        <div class="activity-text">
+                            <h4>Examen de historia</h4>
+                            <span>Historia</span>
+                        </div>
+                    </div>
+                    <div class="activity-center">Entrega: 15/05/2026</div>
+                    <div class="activity-right">
+                        <span class="status-badge pendiente">Pendiente</span>
+                    </div>
+                </div>
+
+                <!-- Presentación del tema -->
+                <div class="activity-row" data-status="pendiente">
+                    <div class="activity-left">
+                        <div class="icon-box light-purple"><i class="fa-solid fa-clipboard-list"></i></div>
+                        <div class="activity-text">
+                            <h4>Presentación del tema</h4>
+                            <span>Tecnología</span>
+                        </div>
+                    </div>
+                    <div class="activity-center">Entrega: 05/05/2026</div>
+                    <div class="activity-right">
+                        <span class="status-badge pendiente">Pendiente</span>
+                    </div>
+                </div>
+
+                <!-- Investigación: Ecosistemas -->
+                <div class="activity-row" data-status="atrasada">
+                    <div class="activity-left">
+                        <div class="icon-box light-purple"><i class="fa-solid fa-clipboard-list"></i></div>
+                        <div class="activity-text">
+                            <h4>investigación: Ecosistemas</h4>
+                            <span>Ciencias Naturales</span>
+                        </div>
+                    </div>
+                    <div class="activity-center">Entrega: 12/05/2026</div>
+                    <div class="activity-right">
+                        <span class="status-badge atrasada">Atrasada</span>
+                    </div>
                 </div>
 
             </div>
 
-           <!-- BARRA ACCESIBILIDAD -->
+            <!-- Link Ver Todo -->
+            <div class="view-all-container">
+                <a href="#" class="view-all-link">Ver todo mi contenido</a>
+            </div>
+
+            <!-- BARRA ACCESIBILIDAD -->
             <footer class="accessibility-bar" style="margin-top: 30px;">
                 <div class="acc-info">
                     <div class="acc-icon-box">
@@ -165,6 +218,9 @@ $grupo_alumno = "1° A";
 
         </main>
     </div>
+
+    <!-- SCRIPT PARA FILTROS INTERACTIVOS -->
+    <script src="jss/detalle_actividades.js"></script>
     <script src="jss/docente_dashboard.js"></script>
 </body>
 </html>
