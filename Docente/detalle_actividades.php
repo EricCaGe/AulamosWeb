@@ -36,7 +36,7 @@ $grupo_alumno = "1° A";
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
                 <a href="crear_curso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Curso</a>
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
-                <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
+                <a href="crear_evaluacio.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 
@@ -98,9 +98,9 @@ $grupo_alumno = "1° A";
             <div class="activities-list">
                 
                 <!-- Mapa conceptual -->
-                <div class="activity-row" data-status="completada">
+                <a href="actividad_Mapa_conceptual.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="completada">
                     <div class="activity-left">
-                        <div class="icon-box purple"><i class="fa-brands fa-youtube"></i></div>
+                        <div class="icon-box purple"><i class="fa-solid fa-file-lines"></i></div>
                         <div class="activity-text">
                             <h4>Mapa conceptual</h4>
                             <span>Ciencias Naturales</span>
@@ -110,10 +110,10 @@ $grupo_alumno = "1° A";
                     <div class="activity-right">
                         <span class="status-badge completada">Completada</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Ejercicio de matemáticas -->
-                <div class="activity-row" data-status="completada">
+                <a href="actividad_Ejercicio_de_matematicas.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="completada">
                     <div class="activity-left">
                         <div class="icon-box red"><i class="fa-solid fa-file-pdf"></i></div>
                         <div class="activity-text">
@@ -125,10 +125,10 @@ $grupo_alumno = "1° A";
                     <div class="activity-right">
                         <span class="status-badge completada">Completada</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Lectura y resumen -->
-                <div class="activity-row" data-status="completada">
+                <a href="actividad_Lectura_y_resumen.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="completada">
                     <div class="activity-left">
                         <div class="icon-box blue"><i class="fa-solid fa-file-lines"></i></div>
                         <div class="activity-text">
@@ -140,10 +140,10 @@ $grupo_alumno = "1° A";
                     <div class="activity-right">
                         <span class="status-badge completada">Completada</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Examen de historia -->
-                <div class="activity-row" data-status="pendiente">
+                <a href="actividad_Examen_de_historia.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="pendiente">
                     <div class="activity-left">
                         <div class="icon-box green"><i class="fa-solid fa-clipboard-check"></i></div>
                         <div class="activity-text">
@@ -155,10 +155,10 @@ $grupo_alumno = "1° A";
                     <div class="activity-right">
                         <span class="status-badge pendiente">Pendiente</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Presentación del tema -->
-                <div class="activity-row" data-status="pendiente">
+                <a href="actividad_Presentacion_del_tema.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="pendiente">
                     <div class="activity-left">
                         <div class="icon-box light-purple"><i class="fa-solid fa-clipboard-list"></i></div>
                         <div class="activity-text">
@@ -170,10 +170,10 @@ $grupo_alumno = "1° A";
                     <div class="activity-right">
                         <span class="status-badge pendiente">Pendiente</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Investigación: Ecosistemas -->
-                <div class="activity-row" data-status="atrasada">
+                <a href="actividad_Investigacion_Ecosistemas.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="atrasada">
                     <div class="activity-left">
                         <div class="icon-box light-purple"><i class="fa-solid fa-clipboard-list"></i></div>
                         <div class="activity-text">
@@ -185,14 +185,10 @@ $grupo_alumno = "1° A";
                     <div class="activity-right">
                         <span class="status-badge atrasada">Atrasada</span>
                     </div>
-                </div>
+                </a>
 
             </div>
 
-            <!-- Link Ver Todo -->
-            <div class="view-all-container">
-                <a href="#" class="view-all-link">Ver todo mi contenido</a>
-            </div>
 
             <!-- BARRA ACCESIBILIDAD -->
             <footer class="accessibility-bar" style="margin-top: 30px;">

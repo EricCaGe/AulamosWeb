@@ -1,20 +1,18 @@
 <?php
 $usuario = "Profesora Ana"; 
 $rol = "Docente";
-$nombre_alumno = "Ana López";
-$grupo_alumno = "1° A";
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resumen del Estudiante - Aulamos</title>
+    <title>Actividad Individual - Aulamos</title>
     
     <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">
     <!-- CSS Específico para esta pantalla -->
-    <link rel="stylesheet" href="styles/resumen.css">
+    <link rel="stylesheet" href="styles/actividad_Mapa_conceptual.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -39,6 +37,8 @@ $grupo_alumno = "1° A";
                 <a href="crear_evaluacio.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
+                
+                <!-- "Mas" Activo -->
                 <a href="mas.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Mas</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
@@ -46,7 +46,6 @@ $grupo_alumno = "1° A";
                 <div class="menu-spacer"></div>
                 <a href="login.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
-                
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
@@ -56,11 +55,10 @@ $grupo_alumno = "1° A";
             <header class="content-header header-with-back">
                 <div class="welcome-text">
                     <h1>
-                        <a href="mas.php" class="back-arrow"><i class="fa-solid fa-arrow-left"></i></a> 
-                        Resumen del estudiante
+                        <a href="detalle_actividades.php" class="back-arrow"><i class="fa-solid fa-arrow-left"></i></a> 
+                        Mapa conceptual
                     </h1>
                 </div>
-                
                 <div class="header-actions">
                     <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
                     <div class="icon-bell-container">
@@ -77,71 +75,72 @@ $grupo_alumno = "1° A";
                 </div>
             </header>
 
-            <!-- PERFIL DEL ESTUDIANTE -->
-            <div class="student-profile-header">
-                <i class="fa-regular fa-circle-user large-avatar"></i>
-                <div class="student-details">
-                    <h2><?php echo $nombre_alumno; ?></h2>
-                    <span class="badge-grade"><?php echo $grupo_alumno; ?></span>
-                </div>
-            </div>
-
-            <!-- CONTENEDOR PRINCIPAL A DOS COLUMNAS -->
-            <div class="resumen-layout">
+            <!-- CONTENIDO DE LA ACTIVIDAD -->
+            <div class="actividad-layout">
                 
-                <!-- COLUMNA IZQUIERDA: Tarjetas de resumen -->
-                <div class="resumen-left">
-                    <h3 class="section-title">Resumen de actividades</h3>
-                    <div class="cards-grid">
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Total de actividades</span>
-                            <div class="card-value">12</div>
-                            <span class="card-subtext gray">Asignadas</span>
+                <!-- COLUMNA IZQUIERDA: Detalles y Entrega -->
+                <div class="actividad-left">
+                    
+                    <div class="materia-info">
+                        <div class="icon-materia">
+                            <i class="fa-solid fa-file-lines"></i>
                         </div>
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Completadas</span>
-                            <div class="card-value">9</div>
-                            <span class="card-subtext green">75%</span>
+                        <div class="text-materia">
+                            <h4>Ciencias Naturales</h4>
+                            <span>Entrega: 12/05/2026</span>
                         </div>
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Pendientes</span>
-                            <div class="card-value">2</div>
-                            <span class="card-subtext yellow">16.1%</span>
-                        </div>
-                        
-                        <div class="activity-card">
-                            <span class="card-title">Atrasadas</span>
-                            <div class="card-value">1</div>
-                            <span class="card-subtext red">8.3%</span>
-                        </div>
-
                     </div>
+
+                    <div class="estado-badge-container">
+                        <span class="status-badge completada">Completada</span>
+                    </div>
+
+                    <div class="seccion-bloque">
+                        <h3>Descripción</h3>
+                        <p>Realiza un mapa conceptual sobre los ecosistemas acuaticos y sus caracteristicas principales</p>
+                    </div>
+
+                    <div class="seccion-bloque">
+                        <h3>Entrega del estudiante</h3>
+                        
+                        <div class="archivo-entrega-card">
+                            <div class="archivo-izq">
+                                <i class="fa-solid fa-file-pdf icon-pdf-dark"></i>
+                                <div class="archivo-textos">
+                                    <strong>Mapa_conceptual_Ana.pdf</strong>
+                                    <span>Entregado el 10/05/2026 14:30</span>
+                                </div>
+                            </div>
+                            <button class="btn-descargar-archivo">
+                                <i class="fa-solid fa-circle-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- COLUMNA DERECHA: Proceso y Botón -->
-                <div class="resumen-right">
-                    <div class="progress-card">
-                        <h3 class="progress-title">Proceso General</h3>
-                        
-                        <!-- Gráfico Circular -->
-                        <div class="circular-progress">
-                            <div class="inner-circle">75%</div>
-                        </div>
-                        
-                        <h4>Buen Trabajo 🥳</h4>
-                        <p>Ana a completado el 75% de sus actividades asignadas</p>
-                    </div>
+                <!-- COLUMNA DERECHA: Calificación y Comentarios -->
+                <div class="actividad-right">
                     
-                    <!-- CÁMBIALO EN resumen_estudiante.php -->
-                    <a href="detalle_actividades.php" class="btn-ver-detalles" style="text-align: center; text-decoration: none; display: block;">Ver detalles de actividades</a>  
+                    <div class="seccion-bloque">
+                        <h3>Calificación</h3>
+                        <div class="calificacion-box">
+                            9.5/10
+                        </div>
+                    </div>
+
+                    <div class="seccion-bloque">
+                        <h3>Comentarios</h3>
+                        <div class="comentario-burbuja">
+                            Excelente trabajo, Ana. Muy bien organizado y completo 👏
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
 
-           <!-- BARRA ACCESIBILIDAD -->
+            <!-- BARRA ACCESIBILIDAD -->
             <footer class="accessibility-bar" style="margin-top: 30px;">
                 <div class="acc-info">
                     <div class="acc-icon-box">
