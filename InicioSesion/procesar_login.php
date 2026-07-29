@@ -12,20 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Obtener datos del formulario
-$rol = $_POST['rol'] ?? '';
+$rol = $_POST['rol'] ?? 'alumno';  // Valor por defecto
 $correo = trim($_POST['correo'] ?? '');
 $password = $_POST['password'] ?? '';
 
 // Validar que los campos no estén vacíos
-if (empty($rol) || empty($correo) || empty($password)) {
+if (empty($correo) || empty($password)) {
     header('Location: login.php?error=sesion');
     exit;
 }
 
-// Validar que el rol sea válido
+// Validar que el rol sea válido, si no forzar a alumno
 if (!in_array($rol, ['alumno', 'docente'])) {
-    header('Location: login.php?error=sesion');
-    exit;
+    $rol = 'alumno';
 }
 
 try {

@@ -21,7 +21,6 @@
 
         <!-- Botones a la derecha -->
         <div class="nav-buttons">
-            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) -->
             <button type="button" class="btn btn-chatbot" aria-label="Abrir chatbot">
                 <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
             </button>
@@ -35,7 +34,6 @@
         
         <!-- Columna Izquierda -->
         <div class="login-left-side">
-            <!-- Textos de recuperación -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <h2 style="font-family: Georgia, serif; font-size: 32px; color: #111827; font-weight: bold; margin-bottom: 10px;">Recupera tu cuenta</h2>
                 <p style="font-size: 15px; color: #4b5563; line-height: 1.4;">Ingresa tu correo electrónico y te enviaremos<br>un enlace para restablecer tu contraseña.</p>
@@ -56,19 +54,40 @@
                         <h2>Recuperar contraseña</h2>
                         <p>Ingresa el correo electrónico asociado a tu cuenta</p>
                     </div>
-                    <!-- BOTÓN REDONDO MORADO (SOLO VISTA, NO HACE NADA) -->
                     <button type="button" class="btn-accessibility-round" aria-label="Opciones de accesibilidad">
                         <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
                     </button>
                 </div>
 
+                <!-- MOSTRAR ERRORES -->
+                <?php if (isset($_GET['error'])): ?>
+                    <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc2626;">
+                        <?php 
+                            $error = $_GET['error'];
+                            if ($error === 'correo_no_existe') {
+                                echo '❌ Este correo no está registrado en el sistema.';
+                            } elseif ($error === 'correo_invalido') {
+                                echo '❌ El correo electrónico no es válido.';
+                            } else {
+                                echo '❌ Error al enviar el enlace. Intenta de nuevo.';
+                            }
+                        ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($_GET['exito']) && $_GET['exito'] === 'enviado'): ?>
+                    <div style="background: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #22c55e;">
+                        ✅ ¡Correo enviado! Revisa tu bandeja de entrada o carpeta de spam.
+                    </div>
+                <?php endif; ?>
+
                 <!-- Formulario -->
-                <form class="login-form" onsubmit="return false;" novalidate>
+                <form class="login-form" action="procesar_recuperar.php" method="POST" novalidate>
                     <div class="input-group">
                         <label for="recuperar-email">Correo electrónico</label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-envelope input-icon" aria-hidden="true"></i>
-                            <input type="email" id="recuperar-email" placeholder="ejemplo@correo.com" required>
+                            <input type="email" id="recuperar-email" name="correo" placeholder="ejemplo@correo.com" required>
                         </div>
                     </div>
 

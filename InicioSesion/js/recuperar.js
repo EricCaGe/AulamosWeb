@@ -46,13 +46,43 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // ========================================== //
-    // PREVENIR ENVÍO DEL FORMULARIO
+    // VALIDACIÓN DEL FORMULARIO                 //
     // ========================================== //
     const form = document.querySelector('.login-form');
+    const emailInput = document.getElementById('recuperar-email');
+    
     if (form) {
         form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            alert('Se enviará el enlace de recuperación a tu correo.');
+            
+            let errores = [];
+            
+            // Validar email
+            if (!emailInput || emailInput.value.trim() === '') {
+                errores.push('El correo electrónico es obligatorio.');
+                emailInput.style.borderColor = '#dc2626';
+            } else if (!emailInput.value.includes('@') || !emailInput.value.includes('.')) {
+                errores.push('El correo electrónico no es válido.');
+                emailInput.style.borderColor = '#dc2626';
+            } else {
+                emailInput.style.borderColor = '';
+            }
+            
+            // Si hay errores, cancelar envío
+            if (errores.length > 0) {
+                event.preventDefault();
+                
+                let mensajeError = '⚠️ Por favor corrige los siguientes errores:\n\n';
+                errores.forEach(function(error) {
+                    mensajeError += '• ' + error + '\n';
+                });
+                alert(mensajeError);
+                
+                return false;
+            }
+            
+            // Si no hay errores, el formulario se envía normalmente
+            console.log('✅ Formulario validado correctamente. Enviando...');
+            return true;
         });
     }
 });
