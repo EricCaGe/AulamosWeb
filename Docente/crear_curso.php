@@ -34,9 +34,7 @@ $rol = "Docente";
                     <p>Aprendemos juntos</p>
                 </div>
             </div>
-            
             <nav class="menu">
-                
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
                 <a href="crear_curso.php" class="menu-item active"><i class="fa-solid fa-medal"></i> Crear Curso</a>
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
@@ -44,13 +42,14 @@ $rol = "Docente";
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="mas.php" class="menu-item"><i class="fa-solid fa-bars"></i> Mas</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
-                
-                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="login.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
             
-            <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
+            
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
