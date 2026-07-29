@@ -73,11 +73,7 @@ $actividadesFiltradas = filtrarActividades($filtro);
         <!-- BARRA LATERAL (idéntica a la de alumno.php) -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="https://placehold.co/50x50/3b71f3/white?text=🦉" alt="Búho Aulamos" class="logo-img">
-                <div>
-                    <h2>AULAMOS</h2>
-                    <p>Aprendemos juntos</p>
-                </div>
+                <img src="img/logogeneral.png" alt="Logo AulamosWeb" class="logo">
             </div>
             
             <nav class="menu">
