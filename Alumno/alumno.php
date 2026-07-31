@@ -1,9 +1,13 @@
 <?php
 session_start();
+// Verificar que el usuario haya iniciado sesión
+if (!isset($_SESSION['usuario'])) {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
 require_once '../Conexion/conexion.php'; // Ajusta si es necesario
 
-$id_usuario = $_SESSION['id_usuario'] ?? 1; // Cambia 1 por el ID real de prueba
-
+$id_usuario = $_SESSION['usuario']['id_usuario'];
 // 1. Datos del usuario
 $stmt = $conexion->prepare("SELECT nombre, apellido_paterno FROM usuarios WHERE id_usuario = ?");
 $stmt->bind_param("i", $id_usuario);

@@ -7,7 +7,8 @@
 // Configuración de la conexión
 $host = 'localhost';
 $usuario = 'root';
-$password = 'Jaziel123';
+$password = '12345678';
+//$password = 'Jaziel123';
 $basedatos = 'aulamos_mvp';
 
 // Crear la conexión
