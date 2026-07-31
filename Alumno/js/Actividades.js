@@ -6,19 +6,29 @@
     const tarjetas = document.querySelectorAll('.card-actividad');
 
     function aplicarFiltro(estado) {
+        // Actualizar clases activas en botones
         filtros.forEach(btn => btn.classList.remove('activo'));
-        document.querySelector(`#filtros button[data-filtro="${estado}"]`).classList.add('activo');
+        const btnActivo = document.querySelector(`#filtros button[data-filtro="${estado}"]`);
+        if (btnActivo) btnActivo.classList.add('activo');
 
+        // Mostrar/ocultar tarjetas
         tarjetas.forEach(card => {
             const estadoCard = card.dataset.estado;
-            if (estado === 'todas' || estadoCard === estado) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
+            let mostrar = false;
+            if (estado === 'todas') {
+                mostrar = true;
+            } else if (estado === 'pendiente') {
+                mostrar = (estadoCard === 'pendiente' || estadoCard === 'atrasada');
+            } else if (estado === 'proceso') {
+                mostrar = (estadoCard === 'en_proceso');
+            } else if (estado === 'completada') {
+                mostrar = (estadoCard === 'completada' || estadoCard === 'calificada');
             }
+            card.style.display = mostrar ? 'flex' : 'none';
         });
     }
 
+    // Event listeners para los filtros
     filtros.forEach(btn => {
         btn.addEventListener('click', function() {
             const estado = this.dataset.filtro;
@@ -30,7 +40,7 @@
         });
     });
 
-    // Cargar filtro desde URL
+    // Cargar filtro desde URL al iniciar
     const params = new URLSearchParams(window.location.search);
     const filtroInicial = params.get('filtro') || 'todas';
     aplicarFiltro(filtroInicial);
@@ -42,23 +52,20 @@
             const actividad = this.closest('.card-actividad').querySelector('.card-titulo').textContent;
             if (confirm(`¿Solicitar extensión de tiempo para "${actividad}"?`)) {
                 alert('Solicitud enviada al docente. Recibirás notificación pronto.');
+                // Aquí podrías hacer una petición AJAX para registrar la solicitud
             }
         });
     });
 
-    // ----- ASISTENTE VIRTUAL (ambos botones) -----
-    document.getElementById('btnAsistente').addEventListener('click', function() {
-        alert('🧠 Asistente Virtual: Estoy aquí para ayudarte con tus dudas sobre las actividades.');
-    });
-    const btnAsistente2 = document.getElementById('btnAsistente2');
-    if (btnAsistente2) {
-        btnAsistente2.addEventListener('click', function() {
-            alert('🧠 Asistente Virtual: ¿En qué puedo ayudarte?');
+    // ----- ASISTENTE VIRTUAL (solo el de la cabecera) -----
+    const btnAsistente = document.getElementById('btnAsistente');
+    if (btnAsistente) {
+        btnAsistente.addEventListener('click', function() {
+            alert('🧠 Asistente Virtual: Estoy aquí para ayudarte con tus dudas sobre las actividades.');
         });
     }
 
-    // ----- ACCESIBILIDAD (funciones que ya están en Inicio.js, pero las repetimos aquí para asegurar) -----
-    // Si Inicio.js ya maneja estas funciones, puedes omitir esta parte, pero la dejamos por si acaso.
+    // ----- ACCESIBILIDAD (si Inicio.js ya la maneja, esto es redundante, pero lo dejamos por compatibilidad) -----
     const body = document.body;
 
     function toggleClase(elemento, clase) {
@@ -72,7 +79,6 @@
         preferencias.forEach(clase => {
             if (localStorage.getItem(clase) === 'true') {
                 body.classList.add(clase);
-                // Marcar botones activos (según los IDs de Inicio.js)
                 const map = {
                     'modo-oscuro': 'btn-darkmode',
                     'alto-contraste': 'btn-contrast',

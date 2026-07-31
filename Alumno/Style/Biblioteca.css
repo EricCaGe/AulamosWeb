@@ -1,19 +1,6 @@
-/* ----- ESTILOS ESPECÍFICOS PARA BIBLIOTECA ----- */
-/* (Se añaden a los estilos base de Inicio.css) */
-
-.page-header {
-    margin-bottom: 28px;
-}
-.page-header h2 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #0f172a;
-}
-.page-header p {
-    color: #64748b;
-    font-size: 1rem;
-    margin-top: 4px;
-}
+/* =========================================================
+   ESTILOS ESPECÍFICOS PARA BIBLIOTECA
+   ========================================================= */
 
 /* Filtros de materia (estilo similar a tabs) */
 .filtros-materia {
@@ -56,7 +43,7 @@
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border: 1px solid #e9edf2;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -74,6 +61,7 @@
 .recurso-titulo {
     font-weight: 600;
     font-size: 1.1rem;
+    color: #0f172a;
     margin-bottom: 4px;
 }
 .recurso-materia {
@@ -92,19 +80,12 @@
     margin-top: 8px;
 }
 
-/* Asistente */
-.asistente-wrapper {
-    margin: 12px 0 24px 0;
-    text-align: right;
-}
-
-/* Ajustes modo oscuro para biblioteca */
+/* =========================================================
+   ADAPTACIONES PARA MODO OSCURO
+   ========================================================= */
 body.modo-oscuro .recurso-card {
     background-color: #1e1e32;
     border-color: #2d2d44;
-}
-body.modo-oscuro .page-header h2 {
-    color: #f1f5f9;
 }
 body.modo-oscuro .filtros-materia a {
     background-color: #2d2d44;
@@ -120,8 +101,13 @@ body.modo-oscuro .recurso-tipo {
     background-color: #2d2d44;
     color: #cbd5e1;
 }
+body.modo-oscuro .recurso-titulo {
+    color: #f1f5f9;
+}
 
-/* Alto contraste */
+/* =========================================================
+   ADAPTACIONES PARA ALTO CONTRASTE
+   ========================================================= */
 body.alto-contraste .recurso-card {
     background-color: #1a1a1a !important;
     border: 2px solid #ffff00 !important;
@@ -135,11 +121,16 @@ body.alto-contraste .filtros-materia a.activo {
     background-color: #ffff00 !important;
     color: #000000 !important;
 }
-
-/* Texto grande */
-body.texto-grande .page-header h2 {
-    font-size: 2.5rem !important;
+body.alto-contraste .recurso-titulo {
+    color: #ffffff !important;
 }
+body.alto-contraste .recurso-materia {
+    color: #ffff00 !important;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA TEXTO GRANDE
+   ========================================================= */
 body.texto-grande .filtros-materia a {
     font-size: 1.2rem !important;
     padding: 10px 24px !important;
@@ -147,8 +138,20 @@ body.texto-grande .filtros-materia a {
 body.texto-grande .recurso-titulo {
     font-size: 1.4rem !important;
 }
+body.texto-grande .recurso-materia {
+    font-size: 1.1rem !important;
+}
+body.texto-grande .recurso-tipo {
+    font-size: 1rem !important;
+    padding: 6px 16px !important;
+}
+body.texto-grande .recurso-icono {
+    font-size: 3.5rem !important;
+}
 
-/* Responsive */
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 @media (max-width: 768px) {
     .grid-recursos {
         grid-template-columns: 1fr 1fr;

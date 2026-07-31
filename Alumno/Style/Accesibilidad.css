@@ -1,0 +1,277 @@
+/* =========================================================
+   ESTILOS ESPECÍFICOS PARA ACCESIBILIDAD
+   ========================================================= */
+
+/* Grid de opciones */
+.accesibilidad-options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.accesibilidad-option {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    border: 1px solid #e9edf2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s, border-color 0.3s;
+}
+.accesibilidad-option:hover {
+    border-color: #3b82f6;
+}
+
+.option-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.option-icon {
+    font-size: 1.8rem;
+    color: #3b82f6;
+    min-width: 50px;
+    text-align: center;
+}
+
+.option-info h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.option-info p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.option-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Toggle switch personalizado */
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+}
+
+.toggle-track {
+    width: 48px;
+    height: 28px;
+    background-color: #cbd5e1;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    padding: 3px;
+    transition: 0.3s;
+    position: relative;
+}
+
+.toggle-thumb {
+    width: 22px;
+    height: 22px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-btn.active .toggle-track {
+    background-color: #3b82f6;
+}
+.toggle-btn.active .toggle-thumb {
+    transform: translateX(20px);
+}
+
+.toggle-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1e293b;
+    min-width: 32px;
+}
+
+/* Select personalizado */
+.select-pref {
+    padding: 8px 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background-color: #ffffff;
+    color: #1e293b;
+    cursor: pointer;
+    transition: 0.2s;
+    min-width: 140px;
+}
+.select-pref:hover {
+    border-color: #3b82f6;
+}
+.select-pref:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Sección de restablecer */
+.reset-section {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 24px 0;
+}
+
+.btn-reset {
+    background-color: #f1f5f9;
+    border: 1px solid #d1d5db;
+    padding: 12px 32px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1e293b;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.btn-reset:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #dc2626;
+}
+.btn-reset i {
+    font-size: 1.1rem;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA MODO OSCURO
+   ========================================================= */
+body.modo-oscuro .accesibilidad-option {
+    background-color: #1e1e32;
+    border-color: #2d2d44;
+}
+body.modo-oscuro .option-info h3 {
+    color: #f1f5f9;
+}
+body.modo-oscuro .option-info p {
+    color: #94a3b8;
+}
+body.modo-oscuro .toggle-label {
+    color: #cbd5e1;
+}
+body.modo-oscuro .toggle-track {
+    background-color: #4a4a6a;
+}
+body.modo-oscuro .toggle-btn.active .toggle-track {
+    background-color: #4f46e5;
+}
+body.modo-oscuro .select-pref {
+    background-color: #2d2d44;
+    color: #cbd5e1;
+    border-color: #4a4a6a;
+}
+body.modo-oscuro .btn-reset {
+    background-color: #2d2d44;
+    color: #cbd5e1;
+    border-color: #4a4a6a;
+}
+body.modo-oscuro .btn-reset:hover {
+    background-color: #3d1a1a;
+    border-color: #ef4444;
+    color: #fca5a5;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA ALTO CONTRASTE
+   ========================================================= */
+body.alto-contraste .accesibilidad-option {
+    background-color: #1a1a1a !important;
+    border: 2px solid #ffff00 !important;
+}
+body.alto-contraste .option-info h3,
+body.alto-contraste .option-info p {
+    color: #ffffff !important;
+}
+body.alto-contraste .toggle-btn.active .toggle-track {
+    background-color: #ffff00 !important;
+}
+body.alto-contraste .toggle-thumb {
+    background-color: #000000 !important;
+}
+body.alto-contraste .select-pref {
+    background-color: #222 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+body.alto-contraste .btn-reset {
+    background-color: #222 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+body.alto-contraste .btn-reset:hover {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA TEXTO GRANDE
+   ========================================================= */
+body.texto-grande .option-info h3 {
+    font-size: 1.4rem !important;
+}
+body.texto-grande .option-info p {
+    font-size: 1.1rem !important;
+}
+body.texto-grande .toggle-label {
+    font-size: 1.1rem !important;
+}
+body.texto-grande .select-pref {
+    font-size: 1.1rem !important;
+    padding: 10px 20px !important;
+}
+body.texto-grande .btn-reset {
+    font-size: 1.1rem !important;
+    padding: 14px 36px !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .accesibilidad-option {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .option-control {
+        justify-content: space-between;
+    }
+}
+@media (max-width: 480px) {
+    .accesibilidad-option {
+        padding: 16px;
+    }
+    .option-header {
+        gap: 10px;
+    }
+    .option-icon {
+        font-size: 1.4rem;
+        min-width: 40px;
+    }
+    .select-pref {
+        min-width: 100px;
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+}

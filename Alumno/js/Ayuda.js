@@ -2,12 +2,45 @@
     'use strict';
 
     // =============================================
-    // ASISTENTE VIRTUAL (solo el de la cabecera)
+    // ASISTENTE VIRTUAL
     // =============================================
     const btnAsistente = document.getElementById('btnAsistente');
     if (btnAsistente) {
         btnAsistente.addEventListener('click', function() {
-            alert('🧠 Asistente Virtual: Revisa tu progreso, ¡vas muy bien! ¿Necesitas ayuda con alguna materia?');
+            alert('🧠 Asistente Virtual: ¡Hola! ¿En qué puedo ayudarte? Puedo guiarte por la plataforma o resolver tus dudas.');
+        });
+    }
+
+    // =============================================
+    // BOTONES DE GUÍAS
+    // =============================================
+    document.querySelectorAll('.help-card .help-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const card = this.closest('.help-card');
+            const titulo = card.querySelector('h3').textContent;
+            alert('🔍 Abriendo guía: "' + titulo + '"\n(Esta funcionalidad estará disponible próximamente)');
+        });
+    });
+
+    // =============================================
+    // BOTONES DE ARTÍCULOS
+    // =============================================
+    document.querySelectorAll('.article-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const item = this.closest('.help-article-item');
+            const titulo = item.querySelector('h3').textContent;
+            alert('📖 Leyendo artículo: "' + titulo + '"\n(El contenido completo se mostrará aquí)');
+        });
+    });
+
+    // =============================================
+    // BOTÓN DE SOPORTE
+    // =============================================
+    const supportBtn = document.querySelector('.support-btn');
+    if (supportBtn) {
+        supportBtn.addEventListener('click', function() {
+            alert('💬 Conectando con soporte...\nUn asesor te atenderá en breve. ¡Estamos para ayudarte!');
         });
     }
 
@@ -79,5 +112,4 @@
     if (body.classList.contains('alto-contraste')) btnContrast?.classList.add('active');
     if (body.classList.contains('texto-grande')) btnText?.classList.add('active');
     */
-
 })();

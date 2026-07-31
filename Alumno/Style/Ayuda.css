@@ -1,0 +1,357 @@
+/* =========================================================
+   ESTILOS ESPECÍFICOS PARA AYUDA
+   ========================================================= */
+
+/* Sección de ayuda */
+.help-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.section-title i {
+    color: #3b82f6;
+    margin-right: 8px;
+}
+
+.section-description {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+/* Tarjetas de guías */
+.help-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.help-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e9edf2;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
+}
+.help-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.help-icon {
+    font-size: 2.5rem;
+    color: #3b82f6;
+    margin-bottom: 12px;
+}
+
+.help-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.help-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+.help-btn {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 40px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-secondary {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+/* Lista de artículos (desde BD) */
+.help-articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.help-article-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid #e9edf2;
+    transition: 0.2s;
+}
+.help-article-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.article-icon {
+    font-size: 1.5rem;
+    color: #3b82f6;
+    min-width: 40px;
+}
+
+.article-content {
+    flex: 1;
+}
+.article-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+.article-content p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.article-tag {
+    display: inline-block;
+    background-color: #f1f5f9;
+    padding: 2px 12px;
+    border-radius: 40px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #475569;
+    margin-top: 4px;
+}
+
+.article-btn {
+    background-color: transparent;
+    border: 1px solid #d1d5db;
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.85rem;
+    color: #1e293b;
+}
+.article-btn:hover {
+    background-color: #f1f5f9;
+    border-color: #3b82f6;
+}
+
+/* Sección de soporte */
+.support-section {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 8px;
+}
+
+.support-content {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.support-icon {
+    font-size: 3rem;
+    color: #3b82f6;
+}
+
+.support-text {
+    flex: 1;
+}
+.support-text h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+.support-text p {
+    color: #475569;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.support-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.95rem;
+}
+.support-btn:hover {
+    background-color: #2563eb;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA MODO OSCURO
+   ========================================================= */
+body.modo-oscuro .help-card,
+body.modo-oscuro .help-article-item {
+    background-color: #1e1e32;
+    border-color: #2d2d44;
+}
+body.modo-oscuro .help-card h3,
+body.modo-oscuro .article-content h3 {
+    color: #f1f5f9;
+}
+body.modo-oscuro .help-card p,
+body.modo-oscuro .article-content p {
+    color: #94a3b8;
+}
+body.modo-oscuro .section-title {
+    color: #f1f5f9;
+}
+body.modo-oscuro .btn-secondary {
+    background-color: #2d2d44;
+    color: #cbd5e1;
+}
+body.modo-oscuro .btn-secondary:hover {
+    background-color: #3d3d5c;
+}
+body.modo-oscuro .support-section {
+    background: linear-gradient(135deg, #1a2a4a, #1e3a5a);
+}
+body.modo-oscuro .support-text h2 {
+    color: #f1f5f9;
+}
+body.modo-oscuro .support-text p {
+    color: #94a3b8;
+}
+body.modo-oscuro .article-tag {
+    background-color: #2d2d44;
+    color: #94a3b8;
+}
+body.modo-oscuro .article-btn {
+    color: #cbd5e1;
+    border-color: #4a4a6a;
+}
+body.modo-oscuro .article-btn:hover {
+    background-color: #2d2d44;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA ALTO CONTRASTE
+   ========================================================= */
+body.alto-contraste .help-card,
+body.alto-contraste .help-article-item {
+    background-color: #1a1a1a !important;
+    border: 2px solid #ffff00 !important;
+}
+body.alto-contraste .help-card h3,
+body.alto-contraste .article-content h3,
+body.alto-contraste .section-title,
+body.alto-contraste .support-text h2 {
+    color: #ffffff !important;
+}
+body.alto-contraste .help-card p,
+body.alto-contraste .article-content p,
+body.alto-contraste .support-text p {
+    color: #ffff00 !important;
+}
+body.alto-contraste .btn-primary,
+body.alto-contraste .support-btn {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+body.alto-contraste .btn-secondary {
+    background-color: #222 !important;
+    color: #ffff00 !important;
+    border: 2px solid #ffff00 !important;
+}
+body.alto-contraste .support-section {
+    background: #111111 !important;
+    border: 2px solid #ffff00 !important;
+}
+body.alto-contraste .article-btn {
+    background-color: #222 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+
+/* =========================================================
+   ADAPTACIONES PARA TEXTO GRANDE
+   ========================================================= */
+body.texto-grande .section-title {
+    font-size: 1.8rem !important;
+}
+body.texto-grande .help-card h3 {
+    font-size: 1.4rem !important;
+}
+body.texto-grande .help-card p {
+    font-size: 1.1rem !important;
+}
+body.texto-grande .article-content h3 {
+    font-size: 1.3rem !important;
+}
+body.texto-grande .article-content p {
+    font-size: 1rem !important;
+}
+body.texto-grande .support-text h2 {
+    font-size: 1.6rem !important;
+}
+body.texto-grande .support-text p {
+    font-size: 1.1rem !important;
+}
+body.texto-grande .help-btn,
+body.texto-grande .support-btn,
+body.texto-grande .article-btn {
+    font-size: 1.1rem !important;
+    padding: 10px 28px !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .help-cards-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .support-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    .help-article-item {
+        flex-wrap: wrap;
+    }
+    .article-btn {
+        width: 100%;
+        margin-top: 8px;
+    }
+}
+@media (max-width: 480px) {
+    .help-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .support-content {
+        padding: 8px;
+    }
+}
