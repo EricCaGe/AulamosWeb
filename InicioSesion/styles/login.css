@@ -422,3 +422,35 @@ body {
         gap: 10px;
     }
 }
+
+/* ========================================== */
+/* VALIDACIONES DE CONTRASEÑA                */
+/* ========================================== */
+
+.password-requirements {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.password-requirements ul li {
+    transition: all 0.3s ease;
+}
+
+.password-requirements ul li i {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+/* Cuando se cumple un requisito */
+.password-requirements ul li.cumplido {
+    color: #16a34a !important;
+}
+
+.password-requirements ul li.cumplido i {
+    color: #16a34a;
+}

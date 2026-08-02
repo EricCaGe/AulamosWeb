@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 password.style.borderColor = '';
             }
             
+            
             // Validar rol
             if (!rol || rol.value === '' || rol.value === null) {
                 errores.push('Debes seleccionar un rol (Alumno o Docente).');

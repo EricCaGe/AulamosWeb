@@ -97,6 +97,36 @@
                             <i class="fa-regular fa-eye toggle-password-icon" id="btn-ver-password" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
                         </div>
                         <p style="font-size: 12px; color: #6b7280; margin-top: 2px;">Mínimo 8 caracteres.</p>
+
+                        <!-- ✅ VALIDACIONES DE CONTRASEÑA EN TIEMPO REAL -->
+                        <div class="password-requirements" id="passwordRequirements">
+                            <p style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4b5563;">
+                                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> 
+                                Tu contraseña debe cumplir con:
+                            </p>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px;">
+                                <li id="req-length" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                                    <span>Mínimo 8 caracteres</span>
+                                </li>
+                                <li id="req-uppercase" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                                    <span>Al menos 1 mayúscula</span>
+                                </li>
+                                <li id="req-lowercase" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                                    <span>Al menos 1 minúscula</span>
+                                </li>
+                                <li id="req-number" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                                    <span>Al menos 1 número</span>
+                                </li>
+                                <li id="req-special" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                                    <span>Al menos 1 carácter especial (-_!@#$%^&*)</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -126,7 +156,9 @@
     <!-- ========================================== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mostrar/Ocultar contraseña
+            // ========================================== //
+            // MOSTRAR/OCULTAR CONTRASEÑA                //
+            // ========================================== //
             const btnVer = document.getElementById('btn-ver-password');
             const inputPass = document.getElementById('nueva-password');
 
@@ -139,7 +171,65 @@
                 });
             }
 
-            // Validar que las contraseñas coincidan
+            // ========================================== //
+            // VALIDACIÓN DE CONTRASEÑA EN TIEMPO REAL    //
+            // ========================================== //
+            const passwordInput = document.getElementById('nueva-password');
+            const reqLength = document.getElementById('req-length');
+            const reqUppercase = document.getElementById('req-uppercase');
+            const reqLowercase = document.getElementById('req-lowercase');
+            const reqNumber = document.getElementById('req-number');
+            const reqSpecial = document.getElementById('req-special');
+
+            if (passwordInput) {
+                function validarContraseña(contraseña) {
+                    const requisitos = {
+                        length: contraseña.length >= 8,
+                        uppercase: /[A-Z]/.test(contraseña),
+                        lowercase: /[a-z]/.test(contraseña),
+                        number: /[0-9]/.test(contraseña),
+                        special: /[_\-!@#$%^&*]/.test(contraseña)
+                    };
+                    return requisitos;
+                }
+
+                function actualizarRequisito(elemento, cumple) {
+                    if (!elemento) return;
+                    if (cumple) {
+                        elemento.style.color = '#16a34a';
+                        const icono = elemento.querySelector('i');
+                        if (icono) icono.className = 'fa-regular fa-circle-check';
+                    } else {
+                        elemento.style.color = '#6b7280';
+                        const icono = elemento.querySelector('i');
+                        if (icono) icono.className = 'fa-regular fa-circle';
+                    }
+                }
+
+                passwordInput.addEventListener('input', function() {
+                    const contraseña = this.value;
+                    const requisitos = validarContraseña(contraseña);
+
+                    actualizarRequisito(reqLength, requisitos.length);
+                    actualizarRequisito(reqUppercase, requisitos.uppercase);
+                    actualizarRequisito(reqLowercase, requisitos.lowercase);
+                    actualizarRequisito(reqNumber, requisitos.number);
+                    actualizarRequisito(reqSpecial, requisitos.special);
+
+                    const allValid = Object.values(requisitos).every(val => val === true);
+                    if (contraseña.length === 0) {
+                        this.style.borderColor = '';
+                    } else if (allValid) {
+                        this.style.borderColor = '#16a34a';
+                    } else {
+                        this.style.borderColor = '#dc2626';
+                    }
+                });
+            }
+
+            // ========================================== //
+            // VALIDAR QUE LAS CONTRASEÑAS COINCIDAN     //
+            // ========================================== //
             const form = document.querySelector('.login-form');
             const pass = document.getElementById('nueva-password');
             const confirm = document.getElementById('confirmar-password');
@@ -148,11 +238,24 @@
                 form.addEventListener('submit', function(event) {
                     let errores = [];
 
+                    // Validar contraseña fuerte (misma validación del registro)
                     if (!pass || pass.value.trim() === '') {
                         errores.push('La contraseña es obligatoria.');
                         pass.style.borderColor = '#dc2626';
                     } else if (pass.value.length < 8) {
                         errores.push('La contraseña debe tener al menos 8 caracteres.');
+                        pass.style.borderColor = '#dc2626';
+                    } else if (!/[A-Z]/.test(pass.value)) {
+                        errores.push('La contraseña debe tener al menos 1 mayúscula.');
+                        pass.style.borderColor = '#dc2626';
+                    } else if (!/[a-z]/.test(pass.value)) {
+                        errores.push('La contraseña debe tener al menos 1 minúscula.');
+                        pass.style.borderColor = '#dc2626';
+                    } else if (!/[0-9]/.test(pass.value)) {
+                        errores.push('La contraseña debe tener al menos 1 número.');
+                        pass.style.borderColor = '#dc2626';
+                    } else if (!/[_\-!@#$%^&*]/.test(pass.value)) {
+                        errores.push('La contraseña debe tener al menos 1 carácter especial (-_!@#$%^&*).');
                         pass.style.borderColor = '#dc2626';
                     } else {
                         pass.style.borderColor = '';

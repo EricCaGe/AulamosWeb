@@ -138,15 +138,46 @@
                     </div>
 
                     <!-- Contraseña -->
-                    <div class="input-group">
-                        <label for="registro-password">Contraseña</label>
-                        <div class="input-wrapper">
-                            <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
-                            <input type="password" id="registro-password" name="password" placeholder="••••••••••••••••" required>
-                            <i class="fa-regular fa-eye toggle-password-icon" id="btn-ver-password" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
-                        </div>
-                        <p style="font-size: 12px; color: #6b7280; margin-top: 2px;">La contraseña debe tener al menos 8 caracteres.</p>
-                    </div>
+                   <!-- Contraseña -->
+<div class="input-group">
+    <label for="registro-password">Contraseña</label>
+    <div class="input-wrapper">
+        <i class="fa-solid fa-lock input-icon" aria-hidden="true"></i>
+        <input type="password" id="registro-password" name="password" placeholder="••••••••••••••••" required>
+        <i class="fa-regular fa-eye toggle-password-icon" id="btn-ver-password" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
+    </div>
+    <p style="font-size: 12px; color: #6b7280; margin-top: 2px;">La contraseña debe tener al menos 8 caracteres.</p>
+
+    <!-- ✅ VALIDACIONES DE CONTRASEÑA EN TIEMPO REAL -->
+    <div class="password-requirements" id="passwordRequirements">
+        <p style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4b5563;">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> 
+            Tu contraseña debe cumplir con:
+        </p>
+        <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px;">
+            <li id="req-length" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                <span>Mínimo 8 caracteres</span>
+            </li>
+            <li id="req-uppercase" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                <span>Al menos 1 mayúscula</span>
+            </li>
+            <li id="req-lowercase" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                <span>Al menos 1 minúscula</span>
+            </li>
+            <li id="req-number" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                <span>Al menos 1 número</span>
+            </li>
+            <li id="req-special" style="padding: 4px 0; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-circle" aria-hidden="true"></i>
+                <span>Al menos 1 carácter especial (-_!@#$%^&*)</span>
+            </li>
+        </ul>
+    </div>
+</div>
 
                     <button type="submit" class="btn-submit-login">Crear Cuenta</button>
                 </form>

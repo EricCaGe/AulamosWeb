@@ -3,6 +3,10 @@
 // ========================================== //
 document.addEventListener("DOMContentLoaded", function() {
     
+    // ========================================== //
+    // 1. FUNCIONES DE NAVEGACIÓN CON FLECHAS     //
+    // ========================================== //
+    
     function obtenerElementosInteractivos() {
         const elementos = document.querySelectorAll(
             'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -45,10 +49,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // ========================================== //
-    // FUNCIONES ESPECÍFICAS DE CADA PÁGINA      //
+    // 2. MOSTRAR/OCULTAR CONTRASEÑA             //
     // ========================================== //
     
-    // --- Mostrar/Ocultar Contraseña (Registro) ---
     const btnVerPassword = document.getElementById('btn-ver-password');
     const inputPassword = document.getElementById('registro-password');
 
@@ -70,14 +73,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // ========================================== //
-    // ALTERNAR ROLES + ACTUALIZAR CAMPO OCULTO  //
+    // 3. ALTERNAR ROLES + ACTUALIZAR CAMPO OCULTO //
     // ========================================== //
     const btnAlumno = document.getElementById('btn-registro-alumno');
     const btnDocente = document.getElementById('btn-registro-docente');
     const rolInput = document.getElementById('rol-input');
 
     if (btnAlumno && btnDocente && rolInput) {
-        // Asegurar que el rol inicial sea "alumno"
         rolInput.value = 'Alumno';
 
         btnAlumno.addEventListener('click', function() {
@@ -94,14 +96,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // ========================================== //
-    // VALIDACIÓN DEL FORMULARIO                  //
+    // 4. VALIDACIÓN DEL FORMULARIO              //
     // ========================================== //
     const formulario = document.querySelector('.login-form');
     
     if (formulario) {
         formulario.addEventListener('submit', function(event) {
             
-            // Obtener campos
             const nombre = document.getElementById('registro-nombre');
             const apellidoPaterno = document.getElementById('registro-apellido-paterno');
             const apellidoMaterno = document.getElementById('registro-apellido-materno');
@@ -111,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function() {
             
             let errores = [];
             
-            // Validar nombre
             if (!nombre || nombre.value.trim() === '') {
                 errores.push('El nombre es obligatorio.');
                 nombre.style.borderColor = '#dc2626';
@@ -119,7 +119,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 nombre.style.borderColor = '';
             }
             
-            // Validar apellido paterno
             if (!apellidoPaterno || apellidoPaterno.value.trim() === '') {
                 errores.push('El apellido paterno es obligatorio.');
                 apellidoPaterno.style.borderColor = '#dc2626';
@@ -127,7 +126,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 apellidoPaterno.style.borderColor = '';
             }
             
-            // Validar apellido materno
             if (!apellidoMaterno || apellidoMaterno.value.trim() === '') {
                 errores.push('El apellido materno es obligatorio.');
                 apellidoMaterno.style.borderColor = '#dc2626';
@@ -135,7 +133,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 apellidoMaterno.style.borderColor = '';
             }
             
-            // Validar email
             if (!email || email.value.trim() === '') {
                 errores.push('El correo electrónico es obligatorio.');
                 email.style.borderColor = '#dc2626';
@@ -146,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 email.style.borderColor = '';
             }
             
-            // Validar contraseña
             if (!password || password.value.trim() === '') {
                 errores.push('La contraseña es obligatoria.');
                 password.style.borderColor = '#dc2626';
@@ -157,7 +153,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 password.style.borderColor = '';
             }
             
-            // Si hay errores, cancelar envío
             if (errores.length > 0) {
                 event.preventDefault();
                 
@@ -170,8 +165,64 @@ document.addEventListener("DOMContentLoaded", function() {
                 return false;
             }
             
-            // Si no hay errores, el formulario se envía normalmente
             return true;
+        });
+    }
+
+    // ========================================== //
+    // 5. VALIDACIÓN DE CONTRASEÑA EN TIEMPO REAL //
+    // ========================================== //
+    
+    const passwordInput = document.getElementById('registro-password');
+    const reqLength = document.getElementById('req-length');
+    const reqUppercase = document.getElementById('req-uppercase');
+    const reqLowercase = document.getElementById('req-lowercase');
+    const reqNumber = document.getElementById('req-number');
+    const reqSpecial = document.getElementById('req-special');
+
+    if (passwordInput) {
+        function validarContraseña(contraseña) {
+            const requisitos = {
+                length: contraseña.length >= 8,
+                uppercase: /[A-Z]/.test(contraseña),
+                lowercase: /[a-z]/.test(contraseña),
+                number: /[0-9]/.test(contraseña),
+            special: /[_\-!@#$%^&*]/.test(contraseña)
+            };
+            return requisitos;
+        }
+
+        function actualizarRequisito(elemento, cumple) {
+            if (!elemento) return;
+            if (cumple) {
+                elemento.style.color = '#16a34a';
+                const icono = elemento.querySelector('i');
+                if (icono) icono.className = 'fa-regular fa-circle-check';
+            } else {
+                elemento.style.color = '#6b7280';
+                const icono = elemento.querySelector('i');
+                if (icono) icono.className = 'fa-regular fa-circle';
+            }
+        }
+
+        passwordInput.addEventListener('input', function() {
+            const contraseña = this.value;
+            const requisitos = validarContraseña(contraseña);
+
+            actualizarRequisito(reqLength, requisitos.length);
+            actualizarRequisito(reqUppercase, requisitos.uppercase);
+            actualizarRequisito(reqLowercase, requisitos.lowercase);
+            actualizarRequisito(reqNumber, requisitos.number);
+            actualizarRequisito(reqSpecial, requisitos.special);
+
+            const allValid = Object.values(requisitos).every(val => val === true);
+            if (contraseña.length === 0) {
+                this.style.borderColor = '';
+            } else if (allValid) {
+                this.style.borderColor = '#16a34a';
+            } else {
+                this.style.borderColor = '#dc2626';
+            }
         });
     }
 });
