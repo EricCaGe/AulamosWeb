@@ -53,18 +53,7 @@
                     </p>
                 </div>
 
-                <!-- ENLACE PARA PRUEBA (SOLO DESARROLLO) -->
-                <?php if ($enlace): ?>
-                    <div style="background: #fef3c7; color: #92400e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
-                        <p style="margin: 0 0 10px 0;">
-                            <i class="fa-solid fa-link" aria-hidden="true"></i>
-                            <strong>Enlace de prueba (desarrollo):</strong>
-                        </p>
-                        <a href="<?php echo $enlace; ?>" target="_blank" style="word-break: break-all; color: #5a189a;">
-                            <?php echo $enlace; ?>
-                        </a>
-                    </div>
-                <?php endif; ?>
+               
 
                 <div style="text-align: center;">
                     <a href="login.php" class="btn-submit-login" style="display: inline-block; text-decoration: none; text-align: center;">

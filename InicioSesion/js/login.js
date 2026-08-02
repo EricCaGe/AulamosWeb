@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     if (roleButtons.length > 0 && rolInput) {
         // Asegurar que el rol inicial sea "alumno"
-        rolInput.value = 'alumno';
+        rolInput.value = 'Alumno';
 
         roleButtons.forEach(function(button) {
             button.addEventListener('click', function() {

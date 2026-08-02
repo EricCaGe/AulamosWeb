@@ -5,6 +5,7 @@
 
 require_once '../Conexion/conexion.php';
 
+
 // Verificar que se envió el formulario
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: registro.php?error=sesion');
@@ -12,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Obtener datos del formulario
-$rol = $_POST['rol'] ?? 'alumno';  // Valor por defecto si no llega
+$rol = $_POST['rol'] ?? 'Alumno';
 $correo = trim($_POST['correo'] ?? '');
 $password = $_POST['password'] ?? '';
 $nombre = trim($_POST['nombre'] ?? '');
@@ -26,8 +27,8 @@ if (empty($correo) || empty($password) || empty($nombre) || empty($apellido_pate
 }
 
 // Validar que el rol sea válido
-if (!in_array($rol, ['alumno', 'docente'])) {
-    $rol = 'alumno';  // Forzar a alumno si no es válido
+if (!in_array($rol, ['Alumno', 'Docente'])) {
+    $rol = 'Alumno';
 }
 
 // Validar formato de correo
@@ -81,27 +82,14 @@ try {
     $stmt->close();
     
     // ========================================== */
-    // ASIGNAR ROL                               */
+    // ASIGNAR ROL (MANUAL)                       */
     // ========================================== */
     
-    // Obtener el ID del rol
-    $stmt = $conexion->prepare("SELECT id_rol FROM roles WHERE nombre = ?");
-    $stmt->bind_param("s", $rol);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $rol_data = $resultado->fetch_assoc();
-    $stmt->close();
-    
-    if (!$rol_data) {
-        // Si el rol no existe, lo creamos
-        $descripcion = ($rol === 'alumno') ? 'Usuario estudiante de la plataforma' : 'Usuario profesor de la plataforma';
-        $stmt = $conexion->prepare("INSERT INTO roles (nombre, descripcion) VALUES (?, ?)");
-        $stmt->bind_param("ss", $rol, $descripcion);
-        $stmt->execute();
-        $id_rol = $conexion->insert_id;
-        $stmt->close();
+    // Asignar ID de rol manualmente según lo que seleccionó el usuario
+    if ($rol === 'Alumno') {
+        $id_rol = 1;  // ID fijo para Alumno
     } else {
-        $id_rol = $rol_data['id_rol'];
+        $id_rol = 2;  // ID fijo para Docente
     }
     
     // Asignar rol al usuario

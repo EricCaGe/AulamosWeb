@@ -3,6 +3,10 @@
 // PROCESAR RECUPERAR CONTRASEÑA             */
 // ========================================== */
 
+// Activar errores para depurar
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once '../Conexion/conexion.php';
 
 // Verificar que se envió el formulario
@@ -73,78 +77,34 @@ try {
     $enlace = $protocolo . $host . $ruta_base . 'restablecer.php?token=' . $token;
     
     // ========================================== */
-    // ENVIAR CORREO (SIMULADO)                   */
+    // ENVIAR CORREO CON PHPMailer               */
     // ========================================== */
     
-    // En desarrollo, mostramos el enlace en pantalla
-    // En producción, aquí iría el código de envío de correo con PHPMailer
-    
-    $mensaje = "
-    <html>
-    <head>
-        <style>
-            body { font-family: Arial, sans-serif; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #5a189a; color: white; padding: 20px; text-align: center; }
-            .content { padding: 20px; background: #f9f9f9; }
-            .btn { 
-                display: inline-block; 
-                padding: 12px 30px; 
-                background: #5a189a; 
-                color: white; 
-                text-decoration: none; 
-                border-radius: 8px;
-                margin: 20px 0;
-            }
-            .footer { text-align: center; padding: 10px; color: #666; font-size: 12px; }
-        </style>
-    </head>
-    <body>
-        <div class='container'>
-            <div class='header'>
-                <h1>AULAMOS</h1>
-                <p>Recuperación de contraseña</p>
-            </div>
-            <div class='content'>
-                <p>Hola <strong>" . htmlspecialchars($usuario['nombre']) . "</strong>,</p>
-                <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
-                <p>Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
-                <p style='text-align: center;'>
-                    <a href='" . $enlace . "' class='btn'>Restablecer contraseña</a>
-                </p>
-                <p>O copia y pega este enlace en tu navegador:</p>
-                <p style='background: #eee; padding: 10px; word-break: break-all; font-size: 12px;'>
-                    " . $enlace . "
-                </p>
-                <p><strong>Este enlace expirará en 1 hora.</strong></p>
-                <p>Si no solicitaste este cambio, ignora este mensaje.</p>
-            </div>
-            <div class='footer'>
-                <p>&copy; 2024 AULAMOS - Todos los derechos reservados</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    ";
+    // Incluir recovery.php y enviar el correo
+    require_once 'recovery.php';
+    $enviado = enviarCorreoRecuperacion($correo, $usuario['nombre'], $enlace);
     
     // ========================================== */
-    // GUARDAR ENLACE EN SESIÓN PARA MOSTRARLO   */
+    // GUARDAR ENLACE EN SESIÓN (por si falla)   */
     // ========================================== */
     
-    // Iniciar sesión para guardar el enlace temporalmente
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
     
-    // Guardar el enlace para mostrarlo en una página de confirmación
     $_SESSION['enlace_recuperacion'] = $enlace;
     $_SESSION['correo_recuperacion'] = $correo;
     
     // ========================================== */
-    // REDIRIGIR A PÁGINA DE CONFIRMACIÓN        */
+    // REDIRIGIR SEGÚN RESULTADO                 */
     // ========================================== */
     
-    header('Location: recuperar_confirmacion.php');
+    if ($enviado) {
+        header('Location: recuperar_confirmacion.php?exito=correo_enviado');
+    } else {
+        // Si no se envió, mostramos el enlace para pruebas
+        header('Location: recuperar_confirmacion.php?exito=correo_no_enviado');
+    }
     exit;
     
 } catch(Exception $e) {

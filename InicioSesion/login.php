@@ -84,19 +84,19 @@
 
                 <!-- Selector de Rol -->
                 <div class="role-selector">
-                    <button type="button" class="btn-role active" data-rol="alumno" aria-label="Seleccionar rol alumno">
+                    <button type="button" class="btn-role active" data-rol="Alumno" aria-label="Seleccionar rol Alumno">
                         <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
                     </button>
-                    <button type="button" class="btn-role" data-rol="docente" aria-label="Seleccionar rol docente">
+                    <button type="button" class="btn-role" data-rol="Docente" aria-label="Seleccionar rol Docente">
                         <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
                     </button>
                 </div>
 
-                <!-- Campo oculto para el rol -->
-                <input type="hidden" name="rol" id="rol-input" value="alumno">
 
                 <!-- Formulario -->
                 <form class="login-form" action="procesar_login.php" method="POST" novalidate>
+                    <!-- Campo oculto para el rol -->
+                <input type="hidden" name="rol" id="rol-input" value="Alumno">
                     <div class="input-group">
                         <label for="login-email">Correo electrónico</label>
                         <div class="input-wrapper">

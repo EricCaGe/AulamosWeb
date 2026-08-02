@@ -78,18 +78,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (btnAlumno && btnDocente && rolInput) {
         // Asegurar que el rol inicial sea "alumno"
-        rolInput.value = 'alumno';
+        rolInput.value = 'Alumno';
 
         btnAlumno.addEventListener('click', function() {
             btnDocente.classList.remove('active');
             btnAlumno.classList.add('active');
-            rolInput.value = 'alumno';
+            rolInput.value = 'Alumno';
         });
 
         btnDocente.addEventListener('click', function() {
             btnAlumno.classList.remove('active');
             btnDocente.classList.add('active');
-            rolInput.value = 'docente';
+            rolInput.value = 'Docente';
         });
     }
 
