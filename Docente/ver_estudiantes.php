@@ -24,7 +24,7 @@ $rol = "Docente";
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="https://placehold.co/50x50/ffffff/3b71f3?text=🦉" alt="Búho Aulamos" class="logo-img">
+                <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
                 <div>
                     <h2>AULAMOS</h2>
                     <p>Aprendemos juntos</p>

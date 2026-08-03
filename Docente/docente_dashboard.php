@@ -178,7 +178,7 @@ function formatearFecha($fecha) {
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="../img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
+                <img src="../img/logo_g.png" alt="Logo Aulamos" class="logo-img">
                 <div>
                     <h2>AULAMOS</h2>
                     <p>Aprendemos juntos</p>

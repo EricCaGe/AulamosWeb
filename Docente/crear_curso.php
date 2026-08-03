@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_grupo = $_POST['id_grupo'] ?? 0;
     $id_ciclo = $_POST['id_ciclo'] ?? 0;
     $estado = $_POST['estado'] ?? 'Activo';
+    $id_recurso = $_POST['id_recurso'] ?? null;
 
     // Validar campos obligatorios
     if (empty($nombre) || empty($id_materia) || empty($id_grupo) || empty($id_ciclo)) {
@@ -77,51 +78,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tipo_mensaje = 'exito';
 
             // ========================================== */
-            // SUBIR ARCHIVO                             */
+            // ASOCIAR RECURSO AL CURSO (si se subió uno)  */
             // ========================================== */
-            if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
-                $archivo = $_FILES['archivo'];
-                $nombre_original = basename($archivo['name']);
-                $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
+            if (!empty($id_recurso)) {
+                $stmt = $conexion->prepare("
+                    UPDATE recursos_educativos 
+                    SET id_materia = ?, id_actividad = NULL 
+                    WHERE id_recurso = ?
+                ");
+                $stmt->bind_param("ii", $id_materia, $id_recurso);
+                $stmt->execute();
+                $stmt->close();
                 
-                // Tipos permitidos
-                $tipos_permitidos = ['pdf', 'mp4', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'jpg', 'png'];
-                
-                if (in_array($extension, $tipos_permitidos)) {
-                    // Generar nombre único
-                    $nombre_archivo = uniqid() . '.' . $extension;
-                    $ruta_destino = '../uploads/cursos/' . $nombre_archivo;
-                    
-                    // Crear carpeta si no existe
-                    if (!is_dir('../uploads/cursos/')) {
-                        mkdir('../uploads/cursos/', 0777, true);
-                    }
-                    
-                    // Mover archivo
-                    if (move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
-                        // Guardar en recursos_educativos
-                        $tipo_recurso = $_POST['tipo_curso'] ?? 'Documento';
-                        $titulo_recurso = $nombre;
-                        
-                        $stmt = $conexion->prepare("
-                            INSERT INTO recursos_educativos (
-                                titulo, 
-                                descripcion, 
-                                tipo, 
-                                url_recurso, 
-                                id_materia, 
-                                id_docente, 
-                                compartido_tipo,
-                                estado
-                            ) VALUES (?, ?, ?, ?, ?, ?, 'Curso', 'Activo')
-                        ");
-                        $stmt->bind_param("ssssii", $titulo_recurso, $descripcion, $tipo_recurso, $ruta_destino, $id_materia, $id_docente);
-                        $stmt->execute();
-                        $stmt->close();
-                        
-                        $mensaje .= ' 📎 Archivo subido correctamente.';
-                    }
-                }
+                $mensaje .= ' 📎 Archivo asociado al curso.';
             }
             
             // Limpiar campos después de guardar
@@ -152,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="../img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
+                <img src="../img/logo_g.png" alt="Logo Aulamos" class="logo-img">
                 <div>
                     <h2>AULAMOS</h2>
                     <p>Aprendemos juntos</p>
@@ -378,98 +347,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="jss/docente_dashboard.js"></script>
     <!-- ✅ AGREGAR AQUÍ EL CÓDIGO DE SUBIDA DE ARCHIVOS -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uploadArea = document.querySelector('.upload-area');
-    const fileInput = document.getElementById('archivo');
-    const uploadText = uploadArea.querySelector('p');
-    let archivoSeleccionado = null;
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.querySelector('.upload-area');
+        const fileInput = document.getElementById('archivo');
+        const uploadText = uploadArea.querySelector('p');
+        let archivoSeleccionado = null;
+        let recursoSubido = false;
 
-    // --- Seleccionar archivo con clic ---
-    fileInput.addEventListener('change', function() {
-        if (this.files.length > 0) {
-            archivoSeleccionado = this.files[0];
-            uploadText.textContent = '📎 ' + archivoSeleccionado.name;
-            uploadText.style.color = '#16a34a';
-            uploadText.style.fontWeight = '500';
-            subirArchivo(archivoSeleccionado);
-        } else {
-            uploadText.textContent = 'Toca para seleccionar o arrastrar tu archivo aquí';
-            uploadText.style.color = '';
-            uploadText.style.fontWeight = '';
-        }
-    });
-
-    // --- Arrastrar archivo ---
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '#5a189a';
-        this.style.background = '#f3e8ff';
-    });
-
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '';
-        this.style.background = '';
-    });
-
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '';
-        this.style.background = '';
-
-        if (e.dataTransfer.files.length > 0) {
-            archivoSeleccionado = e.dataTransfer.files[0];
-            fileInput.files = e.dataTransfer.files;
-            uploadText.textContent = '📎 ' + archivoSeleccionado.name;
-            uploadText.style.color = '#16a34a';
-            uploadText.style.fontWeight = '500';
-            subirArchivo(archivoSeleccionado);
-        }
-    });
-
-    // --- Función para subir archivo con AJAX ---
-    function subirArchivo(archivo) {
-        const formData = new FormData();
-        formData.append('archivo', archivo);
-
-        const titulo = document.querySelector('input[name="nombre"]').value || archivo.name;
-        const descripcion = document.querySelector('input[name="descripcion"]').value || '';
-        const id_materia = document.querySelector('select[name="id_materia"]').value || '';
-        const tipo_curso = document.getElementById('tipo_curso').value || 'Documento';
-
-        formData.append('titulo', titulo);
-        formData.append('descripcion', descripcion);
-        formData.append('id_materia', id_materia);
-        formData.append('tipo_curso', tipo_curso);
-
-        uploadText.textContent = '⏳ Subiendo...';
-        uploadText.style.color = '#f59e0b';
-
-        fetch('subir_archivo.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                uploadText.textContent = '✅ ' + data.nombre + ' (subido)';
+        // --- Seleccionar archivo con clic ---
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                archivoSeleccionado = this.files[0];
+                uploadText.textContent = '📎 ' + archivoSeleccionado.name;
                 uploadText.style.color = '#16a34a';
-                if (document.getElementById('id_recurso')) {
-                    document.getElementById('id_recurso').value = data.id_recurso;
-                }
+                uploadText.style.fontWeight = '500';
+                subirArchivo(archivoSeleccionado);
             } else {
-                uploadText.textContent = '❌ Error: ' + data.error;
-                uploadText.style.color = '#dc2626';
+                uploadText.textContent = 'Toca para seleccionar o arrastrar tu archivo aquí';
+                uploadText.style.color = '';
+                uploadText.style.fontWeight = '';
             }
-        })
-        .catch(error => {
-            uploadText.textContent = '❌ Error al subir el archivo';
-            uploadText.style.color = '#dc2626';
-            console.error('Error:', error);
         });
-    }
-});
-</script>
+
+        // --- Arrastrar archivo ---
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#5a189a';
+            this.style.background = '#f3e8ff';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '';
+            this.style.background = '';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '';
+            this.style.background = '';
+
+            if (e.dataTransfer.files.length > 0) {
+                archivoSeleccionado = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+                uploadText.textContent = '📎 ' + archivoSeleccionado.name;
+                uploadText.style.color = '#16a34a';
+                uploadText.style.fontWeight = '500';
+                subirArchivo(archivoSeleccionado);
+            }
+        });
+
+        // --- Función para subir archivo con AJAX (sin validar formulario) ---
+        function subirArchivo(archivo) {
+            const formData = new FormData();
+            formData.append('archivo', archivo);
+
+            const titulo = document.querySelector('input[name="nombre"]').value || archivo.name;
+            const descripcion = document.querySelector('input[name="descripcion"]').value || '';
+            const tipo_curso = document.getElementById('tipo_curso').value || 'Documento';
+
+            formData.append('titulo', titulo);
+            formData.append('descripcion', descripcion);
+            formData.append('tipo_curso', tipo_curso);
+
+            uploadText.textContent = '⏳ Subiendo archivo...';
+            uploadText.style.color = '#f59e0b';
+
+            fetch('subir_archivo.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    recursoSubido = true;
+                    uploadText.textContent = '✅ ' + data.nombre + ' (subido)';
+                    uploadText.style.color = '#16a34a';
+                    if (document.getElementById('id_recurso')) {
+                        document.getElementById('id_recurso').value = data.id_recurso;
+                    }
+                    const mensaje = document.querySelector('.mensaje-container');
+                    if (mensaje) {
+                        mensaje.innerHTML = '<div class="mensaje exito" style="padding: 15px 20px; border-radius: 8px; font-weight: 500; background: #dcfce7; color: #166534; border-left: 4px solid #22c55e;">✅ Archivo "' + data.nombre + '" subido correctamente. Ahora completa el formulario y publica el curso.</div>';
+                    }
+                } else {
+                    uploadText.textContent = '❌ Error: ' + data.error;
+                    uploadText.style.color = '#dc2626';
+                }
+            })
+            .catch(error => {
+                uploadText.textContent = '❌ Error al subir el archivo';
+                uploadText.style.color = '#dc2626';
+                console.error('Error:', error);
+            });
+        }
+    });
+    </script>
 </body>
 </html>
