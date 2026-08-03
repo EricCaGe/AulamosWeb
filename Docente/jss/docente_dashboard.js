@@ -3,30 +3,24 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 1. ACCESIBILIDAD
     // ==========================================
-    
     const btnContrast = document.getElementById("btn-contrast");
     const btnDarkMode = document.getElementById("btn-darkmode");
     const btnTextSize = document.getElementById("btn-text-size");
 
-    // Alternar Alto Contraste
     if (btnContrast) {
         btnContrast.addEventListener("click", () => {
             document.body.classList.toggle("high-contrast-theme");
-            // Quitamos el modo oscuro si se activa el alto contraste para que no choquen
             document.body.classList.remove("dark-theme"); 
         });
     }
 
-    // Alternar Modo Oscuro
     if (btnDarkMode) {
         btnDarkMode.addEventListener("click", () => {
             document.body.classList.toggle("dark-theme");
-            // Quitamos el alto contraste si se activa el modo oscuro
             document.body.classList.remove("high-contrast-theme");
         });
     }
 
-    // Alternar Texto Grande
     if (btnTextSize) {
         btnTextSize.addEventListener("click", () => {
             document.body.classList.toggle("large-text-theme");
@@ -36,60 +30,71 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 2. ASISTENTE VIRTUAL
     // ==========================================
-    
     const btnAsistente = document.getElementById("btn-asistente");
-    
     if (btnAsistente) {
         btnAsistente.addEventListener("click", () => {
-            // Aquí puedes lanzar un modal, un chatbot o una alerta simple
             alert("🤖 ¡Hola! Soy tu asistente virtual de Aulamos. ¿En qué te puedo ayudar hoy, Profesora Ana?");
         });
     }
 
     // ==========================================
-    // 3. CALENDARIO DINÁMICO (BÁSICO)
+    // 3. CALENDARIO DINÁMICO
     // ==========================================
-    
-    const prevMonthBtn = document.querySelector(".calendar-nav i.fa-chevron-left");
-    const nextMonthBtn = document.querySelector(".calendar-nav i.fa-chevron-right");
-    const monthTitle = document.querySelector(".month-title");
+    const monthYearTitle = document.getElementById("month-year-title");
+    const daysContainer = document.getElementById("calendar-days");
+    const prevMonthBtn = document.getElementById("prev-month");
+    const nextMonthBtn = document.getElementById("next-month");
+    const prevYearBtn = document.getElementById("prev-year");
+    const nextYearBtn = document.getElementById("next-year");
 
-    // Fecha actual para iniciar el calendario
-    let currentDate = new Date(); 
-
-    // Función para actualizar el texto del mes y año
-    function updateCalendarView(date) {
+    // Validar que el calendario exista en la página actual
+    if (monthYearTitle && daysContainer) {
+        let currentDate = new Date(); 
+        const today = new Date(); 
         const monthNames = [
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ];
-        
-        if (monthTitle) {
-            monthTitle.textContent = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            monthYearTitle.textContent = `${monthNames[month]} ${year}`;
+            daysContainer.innerHTML = "";
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDiv = document.createElement("div");
+                emptyDiv.classList.add("day", "empty");
+                daysContainer.appendChild(emptyDiv);
+            }
+
+            for (let i = 1; i <= lastDay; i++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.classList.add("day");
+                dayDiv.textContent = i;
+
+                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayDiv.classList.add("today");
+                }
+
+                dayDiv.addEventListener("click", () => {
+                    console.log(`Seleccionaste el: ${i} de ${monthNames[month]} de ${year}`);
+                });
+
+                daysContainer.appendChild(dayDiv);
+            }
         }
-        
-        // Nota: Para repintar los números de los días (las bolitas) de forma 100% real,
-        // se requeriría una lógica matemática más extensa para calcular el primer día del mes.
-        // Por ahora, esto permite navegar entre los meses de forma visual en el título.
+
+        // Botones de navegación
+        if(prevMonthBtn) prevMonthBtn.addEventListener("click", () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        if(nextMonthBtn) nextMonthBtn.addEventListener("click", () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+        if(prevYearBtn) prevYearBtn.addEventListener("click", () => { currentDate.setFullYear(currentDate.getFullYear() - 1); renderCalendar(); });
+        if(nextYearBtn) nextYearBtn.addEventListener("click", () => { currentDate.setFullYear(currentDate.getFullYear() + 1); renderCalendar(); });
+
+        renderCalendar();
     }
-
-    // Navegar al mes anterior
-    if (prevMonthBtn) {
-        prevMonthBtn.addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            updateCalendarView(currentDate);
-        });
-    }
-
-    // Navegar al mes siguiente
-    if (nextMonthBtn) {
-        nextMonthBtn.addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            updateCalendarView(currentDate);
-        });
-    }
-
-    // Inicializar el calendario con el mes actual al cargar la página
-    updateCalendarView(currentDate);
-
 });

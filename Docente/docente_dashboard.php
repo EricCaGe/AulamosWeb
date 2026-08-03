@@ -342,27 +342,39 @@ function formatearFecha($fecha) {
                 <div class="right-column">
                     
                     <!-- Calendario -->
-                    <aside class="calendar-widget border-container">
-                        <div class="calendar-header">
-                            <h3 class="section-title">Calendario</h3>
-                            <a href="#" class="link-blue"><i class="fa-regular fa-calendar-days"></i> Ver calendario</a>
-                        </div>
-                        <div class="calendar-month">
-                            <span class="month-title">Mayo 2024</span>
-                            <div class="calendar-nav">
-                                <i class="fa-solid fa-chevron-left"></i>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </div>
-                        </div>
-                        <div class="calendar-grid">
-                            <div class="cal-day-header">LUN</div><div class="cal-day-header">MAR</div><div class="cal-day-header">MIE</div><div class="cal-day-header">JUE</div><div class="cal-day-header">VIE</div><div class="cal-day-header">SAB</div><div class="cal-day-header">DOM</div>
-                            <div class="cal-day disabled">29</div><div class="cal-day disabled">30</div><div class="cal-day dot">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div>
-                            <div class="cal-day">6</div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day dot">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div>
-                            <div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day dot">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div>
-                            <div class="cal-day active">20</div><div class="cal-day dot">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day double-dot">24</div><div class="cal-day">25</div><div class="cal-day">26</div>
-                            <div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day">31</div><div class="cal-day disabled">1</div><div class="cal-day disabled">2</div>
-                        </div>
-                    </aside>
+                     <!-- Calendario -->
+<aside class="calendar-container">
+    <!-- Cabecera y Navegación -->
+    <div class="calendar-header">
+        <div class="nav-left">
+            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+        </div>
+        
+        <h2 id="month-year-title">MES AÑO</h2>
+        
+        <div class="nav-right">
+            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+        </div>
+    </div>
+
+    <!-- Días de la semana -->
+    <div class="calendar-weekdays">
+        <div class="weekday">Do</div>
+        <div class="weekday">Lu</div>
+        <div class="weekday">Ma</div>
+        <div class="weekday">Mi</div>
+        <div class="weekday">Ju</div>
+        <div class="weekday">Vi</div>
+        <div class="weekday">Sá</div>
+    </div>
+
+    <!-- Contenedor dinámico de los días -->
+    <div id="calendar-days" class="calendar-days-grid">
+        <!-- JavaScript inyectará los días aquí -->
+    </div>
+</aside>
 
                     <!-- Próximas actividades -->
                     <aside class="upcoming-activities border-container">
