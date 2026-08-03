@@ -47,14 +47,14 @@ $ruta_destino = $carpeta . $nombre_archivo;
 
 // Mover archivo
 if (move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
-    // Guardar en recursos_educativos
+    // Guardar en recursos_educativos (sin id_materia por ahora)
     require_once '../Conexion/conexion.php';
     
     $id_docente = $_SESSION['usuario']['id_usuario'];
     $tipo_recurso = $_POST['tipo_curso'] ?? 'Documento';
     $titulo = $_POST['titulo'] ?? $nombre_original;
     $descripcion = $_POST['descripcion'] ?? '';
-    $id_materia = $_POST['id_materia'] ?? null;
+    $compartido_tipo = $_POST['compartido_tipo'] ?? 'Curso';
     
     $stmt = $conexion->prepare("
         INSERT INTO recursos_educativos (
@@ -62,25 +62,25 @@ if (move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
             descripcion, 
             tipo, 
             url_recurso, 
-            id_materia, 
             id_docente, 
             compartido_tipo,
             estado
-        ) VALUES (?, ?, ?, ?, ?, ?, 'Curso', 'Activo')
+        ) VALUES (?, ?, ?, ?, ?, ?, 'Activo')
     ");
-    $stmt->bind_param("ssssii", $titulo, $descripcion, $tipo_recurso, $ruta_destino, $id_materia, $id_docente);
+    $stmt->bind_param("ssssis", $titulo, $descripcion, $tipo_recurso, $ruta_destino, $id_docente, $compartido_tipo);
     
     if ($stmt->execute()) {
+        $id_recurso = $conexion->insert_id;
         echo json_encode([
             'success' => true,
             'message' => 'Archivo subido correctamente',
             'nombre' => $nombre_original,
             'url' => $ruta_destino,
-            'id_recurso' => $conexion->insert_id
+            'id_recurso' => $id_recurso
         ]);
     } else {
         http_response_code(500);
-        echo json_encode(['error' => 'Error al guardar en la base de datos']);
+        echo json_encode(['error' => 'Error al guardar en la base de datos: ' . $stmt->error]);
     }
     $stmt->close();
     
