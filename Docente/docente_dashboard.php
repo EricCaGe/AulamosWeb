@@ -197,8 +197,10 @@ function formatearFecha($fecha) {
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
-                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-            </nav>
+    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión
+    </a>
+</nav>
             
         </aside>
 
