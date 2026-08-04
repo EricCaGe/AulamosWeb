@@ -184,3 +184,33 @@ input:checked + .slider:before {
 .btn-submit:hover {
     background-color: #2563eb;
 }
+
+.btn-outline-blue {
+  /* Fondo azul muy claro */
+  background-color: #f0f5ff;
+  
+  /* Borde azul y esquinas redondeadas */
+  border: 1px solid #5c85ff;
+  border-radius: 8px;
+  
+  /* Color del texto azul */
+  color: #5c85ff;
+  
+  /* Tipografía y espaciado */
+  font-family: sans-serif; /* Ajusta según tu fuente */
+  font-size: 16px;
+  padding: 10px 20px;
+  
+  /* Centrar el texto y ajustar el cursor */
+  text-align: center;
+  cursor: pointer;
+  
+  /* Transición suave para cuando se pase el ratón por encima (opcional) */
+  transition: all 0.3s ease;
+}
+
+/* Efecto opcional al pasar el ratón */
+.btn-outline-blue:hover {
+  background-color: #e0ebff;
+  border-color: #4a75f0;
+}

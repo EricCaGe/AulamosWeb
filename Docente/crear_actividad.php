@@ -126,7 +126,7 @@ $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['a
                                 <input type="checkbox" id="permite_entrega_archivo" name="permite_entrega_archivo" checked value="1">
                                 <span class="slider round"></span>
                             </label>
-                        </div>
+                        </div> <br>
 
                         <div class="form-group-clean">
                             <label for="grupo">Grupo</label>
@@ -148,7 +148,7 @@ $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['a
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-submit">Crear Actividad</button>
+                        <button type="submit" class="btn-outline-blue">Crear Actividad</button>
                     </form>
                 </div>
 
