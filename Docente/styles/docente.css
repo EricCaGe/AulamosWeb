@@ -575,48 +575,6 @@ body {
 
 
 
-/* ==========================================
-   ESTILOS DE LOS DÍAS
-   ========================================== */
-
-.day {
-    font-size: 0.9rem;
-    color: #444;
-    cursor: pointer;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto; /* Centra el círculo en su columna */
-    border-radius: 50%;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-/* Efecto hover solo para días reales */
-.day:hover:not(.empty) {
-    background-color: #f0f0f0;
-}
-
-/* Espacios en blanco al inicio del mes */
-.empty {
-    cursor: default;
-}
-
-/* Resaltar el día actual */
-.today {
-    background-color: #222;
-    color: #ffffff;
-    font-weight: bold;
-}
-
-.today:hover {
-    background-color: #000000;
-}
-
-
-
-
 /* PRÓXIMAS ACTIVIDADES */
 .upcoming-activities {
     display: flex;
@@ -663,9 +621,15 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-top: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.acc-info { display: flex; align-items: center; gap: 15px; }
+.acc-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .acc-icon-box {
     background-color: var(--purple-light);
     color: var(--text-purple);
@@ -676,11 +640,28 @@ body {
     align-items: center;
     justify-content: center;
 }
-.acc-icon-main { font-size: 24px; }
-.acc-info strong { font-size: 14px; color: var(--primary-blue); }
-.acc-info p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
-.acc-options { display: flex; gap: 8px; }
+.acc-icon-main {
+    font-size: 24px;
+}
+
+.acc-info strong {
+    font-size: 14px;
+    color: var(--primary-blue);
+    display: block;
+}
+
+.acc-info p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.acc-options {
+    display: flex;
+    gap: 8px;
+}
+
 .acc-opt-btn {
     background: #ffffff;
     border: 1px solid var(--border-color);
@@ -697,12 +678,22 @@ body {
     width: 75px;
     height: 65px;
     color: var(--text-dark);
-    transition: background 0.2s;
-    text-align: center;
+    transition: all 0.2s;
 }
-.acc-opt-btn:hover { background-color: #f1f5f9; }
-.acc-opt-btn i { font-size: 18px; color: var(--text-dark); }
-.font-icon { font-size: 16px; font-weight: bold; }
+
+.acc-opt-btn:hover {
+    background-color: #f1f5f9;
+}
+
+.acc-opt-btn i {
+    font-size: 18px;
+    color: var(--text-dark);
+}
+
+.font-icon {
+    font-size: 16px;
+    font-weight: bold;
+}
 
 .btn-open-config {
     background-color: var(--primary-blue);
@@ -715,33 +706,9 @@ body {
     cursor: pointer;
     transition: background 0.2s;
 }
-.btn-open-config:hover { background-color: #2563eb; }
-/* =========================================
-   VARIABLES PARA MODO OSCURO (JS)
-========================================= */
-.dark-theme {
-    --bg-main: #0f172a;
-    --sidebar-bg: #1e293b;
-    --text-dark: #f8fafc;
-    --text-muted: #94a3b8;
-    --border-color: #334155;
-}
 
-/* Aplicar fondos oscuros a los contenedores blancos */
-.dark-theme .border-container, 
-.dark-theme .quick-access-grid, 
-.dark-theme .accessibility-bar,
-.dark-theme .acc-opt-btn {
-    background-color: #1e293b;
-}
-
-.dark-theme .acc-opt-btn:hover {
-    background-color: #334155;
-}
-
-.dark-theme .acc-opt-btn i,
-.dark-theme .acc-opt-btn .font-icon {
-    color: #cbd5e1;
+.btn-open-config:hover {
+    background-color: #2563eb;
 }
 
 /* =========================================
@@ -756,11 +723,70 @@ body {
     --primary-blue: #00ffff; /* Cian brillante */
 }
 
-.high-contrast-theme .border-container,
-.high-contrast-theme .quick-access-grid,
 .high-contrast-theme .accessibility-bar {
     background-color: #000000;
     border: 2px solid #ffffff;
+}
+
+.high-contrast-theme .acc-opt-btn {
+    background-color: #000000;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+}
+
+.high-contrast-theme .acc-opt-btn i,
+.high-contrast-theme .acc-opt-btn .font-icon {
+    color: #ffff00;
+}
+
+.high-contrast-theme .acc-info strong {
+    color: #00ffff;
+}
+
+.high-contrast-theme .acc-info p {
+    color: #ffff00;
+}
+
+.high-contrast-theme .btn-open-config {
+    background-color: #00ffff;
+    color: #000000;
+    border: 2px solid #ffffff;
+}
+
+/* =========================================
+   VARIABLES PARA MODO OSCURO (JS)
+========================================= */
+.dark-theme {
+    --bg-main: #0f172a;
+    --sidebar-bg: #1e293b;
+    --text-dark: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+}
+
+.dark-theme .accessibility-bar {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+}
+
+.dark-theme .acc-opt-btn {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+}
+
+.dark-theme .acc-opt-btn i,
+.dark-theme .acc-opt-btn .font-icon {
+    color: #cbd5e1;
+}
+
+.dark-theme .acc-info strong {
+    color: #818cf8;
+}
+
+.dark-theme .btn-open-config {
+    background-color: #3b82f6;
+    color: white;
 }
 
 /* =========================================
@@ -768,4 +794,30 @@ body {
 ========================================= */
 .large-text-theme {
     font-size: 115%; /* Aumenta el tamaño base de toda la página */
+}
+
+.large-text-theme .acc-opt-btn {
+    width: 85px;
+    height: 75px;
+    font-size: 12px;
+}
+
+.large-text-theme .acc-info strong {
+    font-size: 16px;
+}
+
+.large-text-theme .acc-info p {
+    font-size: 14px;
+}
+
+/* Estilo para botones de accesibilidad activados */
+.acc-opt-btn.active {
+    background-color: var(--primary-blue);
+    color: white;
+    border: 2px solid var(--primary-blue);
+}
+
+.acc-opt-btn.active i,
+.acc-opt-btn.active .font-icon {
+    color: white;
 }
