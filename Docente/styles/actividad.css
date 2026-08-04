@@ -158,3 +158,59 @@ input:checked + .slider:before {
     height: 30px;
     font-size: 12px;
 }
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border: 1px solid #ef9a9a;
+}
+
+.btn-submit {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.btn-submit:hover {
+    background-color: #2563eb;
+}
+
+.btn-outline-blue {
+  /* Fondo azul muy claro */
+  background-color: #f0f5ff;
+  
+  /* Borde azul y esquinas redondeadas */
+  border: 1px solid #5c85ff;
+  border-radius: 8px;
+  
+  /* Color del texto azul */
+  color: #5c85ff;
+  
+  /* Tipografía y espaciado */
+  font-family: sans-serif; /* Ajusta según tu fuente */
+  font-size: 16px;
+  padding: 10px 20px;
+  
+  /* Centrar el texto y ajustar el cursor */
+  text-align: center;
+  cursor: pointer;
+  
+  /* Transición suave para cuando se pase el ratón por encima (opcional) */
+  transition: all 0.3s ease;
+}
+
+/* Efecto opcional al pasar el ratón */
+.btn-outline-blue:hover {
+  background-color: #e0ebff;
+  border-color: #4a75f0;
+}

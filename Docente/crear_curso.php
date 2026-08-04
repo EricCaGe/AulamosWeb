@@ -122,10 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../img/logo_g.png" alt="Logo Aulamos" class="logo-img">
-                <div>
-                    <h2>AULAMOS</h2>
-                    <p>Aprendemos juntos</p>
-                </div>
+                
             </div>
             <nav class="menu">
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
