@@ -6,30 +6,35 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
     exit;
 }
 
+require_once '../Conexion/conexion.php';
+
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
 
-// Datos de ejemplo (después se conectarán a la BD)
-$total_materias = 2;
-$activas = 2;
-$inactivas = 0;
+// ========================================== */
+// CONSULTAS A LA BD                          */
+// ========================================== */
 
-$materias = [
-    [
-        'id' => 1,
-        'nombre' => 'Inglés',
-        'campo' => 'Lenguaje',
-        'descripcion' => 'Se enfoca en el uso de lenguajes para comunicarse, expresar ideas, interpretar el mundo',
-        'estado' => 'Activa'
-    ],
-    [
-        'id' => 2,
-        'nombre' => 'Matemáticas',
-        'campo' => 'Pensamiento matemático',
-        'descripcion' => 'Desarrolla habilidades de razonamiento lógico y resolución de problemas',
-        'estado' => 'Activa'
-    ]
-];
+$resultado = $conexion->query("SELECT COUNT(*) AS total FROM materias");
+$row = $resultado->fetch_assoc();
+$total_materias = $row['total'] ?? 0;
+
+$resultado = $conexion->query("SELECT COUNT(*) AS total FROM materias WHERE estado = 'Activa'");
+$row = $resultado->fetch_assoc();
+$materias_activas = $row['total'] ?? 0;
+
+$resultado = $conexion->query("SELECT COUNT(*) AS total FROM materias WHERE estado = 'Inactiva'");
+$row = $resultado->fetch_assoc();
+$materias_inactivas = $row['total'] ?? 0;
+
+$materias = $conexion->query("
+    SELECT id_materia, nombre, campo_formativo, descripcion, estado 
+    FROM materias 
+    ORDER BY nombre
+")->fetch_all(MYSQLI_ASSOC);
+
+$mensaje = $_GET['mensaje'] ?? '';
+$tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -39,13 +44,14 @@ $materias = [
     <title>Materias - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
+    <link rel="stylesheet" href="styles/materias.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="dashboard-container">
     
-    <!-- BARRA LATERAL (SIDEBAR) -->
+    <!-- BARRA LATERAL -->
     <aside class="sidebar">
         <div class="logo-section">
             <img src="../img/logogeneral.png" alt="Logo Aulamos" class="logo">
@@ -119,6 +125,13 @@ $materias = [
             </div>
         </header>
 
+        <!-- MENSAJES -->
+        <?php if ($mensaje): ?>
+            <div class="mensaje <?php echo $tipo; ?>" style="padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; <?php echo ($tipo === 'exito') ? 'background: #dcfce7; color: #166534; border-left: 4px solid #22c55e;' : 'background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626;'; ?>">
+                <?php echo htmlspecialchars($mensaje); ?>
+            </div>
+        <?php endif; ?>
+
         <!-- ========================================== -->
         <!-- RESUMEN DE MATERIAS                        -->
         <!-- ========================================== -->
@@ -129,14 +142,14 @@ $materias = [
                     <span class="stat-label">Total</span>
                 </div>
                 <div class="stat-card stat-activa">
-                    <span class="stat-number"><?php echo $activas; ?></span>
+                    <span class="stat-number"><?php echo $materias_activas; ?></span>
                     <span class="stat-label">Activas</span>
                 </div>
                 <div class="stat-card stat-inactiva">
-                    <span class="stat-number"><?php echo $inactivas; ?></span>
+                    <span class="stat-number"><?php echo $materias_inactivas; ?></span>
                     <span class="stat-label">Inactivas</span>
                 </div>
-                <button class="btn-nueva-materia">
+                <button class="btn-nueva-materia" id="btnNuevaMateria">
                     <i class="fa-solid fa-plus"></i> Nueva materia
                 </button>
             </div>
@@ -148,12 +161,12 @@ $materias = [
         <section class="filtros-materias">
             <div class="busqueda-container">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" placeholder="Buscar materia..." class="input-busqueda">
+                <input type="text" placeholder="Buscar materia..." class="input-busqueda" id="buscarMateria">
             </div>
             <div class="filtros-botones">
-                <button class="filtro-btn active">Todas</button>
-                <button class="filtro-btn">Activa</button>
-                <button class="filtro-btn">Inactiva</button>
+                <button class="filtro-btn active" data-filtro="todas">Todas</button>
+                <button class="filtro-btn" data-filtro="Activa">Activa</button>
+                <button class="filtro-btn" data-filtro="Inactiva">Inactiva</button>
             </div>
         </section>
 
@@ -163,33 +176,90 @@ $materias = [
         <section class="catalogo-materias">
             <div class="catalogo-header">
                 <h3>Catálogo</h3>
-                <span class="resultados"><?php echo count($materias); ?> resultados</span>
+                <span class="resultados" id="totalResultados"><?php echo count($materias); ?> resultados</span>
             </div>
 
-            <div class="materias-grid">
+            <div class="materias-grid" id="materiasGrid">
                 <?php foreach ($materias as $materia): ?>
-                <div class="materia-card">
+                <div class="materia-card" data-estado="<?php echo $materia['estado']; ?>">
                     <div class="materia-header">
                         <div>
-                            <h4 class="materia-nombre"><?php echo $materia['nombre']; ?></h4>
-                            <span class="materia-campo"><?php echo $materia['campo']; ?></span>
+                            <h4 class="materia-nombre"><?php echo htmlspecialchars($materia['nombre']); ?></h4>
+                            <span class="materia-campo"><?php echo htmlspecialchars($materia['campo_formativo']); ?></span>
                         </div>
                         <span class="badge <?php echo ($materia['estado'] === 'Activa') ? 'badge-activo' : 'badge-inactivo'; ?>">
                             <?php echo $materia['estado']; ?>
                         </span>
                     </div>
-                    <p class="materia-descripcion"><?php echo $materia['descripcion']; ?></p>
+                    <p class="materia-descripcion"><?php echo htmlspecialchars($materia['descripcion'] ?? 'Sin descripción'); ?></p>
                     <div class="materia-acciones">
-    <button class="btn-editar"><i class="fa-regular fa-pen-to-square"></i> Editar</button>
-    <button class="btn-deshabilitar"><i class="fa-solid fa-eye-slash"></i> Deshabilitar</button>
-    <button class="btn-eliminar"><i class="fa-regular fa-trash-can"></i> Eliminar</button>
-</div>
+                        <button class="btn-editar" data-id="<?php echo $materia['id_materia']; ?>">
+                            <i class="fa-regular fa-pen-to-square"></i> Editar
+                        </button>
+                        <button class="btn-deshabilitar" data-id="<?php echo $materia['id_materia']; ?>">
+                            <i class="fa-solid fa-eye-slash"></i> Deshabilitar
+                        </button>
+                        <button class="btn-eliminar" data-id="<?php echo $materia['id_materia']; ?>">
+                            <i class="fa-regular fa-trash-can"></i> Eliminar
+                        </button>
+                    </div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </section>
 
-        <!-- BARRA DE ACCESIBILIDAD INFERIOR -->
+        <!-- ========================================== -->
+        <!-- MODAL PARA NUEVA / EDITAR MATERIA         -->
+        <!-- ========================================== -->
+        <div class="modal-overlay" id="modalMateria">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitulo">Nueva materia</h2>
+                    <button class="modal-cerrar" id="modalCerrar">&times;</button>
+                </div>
+                <form id="formMateria" method="POST" action="logica/procesar_materias.php">
+                    <input type="hidden" name="accion" id="modalAccion" value="guardar">
+                    <input type="hidden" name="id" id="modalId" value="">
+
+                    <div class="form-group">
+                        <label for="modalNombre">Nombre de la materia <span class="text-danger">*</span></label>
+                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej. Matemáticas" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalCampo">Campo formativo <span class="text-danger">*</span></label>
+                        <input type="text" id="modalCampo" name="campo_formativo" placeholder="Ej. Saberes y Pensamiento Científico" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalDescripcion">Descripción</label>
+                        <textarea id="modalDescripcion" name="descripcion" rows="3" placeholder="Descripción de la materia" maxlength="1000"></textarea>
+                        <p class="contador-caracteres"><span id="modalContador">0</span>/1000</p>
+                    </div>
+
+                    <div class="form-group">
+    <label>Estado</label>
+    <div class="radio-group">
+        <label>
+            <input type="radio" name="estado" value="Activa" checked>
+            <i class="fa-solid fa-circle-check"></i> Activa
+        </label>
+        <label>
+            <input type="radio" name="estado" value="Inactiva">
+            <i class="fa-solid fa-circle-xmark"></i> Inactiva
+        </label>
+    </div>
+</div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
+                        <button type="submit" class="btn-guardar">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- BARRA DE ACCESIBILIDAD -->
         <footer class="accessibility-bar">
             <div class="acc-info">
                 <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
@@ -225,5 +295,6 @@ $materias = [
 </div>
 
 <script src="js/admin.js"></script>
+<script src="js/materias.js"></script>
 </body>
 </html>

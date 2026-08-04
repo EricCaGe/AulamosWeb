@@ -1,239 +1,123 @@
-<?php
-session_start();
-
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
-    header('Location: ../InicioSesion/login.php');
-    exit;
-}
-
-$nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
-$pagina_actual = basename($_SERVER['PHP_SELF']);
-
-// Datos de ejemplo (después se conectarán a la BD)
-$total_grupos = 1;
-$activos = 1;
-$inactivos = 0;
-
-$grupos = [
-    [
-        'id' => 1,
-        'nombre' => 'Primero° 1° A',
-        'turno' => 'Vespertino',
-        'modalidad' => 'Presencial',
-        'cupo' => 30,
-        'cursos_relacionados' => 2,
-        'estado' => 'Activo'
-    ]
-];
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grupos - Administrador</title>
-    
-    <link rel="stylesheet" href="styles/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-
-<div class="dashboard-container">
-    
-    <!-- BARRA LATERAL -->
-    <aside class="sidebar">
-        <div class="logo-section">
-            <img src="../img/logogeneral.png" alt="Logo Aulamos" class="logo">
+<!-- ========================================== -->
+<!-- MODAL PARA NUEVO / EDITAR GRUPO           -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="modalGrupo">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitulo">Nuevo grupo</h2>
+            <button class="modal-cerrar" id="modalCerrar">&times;</button>
         </div>
-        
-        <nav class="menu">
-            <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </a>
-            <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> Ciclos escolares
-            </a>
-            <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> Periodos
-            </a>
-            <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> Materias
-            </a>
-            <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> Grupos
-            </a>
-            <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> Cursos
-            </a>
-            <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
-            </a>
-            <a href="usuarios.php" class="menu-item <?php echo ($pagina_actual == 'usuarios.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-users"></i> Usuarios
-            </a>
-            <a href="reportes.php" class="menu-item <?php echo ($pagina_actual == 'reportes.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-chart-bar"></i> Reportes
-            </a>
-            <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> Configuración
-            </a>
-        </nav>
-        
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> Accesibilidad
-        </button>
-    </aside>
+        <form id="formGrupo" method="POST" action="logica/procesar_grupos.php">
+            <input type="hidden" name="accion" id="modalAccion" value="guardar">
+            <input type="hidden" name="id" id="modalId" value="">
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="main-content">
-        
-        <!-- ENCABEZADO -->
-        <header class="content-header">
-            <div class="welcome-text">
-                <h1>Grupos</h1>
-                <p>Administra los grupos, turnos y cupos escolares.</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">
-                    <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button>
-                <div class="icon-bell">
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-                <button class="btn-accessibility-header">
-                    <i class="fa-solid fa-universal-access"></i>
-                </button>
-                <div class="user-profile">
-                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </div>
-                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </header>
-
-        <!-- ========================================== -->
-        <!-- RESUMEN DE GRUPOS                          -->
-        <!-- ========================================== -->
-        <section class="resumen-grupos">
-            <div class="stats-row">
-                <div class="stat-card">
-                    <span class="stat-number"><?php echo $total_grupos; ?></span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-card stat-activa">
-                    <span class="stat-number"><?php echo $activos; ?></span>
-                    <span class="stat-label">Activos</span>
-                </div>
-                <div class="stat-card stat-inactiva">
-                    <span class="stat-number"><?php echo $inactivos; ?></span>
-                    <span class="stat-label">Inactivos</span>
-                </div>
-                <button class="btn-nuevo-grupo">
-                    <i class="fa-solid fa-plus"></i> Nuevo grupo
-                </button>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- BÚSQUEDA Y FILTROS                         -->
-        <!-- ========================================== -->
-        <section class="filtros-grupos">
-            <div class="busqueda-container">
-                <i class="fa-solid fa-search"></i>
-                <input type="text" placeholder="Buscar grupo, turno o modalidad..." class="input-busqueda">
-            </div>
-            <div class="filtros-botones">
-                <button class="filtro-btn active">Todos</button>
-                <button class="filtro-btn">Activo</button>
-                <button class="filtro-btn">Inactivo</button>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- LISTA DE GRUPOS                            -->
-        <!-- ========================================== -->
-        <section class="lista-grupos">
-            <div class="grupos-header">
-                <h3>Grupos registrados</h3>
-                <span class="resultados"><?php echo count($grupos); ?> resultados</span>
+            <div class="form-group">
+                <label for="modalCiclo">Ciclo escolar <span class="text-danger">*</span></label>
+                <select id="modalCiclo" name="id_ciclo" required>
+                    <?php
+                    $ciclos = $conexion->query("SELECT id_ciclo, nombre FROM ciclos_escolares WHERE estado = 'Activo' ORDER BY fecha_inicio DESC");
+                    while ($ciclo = $ciclos->fetch_assoc()):
+                    ?>
+                    <option value="<?php echo $ciclo['id_ciclo']; ?>">
+                        <?php echo htmlspecialchars($ciclo['nombre']); ?>
+                    </option>
+                    <?php endwhile; ?>
+                </select>
             </div>
 
-            <div class="grupos-grid">
-                <?php foreach ($grupos as $grupo): ?>
-                <div class="grupo-card">
-                    <div class="grupo-header">
-                        <h4 class="grupo-nombre"><?php echo $grupo['nombre']; ?></h4>
-                        <span class="badge <?php echo ($grupo['estado'] === 'Activo') ? 'badge-activo' : 'badge-inactivo'; ?>">
-                            <?php echo $grupo['estado']; ?>
-                        </span>
-                    </div>
-
-                    <div class="grupo-detalles">
-                        <div class="detalle-item">
-                            <span class="detalle-label">Turno:</span>
-                            <span class="detalle-valor"><?php echo $grupo['turno']; ?></span>
-                        </div>
-                        <div class="detalle-item">
-                            <span class="detalle-label">Modalidad:</span>
-                            <span class="detalle-valor"><?php echo $grupo['modalidad']; ?></span>
-                        </div>
-                        <div class="detalle-item">
-                            <span class="detalle-label">Cupo:</span>
-                            <span class="detalle-valor"><?php echo $grupo['cupo']; ?> estudiantes</span>
-                        </div>
-                        <div class="detalle-item">
-                            <span class="detalle-label">Cursos relacionados:</span>
-                            <span class="detalle-valor"><?php echo $grupo['cursos_relacionados']; ?></span>
-                        </div>
-                    </div>
-
-                    <div class="grupo-acciones">
-                        <button class="btn-editar"><i class="fa-regular fa-pen-to-square"></i> Editar</button>
-                        <button class="btn-deshabilitar"><i class="fa-solid fa-eye-slash"></i> Desactivar</button>
-                    </div>
-                </div>
-                <?php endforeach; ?>
+            <div class="form-group">
+                <label for="modalDocente">Docente a cargo <span class="text-danger">*</span></label>
+                <select id="modalDocente" name="id_docente" required>
+                    <?php
+                    $docentes = $conexion->query("
+                        SELECT u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno 
+                        FROM usuarios u
+                        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+                        WHERE ur.id_rol = 2 AND u.estado = 'Activo'
+                        ORDER BY u.nombre
+                    ");
+                    while ($docente = $docentes->fetch_assoc()):
+                    ?>
+                    <option value="<?php echo $docente['id_usuario']; ?>">
+                        <?php echo htmlspecialchars($docente['nombre'] . ' ' . $docente['apellido_paterno'] . ' ' . $docente['apellido_materno']); ?>
+                    </option>
+                    <?php endwhile; ?>
+                </select>
             </div>
-        </section>
 
-        <!-- BARRA DE ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
+            <div class="form-group">
+                <label for="modalNombre">Nombre del grupo <span class="text-danger">*</span></label>
+                <input type="text" id="modalNombre" name="nombre" placeholder="Ej. A" required>
+            </div>
+
+            <div class="form-group">
+                <label>Grado escolar</label>
+                <div class="radio-group radio-inline">
+                    <label>
+                        <input type="radio" name="grado" value="1°" checked> 1°
+                    </label>
+                    <label>
+                        <input type="radio" name="grado" value="2°"> 2°
+                    </label>
+                    <label>
+                        <input type="radio" name="grado" value="3°"> 3°
+                    </label>
                 </div>
             </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span>Alto contraste</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span>Modo oscuro</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span>Texto grande</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span>Navegación</span>
-                </button>
-            </div>
-            <button class="btn-open-config">Abrir configuración</button>
-        </footer>
 
-    </main>
+            <div class="form-group">
+                <label>Turno</label>
+                <div class="radio-group radio-inline">
+                    <label>
+                        <input type="radio" name="turno" value="Matutino" checked> Matutino
+                    </label>
+                    <label>
+                        <input type="radio" name="turno" value="Vespertino"> Vespertino
+                    </label>
+                    <label>
+                        <input type="radio" name="turno" value="Mixto"> Mixto
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Modalidad</label>
+                <div class="radio-group radio-inline">
+                    <label>
+                        <input type="radio" name="modalidad" value="Presencial" checked> Presencial
+                    </label>
+                    <label>
+                        <input type="radio" name="modalidad" value="Hibrida"> Híbrida
+                    </label>
+                    <label>
+                        <input type="radio" name="modalidad" value="Virtual"> Virtual
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="modalCupo">Cupo máximo</label>
+                <input type="number" id="modalCupo" name="cupo_maximo" placeholder="30" value="30" min="1">
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="estado" value="Activo" checked>
+                        <i class="fa-solid fa-circle-check"></i> Activo
+                    </label>
+                    <label>
+                        <input type="radio" name="estado" value="Inactivo">
+                        <i class="fa-solid fa-circle-xmark"></i> Inactivo
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
+                <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+        </form>
+    </div>
 </div>
-
-<script src="js/admin.js"></script>
-</body>
-</html>

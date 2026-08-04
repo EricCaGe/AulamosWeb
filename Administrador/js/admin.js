@@ -100,3 +100,17 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 });
+
+// ========================================== */
+// MENSAJES TEMPORALES                        */
+// ========================================== */
+setTimeout(function() {
+    const mensajes = document.querySelectorAll('.mensaje');
+    mensajes.forEach(function(mensaje) {
+        mensaje.style.transition = 'opacity 0.5s ease';
+        mensaje.style.opacity = '0';
+        setTimeout(function() {
+            mensaje.style.display = 'none';
+        }, 500);
+    });
+}, 4000);

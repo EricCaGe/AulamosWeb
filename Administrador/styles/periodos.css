@@ -1,0 +1,726 @@
+/* =========================================================
+   PERIODOS - ESTILOS ESPECÍFICOS
+   ========================================================= */
+
+/* Selector de ciclo */
+.selector-ciclo {
+    margin-bottom: 30px;
+}
+
+.ciclo-selector-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.selector-label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.selector-select {
+    padding: 10px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #f8fafc;
+    min-width: 250px;
+    cursor: pointer;
+}
+
+.ciclo-fechas-info {
+    margin-left: auto;
+}
+
+.fecha-info {
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fecha-info i {
+    color: #3b71f3;
+}
+
+/* Lista de periodos */
+.periodos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.periodos-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.periodos-sub {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.btn-nuevo-periodo {
+    background: #3b71f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-nuevo-periodo:hover {
+    background: #2563eb;
+}
+
+.periodos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.periodo-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    transition: box-shadow 0.2s;
+}
+
+.periodo-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.periodo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.periodo-nombre {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.periodo-ciclo {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.periodo-fechas {
+    display: flex;
+    gap: 40px;
+    padding: 16px 0;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 16px;
+}
+
+.fecha-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.fecha-label {
+    font-size: 12px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.fecha-valor {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-top: 4px;
+}
+
+.periodo-acciones {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 4px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-activo {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-inactivo {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-cerrado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-editar {
+    background: #f1f5f9;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #475569;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-editar:hover {
+    background: #e2e8f0;
+}
+
+.btn-cerrar {
+    background: #fee2e2;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #991b1b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-cerrar:hover {
+    background: #fecaca;
+}
+
+/* ========================================== */
+/* EMPTY STATE                                */
+/* ========================================== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+}
+
+.empty-state i {
+    font-size: 56px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
+
+.empty-state h4 {
+    font-size: 20px;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.btn-agregar-empty {
+    background: #3b71f3;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-agregar-empty:hover {
+    background: #2563eb;
+}
+
+/* ========================================== */
+/* MODAL                                      */
+/* ========================================== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px 35px;
+    max-width: 550px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalEntrada 0.3s ease;
+}
+
+@keyframes modalEntrada {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.modal-cerrar {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.modal-cerrar:hover {
+    color: #1e293b;
+}
+
+.modal-content .form-group {
+    margin-bottom: 18px;
+}
+
+.modal-content .form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.modal-content .form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background: #f8fafc;
+}
+
+.modal-content .form-group input:focus {
+    outline: none;
+    border-color: #3b71f3;
+    background: #ffffff;
+}
+
+.modal-content .form-group input[type="date"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background: #f8fafc;
+}
+
+.modal-content .form-group input[type="date"]:focus {
+    outline: none;
+    border-color: #3b71f3;
+    background: #ffffff;
+}
+
+.ciclo-info {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 15px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.fechas-permitidas {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fechas-permitidas i {
+    color: #3b71f3;
+}
+
+/* ========================================== */
+/* RADIO BOTONES ESTILIZADOS                 */
+/* ========================================== */
+.radio-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1e293b;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.radio-group label:hover {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+}
+
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+.radio-group label:has(input:checked) {
+    border-color: #3b71f3;
+    background: #eff6ff;
+    color: #1e40af;
+    box-shadow: 0 0 0 3px rgba(59, 113, 243, 0.2);
+}
+
+.radio-group label:has(input[value="Inactivo"]:checked) {
+    border-color: #ef4444;
+    background: #fee2e2;
+    color: #991b1b;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.radio-group label:has(input[value="Cerrado"]:checked) {
+    border-color: #f59e0b;
+    background: #fef3c7;
+    color: #92400e;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.radio-group label i {
+    font-size: 18px;
+    color: #94a3b8;
+}
+
+.radio-group label:has(input:checked) i {
+    color: currentColor;
+}
+
+/* ========================================== */
+/* BOTONES DE ACCIÓN                         */
+/* ========================================== */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancelar {
+    background: #f1f5f9;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-cancelar:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.btn-guardar {
+    background: #3b71f3;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-guardar:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(59, 113, 243, 0.35);
+}
+
+/* ========================================== */
+/* MODO OSCURO                               */
+/* ========================================== */
+body.modo-oscuro .ciclo-selector-card {
+    background: #1e1e32;
+    border-color: #334155;
+}
+
+body.modo-oscuro .selector-label {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .selector-select {
+    background: #2d2d44;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .fecha-info {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .periodo-card {
+    background: #1e1e32;
+    border-color: #334155;
+}
+
+body.modo-oscuro .periodo-nombre {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .periodo-ciclo {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .fecha-valor {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .periodo-fechas {
+    border-color: #334155;
+}
+
+body.modo-oscuro .empty-state {
+    background: #1e1e32;
+    border-color: #334155;
+}
+
+body.modo-oscuro .empty-state h4 {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content {
+    background: #1e1e32;
+}
+
+body.modo-oscuro .modal-header h2 {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content .form-group label {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content .form-group input {
+    background: #2d2d44;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content .form-group input:focus {
+    background: #3d3d5c;
+    border-color: #3b71f3;
+}
+
+body.modo-oscuro .ciclo-info {
+    background: #2d2d44;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .fechas-permitidas {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .radio-group label {
+    background: #2d2d44;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .radio-group label:hover {
+    background: #3d3d5c;
+    border-color: #4a4a6a;
+}
+
+body.modo-oscuro .radio-group label:has(input:checked) {
+    border-color: #3b71f3;
+    background: #1e2d4a;
+    color: #8bb4ff;
+}
+
+body.modo-oscuro .radio-group label:has(input[value="Inactivo"]:checked) {
+    border-color: #ef4444;
+    background: #3d1a1a;
+    color: #f87171;
+}
+
+body.modo-oscuro .radio-group label:has(input[value="Cerrado"]:checked) {
+    border-color: #f59e0b;
+    background: #3d2a1a;
+    color: #fbbf24;
+}
+
+body.modo-oscuro .form-actions {
+    border-color: #334155;
+}
+
+body.modo-oscuro .btn-cancelar {
+    background: #334155;
+    color: #94a3b8;
+}
+
+body.modo-oscuro .btn-cancelar:hover {
+    background: #475569;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .btn-editar {
+    background: #334155;
+    color: #94a3b8;
+}
+
+body.modo-oscuro .btn-editar:hover {
+    background: #475569;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .btn-cerrar {
+    background: #3d1a1a;
+    color: #f87171;
+}
+
+body.modo-oscuro .btn-cerrar:hover {
+    background: #4d2a2a;
+}
+
+/* ========================================== */
+/* RESPONSIVE                                 */
+/* ========================================== */
+@media (max-width: 768px) {
+    .ciclo-selector-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .ciclo-fechas-info {
+        margin-left: 0;
+    }
+    .periodos-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .btn-nuevo-periodo {
+        justify-content: center;
+    }
+    .periodo-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .periodo-fechas {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 20px;
+        margin: 10px;
+        border-radius: 16px;
+    }
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .radio-group label {
+        padding: 12px 16px;
+        justify-content: center;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .btn-cancelar,
+    .btn-guardar {
+        justify-content: center;
+        width: 100%;
+    }
+}

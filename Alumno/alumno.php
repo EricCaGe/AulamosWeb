@@ -160,17 +160,18 @@ $racha_dias = $row['dias_activos'] ?? 0;
     <main class="main-content">
         
         <header class="content-header">
-            <div class="welcome-text">
-                <h1>¡Hola, <?php echo htmlspecialchars($nombre_completo); ?>! 👋</h1>
-                <p>Qué bueno verte hoy. Continúa aprendiendo a tu ritmo.</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
-                <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
-                <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Estudiante" class="avatar">
-            </div>
-        </header>
-
+    <div class="welcome-text">
+        <h1>¡Hola, <?php echo htmlspecialchars($nombre_completo); ?>! 👋</h1>
+        <p>Qué bueno verte hoy. Continúa aprendiendo a tu ritmo.</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-assistant" id="btn-asistente" onclick="window.open('chatbot.php', '_blank')">
+            Asistente Virtual <span class="robot-icon">🤖</span>
+        </button>
+        <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
+        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Estudiante" class="avatar">
+    </div>
+</header>
         <section class="cards-grid">
             <div class="card card-purple">
                 <h3>Continúa donde lo dejaste</h3>
