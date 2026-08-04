@@ -166,3 +166,12 @@ select.clean-input {
     background-size: 1em;
     padding-right: 30px;
 }
+
+.error-message {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 5px;
+}
+.required-star {
+    color: #ef4444;
+}
