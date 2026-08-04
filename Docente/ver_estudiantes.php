@@ -218,38 +218,38 @@ $rol = "Docente";
     <!-- (Tu calendario sigue aquí sin cambios...) -->
 
                 <!-- Calendario -->
-<aside class="calendar-container">
-    <!-- Cabecera y Navegación -->
-    <div class="calendar-header">
-        <div class="nav-left">
-            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
-            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
-        </div>
-        
-        <h2 id="month-year-title">MES AÑO</h2>
-        
-        <div class="nav-right">
-            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
-            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
-        </div>
-    </div>
+                <aside class="calendar-container">
+                    <!-- Cabecera y Navegación -->
+                    <div class="calendar-header">
+                        <div class="nav-left">
+                            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+                            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+                        </div>
+                        
+                        <h2 id="month-year-title">MES AÑO</h2>
+                        
+                        <div class="nav-right">
+                            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+                            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+                        </div>
+                    </div>
 
-    <!-- Días de la semana -->
-    <div class="calendar-weekdays">
-        <div class="weekday">Do</div>
-        <div class="weekday">Lu</div>
-        <div class="weekday">Ma</div>
-        <div class="weekday">Mi</div>
-        <div class="weekday">Ju</div>
-        <div class="weekday">Vi</div>
-        <div class="weekday">Sá</div>
-    </div>
+                    <!-- Días de la semana -->
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Do</div>
+                        <div class="weekday">Lu</div>
+                        <div class="weekday">Ma</div>
+                        <div class="weekday">Mi</div>
+                        <div class="weekday">Ju</div>
+                        <div class="weekday">Vi</div>
+                        <div class="weekday">Sá</div>
+                    </div>
 
-    <!-- Contenedor dinámico de los días -->
-    <div id="calendar-days" class="calendar-days-grid">
-        <!-- JavaScript inyectará los días aquí -->
-    </div>
-</aside>
+                    <!-- Contenedor dinámico de los días -->
+                    <div id="calendar-days" class="calendar-days-grid">
+                        <!-- JavaScript inyectará los días aquí -->
+                    </div>
+                </aside>
 
             <!-- BARRA ACCESIBILIDAD -->
             <footer class="accessibility-bar" style="margin-top: 30px;">
