@@ -75,6 +75,8 @@ $textSizeMap = [
         </nav>
         
         <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
+        <div class="menu-spacer"></div>
+    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
