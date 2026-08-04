@@ -6,25 +6,42 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
     exit;
 }
 
+require_once '../Conexion/conexion.php';
+
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
 
-// Datos de ejemplo (después se conectarán a la BD)
-$ciclos = [
-    ['id' => 1, 'nombre' => 'Ciclo escolar 2026-2027', 'inicio' => '05/10/2026', 'fin' => '05/10/2027']
-];
+// ========================================== */
+// CONSULTAS A LA BD                          */
+// ========================================== */
 
-$ciclo_seleccionado = 1; // Por defecto el primero
-$periodos = [
-    [
-        'id' => 1,
-        'nombre' => 'Primer periodo',
-        'ciclo' => 'Ciclo escolar 2026-2027',
-        'inicio' => '05/10/2026',
-        'fin' => '15/01/2027',
-        'estado' => 'Activo'
-    ]
-];
+// Obtener todos los ciclos para el selector
+$ciclos = $conexion->query("SELECT id_ciclo, nombre, fecha_inicio, fecha_fin FROM ciclos_escolares ORDER BY fecha_inicio DESC")->fetch_all(MYSQLI_ASSOC);
+
+// Ciclo seleccionado (por defecto el primero)
+$ciclo_seleccionado = isset($_GET['id_ciclo']) ? intval($_GET['id_ciclo']) : ($ciclos[0]['id_ciclo'] ?? 0);
+
+// Datos del ciclo seleccionado
+$ciclo_actual = null;
+foreach ($ciclos as $c) {
+    if ($c['id_ciclo'] == $ciclo_seleccionado) {
+        $ciclo_actual = $c;
+        break;
+    }
+}
+
+// Periodos del ciclo seleccionado
+$periodos = [];
+if ($ciclo_seleccionado > 0) {
+    $periodos = $conexion->query("
+        SELECT * FROM periodos_evaluacion 
+        WHERE id_ciclo = $ciclo_seleccionado 
+        ORDER BY fecha_inicio ASC
+    ")->fetch_all(MYSQLI_ASSOC);
+}
+
+$mensaje = $_GET['mensaje'] ?? '';
+$tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -34,6 +51,7 @@ $periodos = [
     <title>Periodos de evaluación - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
+    <link rel="stylesheet" href="styles/periodos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -114,25 +132,34 @@ $periodos = [
             </div>
         </header>
 
+        <!-- MENSAJES -->
+        <?php if ($mensaje): ?>
+            <div class="mensaje <?php echo $tipo; ?>" style="padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; <?php echo ($tipo === 'exito') ? 'background: #dcfce7; color: #166534; border-left: 4px solid #22c55e;' : 'background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626;'; ?>">
+                <?php echo htmlspecialchars($mensaje); ?>
+            </div>
+        <?php endif; ?>
+
         <!-- ========================================== -->
         <!-- SELECTOR DE CICLO ESCOLAR                  -->
         <!-- ========================================== -->
         <section class="selector-ciclo">
             <div class="ciclo-selector-card">
                 <label class="selector-label">Ciclo escolar</label>
-                <select class="selector-select">
+                <select class="selector-select" id="selectorCiclo" onchange="window.location.href='periodos.php?id_ciclo='+this.value">
                     <?php foreach ($ciclos as $ciclo): ?>
-                        <option value="<?php echo $ciclo['id']; ?>" <?php echo ($ciclo['id'] == $ciclo_seleccionado) ? 'selected' : ''; ?>>
-                            <?php echo $ciclo['nombre']; ?>
+                        <option value="<?php echo $ciclo['id_ciclo']; ?>" <?php echo ($ciclo['id_ciclo'] == $ciclo_seleccionado) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($ciclo['nombre']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if ($ciclo_actual): ?>
                 <div class="ciclo-fechas-info">
                     <span class="fecha-info">
                         <i class="fa-regular fa-calendar"></i>
-                        <?php echo $ciclos[0]['inicio']; ?> – <?php echo $ciclos[0]['fin']; ?>
+                        <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_inicio'])); ?> – <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_fin'])); ?>
                     </span>
                 </div>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -141,45 +168,135 @@ $periodos = [
         <!-- ========================================== -->
         <section class="lista-periodos">
             <div class="periodos-header">
-                <h3>Periodos registrados</h3>
-                <span class="resultados"><?php echo count($periodos); ?> periodo encontrado</span>
-                <button class="btn-nuevo-periodo">
-                    <i class="fa-solid fa-plus"></i> Nuevo
+                <div>
+                    <h3>Periodos registrados</h3>
+                    <p class="periodos-sub"><?php echo count($periodos); ?> periodo<?php echo (count($periodos) != 1) ? 's' : ''; ?> encontrado<?php echo (count($periodos) != 1) ? 's' : ''; ?></p>
+                </div>
+                <button class="btn-nuevo-periodo" id="btnNuevoPeriodo">
+                    <i class="fa-solid fa-plus"></i> Nuevo periodo
                 </button>
             </div>
 
             <div class="periodos-grid">
-                <?php foreach ($periodos as $periodo): ?>
-                <div class="periodo-card">
-                    <div class="periodo-header">
-                        <div>
-                            <h4 class="periodo-nombre"><?php echo $periodo['nombre']; ?></h4>
-                            <p class="periodo-ciclo"><?php echo $periodo['ciclo']; ?></p>
-                        </div>
-                        <span class="badge <?php echo ($periodo['estado'] === 'Activo') ? 'badge-activo' : 'badge-inactivo'; ?>">
-                            <?php echo $periodo['estado']; ?>
-                        </span>
+                <?php if (empty($periodos)): ?>
+                    <div class="empty-state">
+                        <i class="fa-solid fa-clock"></i>
+                        <h4>No hay periodos registrados</h4>
+                        <p>Comienza creando un nuevo periodo para este ciclo.</p>
+                        <button class="btn-agregar-empty" id="btnNuevoPeriodoEmpty">
+                            <i class="fa-solid fa-plus"></i> Crear primer periodo
+                        </button>
                     </div>
+                <?php else: ?>
+                    <?php foreach ($periodos as $periodo): ?>
+                    <div class="periodo-card" data-id="<?php echo $periodo['id_periodo']; ?>">
+                        <div class="periodo-header">
+                            <div>
+                                <h4 class="periodo-nombre"><?php echo htmlspecialchars($periodo['nombre']); ?></h4>
+                                <p class="periodo-ciclo"><?php echo htmlspecialchars($ciclo_actual['nombre'] ?? 'Sin ciclo'); ?></p>
+                            </div>
+                            <span class="badge <?php 
+                                echo ($periodo['estado'] === 'Activo') ? 'badge-activo' : 
+                                    (($periodo['estado'] === 'Cerrado') ? 'badge-cerrado' : 'badge-inactivo'); 
+                            ?>">
+                                <?php echo $periodo['estado']; ?>
+                            </span>
+                        </div>
 
-                    <div class="periodo-fechas">
-                        <div class="fecha-item">
-                            <span class="fecha-label">Inicio</span>
-                            <span class="fecha-valor"><?php echo $periodo['inicio']; ?></span>
+                        <div class="periodo-fechas">
+                            <div class="fecha-item">
+                                <span class="fecha-label">Inicio</span>
+                                <span class="fecha-valor"><?php echo date('d/m/Y', strtotime($periodo['fecha_inicio'])); ?></span>
+                            </div>
+                            <div class="fecha-item">
+                                <span class="fecha-label">Fin</span>
+                                <span class="fecha-valor"><?php echo date('d/m/Y', strtotime($periodo['fecha_fin'])); ?></span>
+                            </div>
                         </div>
-                        <div class="fecha-item">
-                            <span class="fecha-label">Fin</span>
-                            <span class="fecha-valor"><?php echo $periodo['fin']; ?></span>
-                        </div>
-                    </div>
 
-                    <div class="periodo-acciones">
-                        <button class="btn-editar"><i class="fa-regular fa-pen-to-square"></i> Editar</button>
-                        <button class="btn-deshabilitar"><i class="fa-solid fa-eye-slash"></i> Desactivar</button>
+                        <div class="periodo-acciones">
+                            <button class="btn-editar" data-id="<?php echo $periodo['id_periodo']; ?>">
+                                <i class="fa-regular fa-pen-to-square"></i> Editar
+                            </button>
+                            <?php if ($periodo['estado'] !== 'Cerrado'): ?>
+                            <button class="btn-cerrar" data-id="<?php echo $periodo['id_periodo']; ?>">
+                                <i class="fa-solid fa-lock"></i> Cerrar
+                            </button>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
+
+        <!-- ========================================== -->
+        <!-- MODAL PARA NUEVO / EDITAR PERIODO         -->
+        <!-- ========================================== -->
+        <div class="modal-overlay" id="modalPeriodo">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitulo">Nuevo periodo</h2>
+                    <button class="modal-cerrar" id="modalCerrar">&times;</button>
+                </div>
+                <form id="formPeriodo" method="POST" action="logica/procesar_periodos.php">
+                    <input type="hidden" name="accion" id="modalAccion" value="guardar">
+                    <input type="hidden" name="id" id="modalId" value="">
+                    <input type="hidden" name="id_ciclo" id="modalCicloId" value="<?php echo $ciclo_seleccionado; ?>">
+
+                    <div class="form-group">
+                        <label>Ciclo escolar</label>
+                        <p class="ciclo-info">
+                            <strong><?php echo htmlspecialchars($ciclo_actual['nombre'] ?? 'Sin ciclo'); ?></strong>
+                        </p>
+                        <?php if ($ciclo_actual): ?>
+                        <p class="fechas-permitidas">
+                            <i class="fa-regular fa-calendar"></i>
+                            Fechas permitidas: <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_inicio'])); ?> – <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_fin'])); ?>
+                        </p>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalNombre">Nombre del periodo <span class="text-danger">*</span></label>
+                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej. Primer periodo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalInicio">Fecha de inicio <span class="text-danger">*</span></label>
+                        <input type="date" id="modalInicio" name="fecha_inicio" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalFin">Fecha final <span class="text-danger">*</span></label>
+                        <input type="date" id="modalFin" name="fecha_fin" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="estado" value="Activo" checked>
+                                <i class="fa-solid fa-circle-check"></i> Activo
+                            </label>
+                            <label>
+                                <input type="radio" name="estado" value="Inactivo">
+                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
+                            </label>
+                            <label>
+                                <input type="radio" name="estado" value="Cerrado">
+                                <i class="fa-solid fa-lock"></i> Cerrado
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
+                        <button type="submit" class="btn-guardar">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <!-- BARRA DE ACCESIBILIDAD -->
         <footer class="accessibility-bar">
@@ -217,5 +334,6 @@ $periodos = [
 </div>
 
 <script src="js/admin.js"></script>
+<script src="js/periodos.js"></script>
 </body>
 </html>
