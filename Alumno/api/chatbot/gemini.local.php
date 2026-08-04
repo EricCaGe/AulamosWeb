@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'api_key' => 'AQ.Ab8RN6KQKDcDcVF2j7FXqffavt0evSHwy1kkrnyxVrl7aiG94w',
+    // API_KEY = 'tu_clave_aqui';  // Comentado o eliminado
     'model' => 'gemini-3.1-flash-lite',
     
 ];
