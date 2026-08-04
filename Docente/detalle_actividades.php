@@ -42,7 +42,6 @@ $grupo_alumno = "1° A";
                 
                 <!-- "Mas" Activo -->
                 <a href="mas.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Mas</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
