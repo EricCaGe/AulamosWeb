@@ -24,7 +24,7 @@ $rol = "Docente";
         <!-- BARRA LATERAL (RECICLADA) -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="https://placehold.co/50x50/ffffff/3b71f3?text=🦉" alt="Búho Aulamos" class="logo-img">
+                <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
                 <div>
                     <h2>AULAMOS</h2>
                     <p>Aprendemos juntos</p>
@@ -39,7 +39,6 @@ $rol = "Docente";
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="mas.php" class="menu-item"><i class="fa-solid fa-bars"></i> Mas</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
@@ -129,23 +128,39 @@ $rol = "Docente";
                     </div>
                     
                     <!-- CALENDARIO RECICLADO -->
-                    <aside class="calendar-widget border-container mt-10">
-                        <div class="calendar-month">
-                            <span class="month-title" style="font-size: 14px;">Mayo 2024</span>
-                            <div class="calendar-nav">
-                                <i class="fa-solid fa-chevron-left" style="font-size: 12px;"></i>
-                                <i class="fa-solid fa-chevron-right" style="font-size: 12px;"></i>
-                            </div>
-                        </div>
-                        <div class="calendar-grid small-cal">
-                            <div class="cal-day-header">LUN</div><div class="cal-day-header">MAR</div><div class="cal-day-header">MIE</div><div class="cal-day-header">JUE</div><div class="cal-day-header">VIE</div><div class="cal-day-header">SAB</div><div class="cal-day-header">DOM</div>
-                            <div class="cal-day disabled">29</div><div class="cal-day disabled">30</div><div class="cal-day dot">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div>
-                            <div class="cal-day">6</div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day dot">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div>
-                            <div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day dot">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div>
-                            <div class="cal-day active">20</div><div class="cal-day dot">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day double-dot">24</div><div class="cal-day">25</div><div class="cal-day">26</div>
-                            <div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day">31</div><div class="cal-day disabled">1</div><div class="cal-day disabled">2</div>
-                        </div>
-                    </aside>
+                    <!-- Calendario -->
+<aside class="calendar-container">
+    <!-- Cabecera y Navegación -->
+    <div class="calendar-header">
+        <div class="nav-left">
+            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+        </div>
+        
+        <h2 id="month-year-title">MES AÑO</h2>
+        
+        <div class="nav-right">
+            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+        </div>
+    </div>
+
+    <!-- Días de la semana -->
+    <div class="calendar-weekdays">
+        <div class="weekday">Do</div>
+        <div class="weekday">Lu</div>
+        <div class="weekday">Ma</div>
+        <div class="weekday">Mi</div>
+        <div class="weekday">Ju</div>
+        <div class="weekday">Vi</div>
+        <div class="weekday">Sá</div>
+    </div>
+
+    <!-- Contenedor dinámico de los días -->
+    <div id="calendar-days" class="calendar-days-grid">
+        <!-- JavaScript inyectará los días aquí -->
+    </div>
+</aside>
                 </div>
             </div>
 

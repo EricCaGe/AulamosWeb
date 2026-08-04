@@ -23,7 +23,7 @@ $rol = "Docente";
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="https://placehold.co/50x50/ffffff/3b71f3?text=🦉" alt="Búho Aulamos" class="logo-img">
+                <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
                 <div>
                     <h2>AULAMOS</h2>
                     <p>Aprendemos juntos</p>
@@ -38,7 +38,6 @@ $rol = "Docente";
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="mas.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Mas</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
@@ -221,38 +220,40 @@ $rol = "Docente";
                     </div>
                 </div>
 
-                <!-- COLUMNA DERECHA: CALENDARIO -->
-                <div class="mas-right-col">
-                    <div class="calendar-card">
-                        <div class="calendar-header">
-                            <h3>Calendario</h3>
-                            <a href="#" class="view-calendar-link">Ver calendario <i class="fa-regular fa-calendar-days"></i></a>
-                        </div>
-                        
-                        <div class="calendar-month-controls">
-                            <span class="month-name">Mayo 2024</span>
-                            <div class="month-arrows">
-                                <i class="fa-solid fa-chevron-left"></i>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </div>
-                        </div>
+                <!-- Calendario -->
+                 <div class="right-column">
+<aside class="calendar-container">
+    <!-- Cabecera y Navegación -->
+    <div class="calendar-header">
+        <div class="nav-left">
+            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+        </div>
+        
+        <h2 id="month-year-title">MES AÑO</h2>
+        
+        <div class="nav-right">
+            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+        </div>
+    </div>
 
-                        <!-- Días de la semana -->
-                        <div class="calendar-weekdays">
-                            <span>LUN</span><span>MAR</span><span>MIÉ</span><span>JUE</span><span>VIE</span><span>SÁB</span><span>DOM</span>
-                        </div>
+    <!-- Días de la semana -->
+    <div class="calendar-weekdays">
+        <div class="weekday">Do</div>
+        <div class="weekday">Lu</div>
+        <div class="weekday">Ma</div>
+        <div class="weekday">Mi</div>
+        <div class="weekday">Ju</div>
+        <div class="weekday">Vi</div>
+        <div class="weekday">Sá</div>
+    </div>
 
-                        <!-- Cuadrícula de días (Simulación visual) -->
-                        <div class="calendar-days">
-                            <span class="inactive">29</span><span class="inactive">30</span>
-                            <span class="day-has-event">1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-                            <span>6</span><span>7</span><span class="day-has-event">8</span><span class="day-has-event">9</span><span>10</span><span>11</span><span>12</span>
-                            <span>13</span><span>14</span><span>15</span><span class="day-has-event">16</span><span>17</span><span>18</span><span>19</span>
-                            <span class="active-day">20</span><span class="day-has-event">21</span><span>22</span><span>23</span><span class="day-has-event">24</span><span>25</span><span>26</span>
-                            <span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span class="inactive">1</span><span class="inactive">2</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- Contenedor dinámico de los días -->
+    <div id="calendar-days" class="calendar-days-grid">
+        <!-- JavaScript inyectará los días aquí -->
+    </div>
+</aside>
 
             </div>
          <!-- BARRA DE ACCESIBILIDAD INFERIOR -->

@@ -24,7 +24,7 @@ $rol = "Docente";
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
-                <img src="https://placehold.co/50x50/ffffff/3b71f3?text=🦉" alt="Búho Aulamos" class="logo-img">
+                <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
                 <div>
                     <h2>AULAMOS</h2>
                     <p>Aprendemos juntos</p>
@@ -39,7 +39,6 @@ $rol = "Docente";
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item active"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="mas.php" class="menu-item"><i class="fa-solid fa-bars"></i> Mas</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
