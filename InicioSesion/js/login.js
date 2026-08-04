@@ -137,11 +137,12 @@ document.addEventListener("DOMContentLoaded", function() {
             
             
             // Validar rol
-            if (!rol || rol.value === '' || rol.value === null) {
-                errores.push('Debes seleccionar un rol (Alumno o Docente).');
-            } else {
-                console.log('Rol a enviar:', rol.value);
-            }
+           // Validar rol
+if (!rol || rol.value === '' || rol.value === null) {
+    errores.push('Debes seleccionar un rol (Alumno, Docente, Investigador o Administrador).');
+} else {
+    console.log('Rol a enviar:', rol.value);
+}
             
             // Si hay errores, cancelar envío
             if (errores.length > 0) {

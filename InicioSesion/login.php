@@ -83,14 +83,24 @@
                 <?php endif; ?>
 
                 <!-- Selector de Rol -->
-                <div class="role-selector">
-                    <button type="button" class="btn-role active" data-rol="Alumno" aria-label="Seleccionar rol Alumno">
-                        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
-                    </button>
-                    <button type="button" class="btn-role" data-rol="Docente" aria-label="Seleccionar rol Docente">
-                        <i class="fa-solid fa-user" aria-hidden="true"></i> Soy Docente
-                    </button>
-                </div>
+<div class="role-selector">
+    <div class="role-row">
+        <button type="button" class="btn-role active" data-rol="Alumno" aria-label="Seleccionar rol Alumno">
+            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
+        </button>
+        <button type="button" class="btn-role" data-rol="Docente" aria-label="Seleccionar rol Docente">
+            <i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Soy Docente
+        </button>
+    </div>
+    <div class="role-row">
+        <button type="button" class="btn-role" data-rol="Investigador" aria-label="Seleccionar rol Investigador">
+            <i class="fa-solid fa-microscope" aria-hidden="true"></i> Soy Investigador
+        </button>
+        <button type="button" class="btn-role" data-rol="Admin" aria-label="Seleccionar rol Administrador">
+            <i class="fa-solid fa-user-gear" aria-hidden="true"></i> Soy Administrador
+        </button>
+    </div>
+</div>
 
 
                 <!-- Formulario -->

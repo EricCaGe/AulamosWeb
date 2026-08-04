@@ -21,7 +21,8 @@ if (empty($correo) || empty($password)) {
     exit;
 }
 
-if (!in_array($rol, ['Alumno', 'Docente'])) {
+// Validar que el rol sea válido
+if (!in_array($rol, ['Alumno', 'Docente', 'Investigador', 'Admin'])) {
     $rol = 'Alumno';
 }
 
@@ -98,12 +99,18 @@ try {
     // Redirigir según el rol
     if ($usuario['rol'] === 'Alumno') {
         header('Location: ../Alumno/alumno.php');
-    } else {
+    } elseif ($usuario['rol'] === 'Docente') {
         header('Location: ../Docente/docente_dashboard.php');
+    } elseif ($usuario['rol'] === 'Investigador') {
+        header('Location: ../Investigador/investigador_dashboard.php');
+    } elseif ($usuario['rol'] === 'Admin') {
+        header('Location: ../Administrador/admin_dashboard.php');
+    } else {
+        header('Location: ../InicioSesion/login.php?error=rol_invalido');
     }
     exit;
 
-} catch(Exception $e) {
+} catch (Exception $e) {
     error_log("Error en login: " . $e->getMessage());
     header('Location: login.php?error=sesion');
     exit;
