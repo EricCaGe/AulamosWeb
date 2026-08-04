@@ -1,165 +1,408 @@
-// ========================================== //
-// NAVEGACIÓN GLOBAL CON FLECHAS ← →          //
-// ========================================== //
-document.addEventListener("DOMContentLoaded", function() {
-    
-    // ========================================== //
-    // 1. FUNCIÓN PARA OBTENER ELEMENTOS INTERACTIVOS
-    // ========================================== //
-    function obtenerElementosInteractivos() {
-        const elementos = document.querySelectorAll(
-            'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        return Array.from(elementos).filter(function(el) {
-            return el.offsetParent !== null && 
-                   !el.disabled && 
-                   el.getAttribute('aria-hidden') !== 'true';
-        });
+document.addEventListener('DOMContentLoaded', () => {
+  // =====================================================
+  // 1. ELEMENTOS DEL INICIO DE SESIÓN
+  // =====================================================
+  const formulario =
+    document.getElementById('formLogin') ||
+    document.querySelector('.login-form');
+
+  const correoInput =
+    document.getElementById('login-email') ||
+    document.getElementById('correo');
+
+  const passwordInput =
+    document.getElementById('login-password') ||
+    document.getElementById('password');
+
+  const mensaje =
+    document.getElementById('mensaje');
+
+  const rolInput =
+    document.getElementById('rol-input');
+
+  if (!formulario) {
+    console.error('No se encontró el formulario de inicio de sesión.');
+    return;
+  }
+
+  if (!correoInput || !passwordInput) {
+    console.error(
+      'No se encontraron los campos de correo o contraseña.'
+    );
+    return;
+  }
+
+  // =====================================================
+  // 2. MOSTRAR MENSAJES
+  // =====================================================
+  function mostrarMensaje(texto, esError = false) {
+    if (mensaje) {
+      mensaje.textContent = texto;
+      mensaje.style.color = esError
+        ? '#dc2626'
+        : '#2D5BFF';
+    } else if (esError) {
+      alert(texto);
     }
+  }
 
-    // ========================================== //
-    // 2. NAVEGACIÓN GLOBAL CON FLECHAS ← →
-    // ========================================== //
-    document.addEventListener('keydown', function(event) {
-        const activo = document.activeElement;
-        const tagName = activo ? activo.tagName.toLowerCase() : '';
-        const esCampoTexto = ['input', 'textarea', 'select'].includes(tagName);
-        
-        if (esCampoTexto) {
-            return;
-        }
+  // =====================================================
+  // 3. NAVEGACIÓN CON FLECHAS
+  // =====================================================
+  function obtenerElementosInteractivos() {
+    const elementos = document.querySelectorAll(
+      'button, a[href], input, select, textarea, ' +
+      '[tabindex]:not([tabindex="-1"])'
+    );
 
-        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-            event.preventDefault();
-            
-            const interactivos = obtenerElementosInteractivos();
-            if (interactivos.length === 0) return;
-            
-            const indexActual = interactivos.indexOf(activo);
-            let nuevoIndex;
-            
-            if (indexActual === -1) {
-                nuevoIndex = 0;
-            } else if (event.key === 'ArrowRight') {
-                nuevoIndex = (indexActual + 1) % interactivos.length;
-            } else {
-                nuevoIndex = (indexActual - 1 + interactivos.length) % interactivos.length;
-            }
-            
-            interactivos[nuevoIndex].focus();
-        }
+    return Array.from(elementos).filter((elemento) => {
+      return (
+        elemento.offsetParent !== null &&
+        !elemento.disabled &&
+        elemento.getAttribute('aria-hidden') !== 'true'
+      );
     });
+  }
 
-    // ========================================== //
-    // 3. FUNCIONES ESPECÍFICAS DE CADA PÁGINA   //
-    // ========================================== //
-    
-    // --- Mostrar/Ocultar Contraseña ---
-    const togglePassword = document.querySelector('.toggle-password-icon');
-    const passwordInput = document.getElementById('login-password');
+  document.addEventListener('keydown', (evento) => {
+    const elementoActivo = document.activeElement;
 
-    if (togglePassword && passwordInput) {
-        function togglePasswordVisibility() {
-            const isPassword = passwordInput.getAttribute('type') === 'password';
-            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-            togglePassword.classList.toggle('fa-eye');
-            togglePassword.classList.toggle('fa-eye-slash');
+    const etiqueta = elementoActivo
+      ? elementoActivo.tagName.toLowerCase()
+      : '';
+
+    const esCampoDeFormulario = [
+      'input',
+      'textarea',
+      'select',
+    ].includes(etiqueta);
+
+    if (esCampoDeFormulario) {
+      return;
+    }
+
+    if (
+      evento.key !== 'ArrowRight' &&
+      evento.key !== 'ArrowLeft'
+    ) {
+      return;
+    }
+
+    evento.preventDefault();
+
+    const elementos = obtenerElementosInteractivos();
+
+    if (elementos.length === 0) {
+      return;
+    }
+
+    const indiceActual =
+      elementos.indexOf(elementoActivo);
+
+    let nuevoIndice;
+
+    if (indiceActual === -1) {
+      nuevoIndice = 0;
+    } else if (evento.key === 'ArrowRight') {
+      nuevoIndice =
+        (indiceActual + 1) % elementos.length;
+    } else {
+      nuevoIndice =
+        (indiceActual - 1 + elementos.length) %
+        elementos.length;
+    }
+
+    elementos[nuevoIndice].focus();
+  });
+
+  // =====================================================
+  // 4. MOSTRAR U OCULTAR CONTRASEÑA
+  // =====================================================
+  const botonMostrarPassword =
+    document.querySelector('.toggle-password-icon');
+
+  if (botonMostrarPassword) {
+    function cambiarVisibilidadPassword() {
+      const estaOculta =
+        passwordInput.type === 'password';
+
+      passwordInput.type =
+        estaOculta ? 'text' : 'password';
+
+      botonMostrarPassword.classList.toggle(
+        'fa-eye',
+        !estaOculta
+      );
+
+      botonMostrarPassword.classList.toggle(
+        'fa-eye-slash',
+        estaOculta
+      );
+
+      botonMostrarPassword.setAttribute(
+        'aria-label',
+        estaOculta
+          ? 'Ocultar contraseña'
+          : 'Mostrar contraseña'
+      );
+    }
+
+    botonMostrarPassword.addEventListener(
+      'click',
+      cambiarVisibilidadPassword
+    );
+
+    botonMostrarPassword.addEventListener(
+      'keydown',
+      (evento) => {
+        if (
+          evento.key === 'Enter' ||
+          evento.key === ' '
+        ) {
+          evento.preventDefault();
+          cambiarVisibilidadPassword();
+        }
+      }
+    );
+  }
+
+  // =====================================================
+  // 5. SELECTOR DE ROL
+  // =====================================================
+  const botonesRol =
+    document.querySelectorAll('.btn-role');
+
+  botonesRol.forEach((boton) => {
+    boton.addEventListener('click', () => {
+      botonesRol.forEach((otroBoton) => {
+        otroBoton.classList.remove('active');
+        otroBoton.setAttribute(
+          'aria-pressed',
+          'false'
+        );
+      });
+
+      boton.classList.add('active');
+      boton.setAttribute('aria-pressed', 'true');
+
+      if (rolInput) {
+        rolInput.value =
+          boton.getAttribute('data-rol') || '';
+      }
+    });
+  });
+
+  // =====================================================
+  // 6. VALIDAR FORMULARIO
+  // =====================================================
+  function validarFormulario() {
+    const errores = [];
+
+    const correo =
+      correoInput.value.trim();
+
+    const password =
+      passwordInput.value;
+
+    const expresionCorreo =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    correoInput.style.borderColor = '';
+    passwordInput.style.borderColor = '';
+
+    if (!correo) {
+      errores.push(
+        'El correo electrónico es obligatorio.'
+      );
+
+      correoInput.style.borderColor = '#dc2626';
+    } else if (!expresionCorreo.test(correo)) {
+      errores.push(
+        'El correo electrónico no es válido.'
+      );
+
+      correoInput.style.borderColor = '#dc2626';
+    }
+
+    if (!password.trim()) {
+      errores.push(
+        'La contraseña es obligatoria.'
+      );
+
+      passwordInput.style.borderColor = '#dc2626';
+    }
+
+    if (rolInput && !rolInput.value) {
+      errores.push(
+        'Debes seleccionar un rol.'
+      );
+    }
+
+    return errores;
+  }
+
+  // =====================================================
+  // 7. CONECTAR CON LA API
+  // =====================================================
+  formulario.addEventListener(
+    'submit',
+    async (evento) => {
+      evento.preventDefault();
+
+      const errores = validarFormulario();
+
+      if (errores.length > 0) {
+        mostrarMensaje(
+          errores.join(' '),
+          true
+        );
+
+        return;
+      }
+
+      mostrarMensaje('Iniciando sesión...');
+
+      const botonSubmit =
+        formulario.querySelector(
+          'button[type="submit"], input[type="submit"]'
+        );
+
+      if (botonSubmit) {
+        botonSubmit.disabled = true;
+      }
+
+      try {
+        const datos = await peticionAPI(
+          '/auth/login',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              correo: correoInput.value.trim(),
+              password: passwordInput.value,
+            }),
+          }
+        );
+
+        if (!datos.token || !datos.usuario) {
+          throw new Error(
+            'La respuesta del servidor no contiene una sesión válida.'
+          );
         }
 
-        togglePassword.addEventListener('click', togglePasswordVisibility);
-        togglePassword.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                togglePasswordVisibility();
-            }
-        });
+        const rolReal = String(
+          datos.usuario.rol ||
+          datos.usuario.nombre_rol ||
+          datos.rol ||
+          ''
+        ).toLowerCase();
+
+        const rolSeleccionado = String(
+          rolInput?.value || ''
+        ).toLowerCase();
+
+        /*
+         * El rol verdadero siempre es el que devuelve
+         * la API, no el seleccionado visualmente.
+         */
+        if (
+          rolSeleccionado &&
+          !rolesEquivalentes(
+            rolSeleccionado,
+            rolReal
+          )
+        ) {
+          throw new Error(
+            `La cuenta ingresada no pertenece al rol ${rolInput.value}.`
+          );
+        }
+
+        guardarSesion(
+          datos.token,
+          datos.usuario
+        );
+
+        mostrarMensaje(
+          'Inicio de sesión correcto.'
+        );
+
+        redirigirSegunRol(rolReal);
+      } catch (error) {
+        mostrarMensaje(
+          error.message ||
+            'No se pudo iniciar sesión.',
+          true
+        );
+      } finally {
+        if (botonSubmit) {
+          botonSubmit.disabled = false;
+        }
+      }
+    }
+  );
+
+  // =====================================================
+  // 8. COMPARAR ROLES
+  // =====================================================
+  function rolesEquivalentes(
+    rolSeleccionado,
+    rolReal
+  ) {
+    const equivalencias = {
+      admin: 'administrador',
+      administrador: 'administrador',
+      alumno: 'alumno',
+      estudiante: 'alumno',
+      docente: 'docente',
+      investigador: 'investigador',
+    };
+
+    return (
+      equivalencias[rolSeleccionado] ===
+      equivalencias[rolReal]
+    );
+  }
+
+  // =====================================================
+  // 9. REDIRECCIÓN
+  // =====================================================
+  function redirigirSegunRol(rol) {
+    if (
+      rol === 'administrador' ||
+      rol === 'admin'
+    ) {
+      window.location.href =
+        '../Administrador/inicio.php';
+
+      return;
     }
 
-    // ========================================== //
-    // SELECTOR DE ROL + ACTUALIZAR CAMPO OCULTO //
-    // ========================================== //
-    const roleButtons = document.querySelectorAll('.btn-role');
-    const rolInput = document.getElementById('rol-input');
-    
-    if (roleButtons.length > 0 && rolInput) {
-        // Asegurar que el rol inicial sea "alumno"
-        rolInput.value = 'Alumno';
+    if (rol === 'docente') {
+      window.location.href =
+        '../Docente/inicio.php';
 
-        roleButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                // Quitar active de todos
-                roleButtons.forEach(function(btn) {
-                    btn.classList.remove('active');
-                });
-                // Activar el seleccionado
-                this.classList.add('active');
-                // Actualizar campo oculto
-                const rol = this.getAttribute('data-rol');
-                rolInput.value = rol;
-                console.log('Rol seleccionado:', rol);
-            });
-        });
+      return;
     }
 
-    // ========================================== //
-    // VALIDACIÓN DEL FORMULARIO                  //
-    // ========================================== //
-    const formulario = document.querySelector('.login-form');
-    
-    if (formulario) {
-        formulario.addEventListener('submit', function(event) {
-            
-            // Obtener campos
-            const email = document.getElementById('login-email');
-            const password = document.getElementById('login-password');
-            const rol = document.getElementById('rol-input');
-            
-            let errores = [];
-            
-            // Validar email
-            if (!email || email.value.trim() === '') {
-                errores.push('El correo electrónico es obligatorio.');
-                email.style.borderColor = '#dc2626';
-            } else if (!email.value.includes('@') || !email.value.includes('.')) {
-                errores.push('El correo electrónico no es válido.');
-                email.style.borderColor = '#dc2626';
-            } else {
-                email.style.borderColor = '';
-            }
-            
-            // Validar contraseña
-            if (!password || password.value.trim() === '') {
-                errores.push('La contraseña es obligatoria.');
-                password.style.borderColor = '#dc2626';
-            } else {
-                password.style.borderColor = '';
-            }
-            
-            
-            // Validar rol
-           // Validar rol
-if (!rol || rol.value === '' || rol.value === null) {
-    errores.push('Debes seleccionar un rol (Alumno, Docente, Investigador o Administrador).');
-} else {
-    console.log('Rol a enviar:', rol.value);
-}
-            
-            // Si hay errores, cancelar envío
-            if (errores.length > 0) {
-                event.preventDefault();
-                
-                let mensajeError = '⚠️ Por favor corrige los siguientes errores:\n\n';
-                errores.forEach(function(error) {
-                    mensajeError += '• ' + error + '\n';
-                });
-                alert(mensajeError);
-                
-                return false;
-            }
-            
-            // Si no hay errores, el formulario se envía normalmente
-            console.log('✅ Formulario validado correctamente. Enviando...');
-            return true;
-        });
+    if (
+      rol === 'alumno' ||
+      rol === 'estudiante'
+    ) {
+      window.location.href =
+        '../Alumno/inicio.php';
+
+      return;
     }
+
+    if (rol === 'investigador') {
+      window.location.href =
+        '../Investigador/inicio.php';
+
+      return;
+    }
+
+    throw new Error(
+      'El usuario no tiene un rol reconocido.'
+    );
+  }
 });
+

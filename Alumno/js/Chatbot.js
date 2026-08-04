@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const endpoint =
         typeof config.endpoint === "string"
             ? config.endpoint
-            : "http://localhost:3000/api/chatbot/mensaje";
+            : "api/chatbot/responder.php";
 
     const rol =
         typeof config.rol === "string" && config.rol.trim()
@@ -26,6 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
             : "anonimo";
 
     const claveHistorial = `aulamos_chatbot_historial_${idUsuario}`;
+    const apiPersistencia = {
+    iniciar: "api/chatbot/iniciar_sesion.php",
+    guardar: "api/chatbot/guardar_interaccion.php",
+    historial: "api/chatbot/obtener_historial.php",
+    cerrar: "api/chatbot/cerrar_sesion.php",
+};
 
     const formulario = document.getElementById("chatForm");
     const campoMensaje = document.getElementById("mensajeChat");
@@ -53,10 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let enviandoMensaje = false;
-    let ultimaRespuesta = "";
-    let historial = cargarHistorial();
+let ultimaRespuesta = "";
+let historial = [];
+let idSesionChatbot = null;
 
-    restaurarHistorial();
+void inicializarChatbot();
 
     function obtenerHoraActual() {
         return new Intl.DateTimeFormat("es-MX", {
@@ -111,6 +118,257 @@ document.addEventListener("DOMContentLoaded", () => {
                 : "Enviar";
         }
     }
+    async function procesarRespuestaJson(respuestaHttp) {
+    const contenido = await respuestaHttp.text();
+
+    let datos = {};
+
+    try {
+        datos = contenido ? JSON.parse(contenido) : {};
+    } catch {
+        throw new Error(
+            "El servidor de historial devolvió una respuesta inválida.",
+        );
+    }
+
+    if (
+        !respuestaHttp.ok ||
+        datos.success === false
+    ) {
+        throw new Error(
+            datos.message ||
+            `Error del servidor: ${respuestaHttp.status}`,
+        );
+    }
+
+    return datos;
+}
+
+async function iniciarSesionChatbot() {
+    if (
+        Number.isInteger(idSesionChatbot) &&
+        idSesionChatbot > 0
+    ) {
+        return idSesionChatbot;
+    }
+
+    const respuestaHttp = await fetch(
+        apiPersistencia.iniciar,
+        {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                Accept: "application/json",
+            },
+        },
+    );
+
+    const datos = await procesarRespuestaJson(
+        respuestaHttp,
+    );
+
+    const idRecibido = Number(datos.idSesion);
+
+    if (
+        !Number.isInteger(idRecibido) ||
+        idRecibido <= 0
+    ) {
+        throw new Error(
+            "El servidor no devolvió una sesión válida.",
+        );
+    }
+
+    idSesionChatbot = idRecibido;
+
+    console.log(
+        `Sesión de AulaBot activa: ${idSesionChatbot}`,
+    );
+
+    return idSesionChatbot;
+}
+
+async function guardarInteraccionChatbot(
+    pregunta,
+    respuesta,
+    tiempoRespuestaMs,
+) {
+    const idSesion = await iniciarSesionChatbot();
+
+    const respuestaHttp = await fetch(
+        apiPersistencia.guardar,
+        {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify({
+                idSesion,
+                pregunta,
+                respuesta,
+                modeloIa: "Gemini",
+                tiempoRespuestaMs,
+            }),
+        },
+    );
+
+    return procesarRespuestaJson(respuestaHttp);
+}
+function convertirFechaEnHora(fechaMysql) {
+    if (
+        typeof fechaMysql !== "string" ||
+        !fechaMysql.trim()
+    ) {
+        return obtenerHoraActual();
+    }
+
+    const fecha = new Date(
+        fechaMysql.replace(" ", "T"),
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+        return obtenerHoraActual();
+    }
+
+    return new Intl.DateTimeFormat("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(fecha);
+}
+
+function eliminarMensajesDinamicos() {
+    const mensajes =
+        contenedorMensajes.querySelectorAll(
+            ".message[data-message-type]",
+        );
+
+    mensajes.forEach((mensaje) => {
+        mensaje.remove();
+    });
+}
+
+async function cargarHistorialPersistente() {
+    const idSesion = await iniciarSesionChatbot();
+
+    const url =
+        `${apiPersistencia.historial}` +
+        `?id_sesion=${encodeURIComponent(idSesion)}`;
+
+    const respuestaHttp = await fetch(url, {
+        method: "GET",
+        credentials: "same-origin",
+        headers: {
+            Accept: "application/json",
+        },
+    });
+
+    const datos = await procesarRespuestaJson(
+        respuestaHttp,
+    );
+
+    const interacciones =
+        Array.isArray(datos.interacciones)
+            ? datos.interacciones
+            : [];
+
+    historial = [];
+    eliminarMensajesDinamicos();
+
+    interacciones.forEach((interaccion) => {
+        const hora = convertirFechaEnHora(
+            interaccion.fechaMensaje,
+        );
+
+        crearMensaje({
+            tipo: "usuario",
+            texto: interaccion.pregunta,
+            hora,
+            guardar: false,
+        });
+
+        crearMensaje({
+            tipo: "bot",
+            texto: interaccion.respuesta,
+            hora,
+            guardar: false,
+        });
+
+        historial.push(
+            {
+                tipo: "usuario",
+                texto: interaccion.pregunta,
+                hora,
+                error: false,
+            },
+            {
+                tipo: "bot",
+                texto: interaccion.respuesta,
+                hora,
+                error: false,
+            },
+        );
+    });
+
+    guardarHistorial();
+
+    console.log(
+        `${interacciones.length} interacciones recuperadas de MySQL.`,
+    );
+}
+
+async function inicializarChatbot() {
+    try {
+        await iniciarSesionChatbot();
+        await cargarHistorialPersistente();
+    } catch (error) {
+        console.warn(
+            "No se pudo recuperar el historial desde MySQL:",
+            error,
+        );
+
+        historial = cargarHistorial();
+        restaurarHistorial();
+
+        establecerEstado(
+            "Se cargó el historial temporal del navegador.",
+            true,
+        );
+    }
+}
+async function cerrarSesionChatbot() {
+    if (
+        !Number.isInteger(idSesionChatbot) ||
+        idSesionChatbot <= 0
+    ) {
+        return false;
+    }
+
+    const idSesionActual = idSesionChatbot;
+
+    const respuestaHttp = await fetch(
+        apiPersistencia.cerrar,
+        {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify({
+                idSesion: idSesionActual,
+            }),
+        },
+    );
+
+    const datos = await procesarRespuestaJson(
+        respuestaHttp,
+    );
+
+    idSesionChatbot = null;
+
+    return Boolean(datos.sesionCerrada);
+}
 
     function crearAvatar(tipo) {
         const avatar = document.createElement("div");
@@ -299,9 +557,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (error instanceof TypeError) {
             return (
-                "No se pudo conectar con AulaBot. Verifica que el " +
-                "backend esté encendido en el puerto 3000."
-            );
+    "No se pudo conectar con AulaBot. Verifica Apache, " +
+    "la conexión a internet y la configuración de Gemini."
+);
         }
 
         if (
@@ -356,19 +614,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const indicador = crearIndicadorEscritura();
 
-        establecerEstado("AulaBot está preparando una respuesta...");
+establecerEstado("AulaBot está preparando una respuesta...");
 
-        try {
+const inicioConsulta = performance.now();
+
+try {
             const respuesta = await consultarAulaBot(mensaje);
 
-            indicador.remove();
+const tiempoRespuestaMs = Math.round(
+    performance.now() - inicioConsulta,
+);
 
-            crearMensaje({
-                tipo: "bot",
-                texto: respuesta,
-            });
+indicador.remove();
 
-            establecerEstado("Respuesta recibida.");
+crearMensaje({
+    tipo: "bot",
+    texto: respuesta,
+});
+
+try {
+    await guardarInteraccionChatbot(
+        mensaje,
+        respuesta,
+        tiempoRespuestaMs,
+    );
+
+    establecerEstado(
+        "Respuesta recibida y guardada.",
+    );
+} catch (errorGuardado) {
+    console.warn(
+        "La respuesta llegó, pero no pudo guardarse:",
+        errorGuardado,
+    );
+
+    establecerEstado(
+        "Respuesta recibida, pero no pudo guardarse en el historial.",
+        true,
+    );
+}
         } catch (error) {
             indicador.remove();
 
@@ -457,38 +741,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function limpiarConversacion() {
-        const confirmado = window.confirm(
-            "¿Deseas eliminar la conversación actual con AulaBot?",
-        );
+    async function limpiarConversacion() {
+    const confirmado = window.confirm(
+        "¿Deseas cerrar esta conversación e iniciar una nueva?",
+    );
 
-        if (!confirmado) {
-            return;
-        }
+    if (!confirmado || enviandoMensaje) {
+        return;
+    }
+
+    establecerCargando(true);
+    establecerEstado("Cerrando conversación...");
+
+    try {
+        await cerrarSesionChatbot();
 
         historial = [];
         ultimaRespuesta = "";
 
         sessionStorage.removeItem(claveHistorial);
 
-        const mensajesGuardados =
-            contenedorMensajes.querySelectorAll(
-                ".message[data-message-type]",
-            );
-
-        mensajesGuardados.forEach((mensaje) => mensaje.remove());
+        eliminarMensajesDinamicos();
 
         crearMensaje({
             tipo: "bot",
             texto:
-                "La conversación fue limpiada. " +
+                "La conversación anterior fue cerrada. " +
                 "¿Qué tema quieres aprender ahora?",
             guardar: false,
         });
 
-        establecerEstado("Conversación limpiada.");
+        await iniciarSesionChatbot();
+
+        establecerEstado(
+            "Nueva conversación iniciada.",
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo cerrar la conversación:",
+            error,
+        );
+
+        establecerEstado(
+            "No se pudo cerrar la conversación. Intenta nuevamente.",
+            true,
+        );
+    } finally {
+        establecerCargando(false);
         campoMensaje.focus();
     }
+}
 
     function leerUltimaRespuesta() {
         if (

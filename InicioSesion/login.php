@@ -163,5 +163,8 @@
         });
     </script>
 
+<script src="../Conexion/api.js"></script>
+<script src="../Conexion/sesion.js"></script>
+<script src="./js/login.js"></script>
 </body>
 </html>
