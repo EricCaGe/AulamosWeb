@@ -835,3 +835,23 @@ body.modo-oscuro .btn-eliminar:hover {
         width: 100%;
     }
 }
+
+/* ========================================== */
+/* SELECT VACÍO - MENSAJE                      */
+/* ========================================== */
+select option:disabled {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+select option[value=""] {
+    color: #94a3b8;
+}
+
+body.modo-oscuro select option:disabled {
+    color: #64748b;
+}
+
+body.modo-oscuro select option[value=""] {
+    color: #64748b;
+}

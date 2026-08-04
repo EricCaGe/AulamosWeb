@@ -5,28 +5,20 @@
 // ============================================
 
 // Configuración de la conexión
-<<<<<<< HEAD
 //$host = '10.2.2.43';
 //$host = '10.2.0.234';
-// .$host = 'localhost';
-// .$usuario = 'root';
+//$host = 'localhost';
+//$usuario = 'root';
 // .$password = '';
 //$password = '12345678';
 //$password = 'Jaziel123';
 //$password = 'qwerty1234.'; //Obregon
-// .$basedatos = 'aulamos_mvp';
+ //$basedatos = 'aulamos_mvp';
 //$puerto = 3306;
 
-$host = '10.2.0.234';
-$usuario = 'Aulamos';
+$host = '10.2.2.43';
+$usuario = 'aulamos';
 $password = 'E12345678!';
-=======
-$host = 'localhost';
-$usuario = 'root';
-//$password = '12345678';
-//$password = 'Jaziel123';
-$password = 'qwerty1234.'; //Obregon
->>>>>>> efb94a4f07110c8acc9314738c782fd7566c3316
 $basedatos = 'aulamos_mvp';
 $puerto = 3306;
 
