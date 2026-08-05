@@ -1,14 +1,44 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    // ASISTENTE VIRTUAL
-    const btnAsistente = document.getElementById('btn-asistente');
-    if (btnAsistente) {
-        btnAsistente.addEventListener('click', function() {
-            alert('🤖 Asistente Virtual: ¡Hola! Soy tu asistente de Aulamos. ¿En qué puedo ayudarte como administrador?');
+    // ==========================================
+    // VARIABLE GLOBAL (Controla si el lector está activo)
+    // ==========================================
+    let lectorActivo = false; 
+
+    // ==========================================
+    // LECTOR DE PANTALLA (Usa el div del HTML)
+    // ==========================================
+    const lectorDiv = document.getElementById('lector-anuncios');
+
+    function leerEnVozAlta(mensaje) {
+        // Si el lector está apagado o no existe el div, no hacer nada
+        if (!lectorActivo || !lectorDiv) return;
+
+        // Truco infalible: Limpiar y forzar relectura con setTimeout
+        lectorDiv.textContent = ''; 
+        setTimeout(() => {
+            lectorDiv.textContent = mensaje;
+        }, 50);
+    }
+
+    // ==========================================
+    // BOTÓN DE ENCENDIDO/APAGADO
+    // ==========================================
+    const btnLectorPantalla = document.getElementById('btn-lector-pantalla');
+    if (btnLectorPantalla) {
+        btnLectorPantalla.addEventListener('click', function() {
+            lectorActivo = !lectorActivo; 
+            this.classList.toggle('active');
+            
+            if (lectorActivo) {
+                leerEnVozAlta('Modo lector activado');
+            }
         });
     }
 
-    // ACCESIBILIDAD
+    // ==========================================
+    // ACCESIBILIDAD (Tus funciones originales)
+    // ==========================================
     const body = document.body;
 
     function toggleClase(elemento, clase) {
@@ -39,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function() {
         btnDark.addEventListener('click', function() {
             toggleClase(body, 'modo-oscuro');
             this.classList.toggle('active');
+            if(lectorActivo) leerEnVozAlta('Modo oscuro activado');
         });
     }
 
@@ -47,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
         btnContrast.addEventListener('click', function() {
             toggleClase(body, 'alto-contraste');
             this.classList.toggle('active');
+            if(lectorActivo) leerEnVozAlta('Alto contraste activado');
         });
     }
 
@@ -55,42 +87,47 @@ document.addEventListener("DOMContentLoaded", function() {
         btnText.addEventListener('click', function() {
             toggleClase(body, 'texto-grande');
             this.classList.toggle('active');
+            if(lectorActivo) leerEnVozAlta('Texto grande activado');
         });
     }
 
-    // NOTIFICACIONES
+    // ==========================================
+    // ASISTENTE Y NOTIFICACIONES (Sin alert)
+    // ==========================================
+    const btnAsistente = document.getElementById('btn-asistente');
+    if (btnAsistente) {
+        btnAsistente.addEventListener('click', function() {
+            if(lectorActivo) leerEnVozAlta('Abriendo asistente virtual');
+        });
+    }
+
     const iconBell = document.querySelector('.icon-bell');
     if (iconBell) {
         iconBell.addEventListener('click', function() {
-            alert('🔔 No tienes notificaciones nuevas.');
+            if(lectorActivo) leerEnVozAlta('No tienes notificaciones nuevas.');
         });
     }
 
-    // ACCESIBILIDAD HEADER
     const btnAccHeader = document.querySelector('.btn-accessibility-header');
     if (btnAccHeader) {
         btnAccHeader.addEventListener('click', function() {
-            alert('♿ Abriendo panel de accesibilidad...');
+            if(lectorActivo) leerEnVozAlta('Abriendo panel de accesibilidad.');
         });
     }
 
-    // BOTONES ACCESIBILIDAD INFERIOR
     document.querySelectorAll('.acc-opt-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const texto = this.querySelector('span')?.textContent || 'Opción';
-            alert('🔊 ' + texto + ' activado (simulación)');
+            if(lectorActivo) leerEnVozAlta(`${texto} activado.`);
         });
     });
 
-    // BOTÓN CONFIGURACIÓN (Accesibilidad)
     const btnConfig = document.querySelector('.btn-open-config');
     if (btnConfig) {
         btnConfig.addEventListener('click', function() {
-            alert('⚙️ Abrir configuración completa de accesibilidad');
+            if(lectorActivo) leerEnVozAlta('Abriendo configuración completa.');
         });
     }
-
-    // ✅ BOTÓN CONFIGURACIÓN DE GESTIÓN ACADÉMICA - ELIMINADO, AHORA REDIRIGE NORMALMENTE
 
 });
 

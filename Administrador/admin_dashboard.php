@@ -251,5 +251,7 @@ $usuarios_recientes = $conexion->query("
 </div>
 
 <script src="js/admin.js"></script>
+<!-- LECTOR DE PANTALLA -->
+<script src="js/lector.js"></script>
 </body>
 </html>

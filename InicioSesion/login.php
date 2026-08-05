@@ -6,6 +6,7 @@
     <title>Iniciar Sesión - AULAMOS</title>
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/accesibilidad.css">
 </head>
 <body>
 
@@ -165,6 +166,34 @@
 </body>
 </html>
 
+<!-- ========================================== -->
+<!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
+<!-- ========================================== -->
+<div class="panel-accesibilidad" id="panelAccesibilidad">
+    <div class="panel-header">
+        <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
+        <button class="panel-cerrar" id="cerrarPanel">&times;</button>
+    </div>
+    <div class="panel-body">
+        <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
+            <i class="fa-solid fa-moon"></i> Modo oscuro
+        </button>
+        <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
+            <i class="fa-solid fa-eye"></i> Alto contraste
+        </button>
+        <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
+            <i class="fa-solid fa-text-height"></i> Texto grande
+        </button>
+        <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
+            <i class="fa-solid fa-volume-high"></i> Lector de pantalla
+        </button>
+        <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
+            <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
+        </button>
+    </div>
+</div>
 
+<script src="js/accesibilidad.js"></script>
+<script src="js/lector.js"></script>
 </body>
 </html>
