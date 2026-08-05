@@ -1,6 +1,19 @@
 <?php
-$usuario = "Profesora Ana"; 
-$rol = "Docente";
+session_start();
+
+// Verificar que el usuario haya iniciado sesión y sea Docente
+if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
+require_once '../Conexion/conexion.php';
+
+$id_docente = $_SESSION['usuario']['id_usuario'];
+$nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
+
+$mensaje = '';
+$tipo_mensaje = '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -38,7 +51,7 @@ $rol = "Docente";
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
-                <a href="login.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
             
         </aside>
@@ -60,8 +73,8 @@ $rol = "Docente";
                     <div class="user-profile">
                         <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
                         <div class="user-info">
-                            <span class="user-name"><?php echo $usuario; ?>!</span>
-                            <span class="user-role"><?php echo $rol; ?></span>
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                            <span class="user-role">Docente</span>
                         </div>
                         <i class="fa-solid fa-chevron-down drop-icon"></i>
                     </div>

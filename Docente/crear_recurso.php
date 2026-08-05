@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Curso - Aulamos</title>
+    <title>Crear Recurso - Aulamos</title>
     
     <link rel="stylesheet" href="styles/docente.css">
     <link rel="stylesheet" href="styles/curso.css">
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- ENCABEZADO -->
             <header class="content-header">
                 <div class="welcome-text">
-                    <h1>Crear curso</h1>
+                    <h1>Crear recurso</h1>
                     <p>Comparte material con tus estudiantes</p>
                 </div>
                 <div class="header-actions">
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     <!-- 1. Tipo de curso -->
                     <section class="section-container">
-                        <h3 class="section-title">Tipo de curso</h3>
+                        <h3 class="section-title">Tipo de recurso</h3>
                         <div class="course-types-grid">
                             <button type="button" class="type-card" onclick="document.getElementById('tipo_curso').value='Video'">
                                 <div class="type-icon text-purple"><i class="fa-solid fa-play"></i></div>
@@ -204,13 +204,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="hidden" id="id_recurso" name="id_recurso" value="">
                     </section>
 
-                    <!-- 2. Información del curso -->
+                    <!-- 2. Información del recurso -->
                     <section class="section-container border-container">
-                        <h3 class="section-title">Información del curso</h3>
+                        <h3 class="section-title">Información del recurso</h3>
                         
                         <form class="course-form" method="POST" action="" enctype="multipart/form-data">
                             <div class="form-group">
-                                <label>Título del curso <span class="text-danger">*</span></label>
+                                <label>Título del recurso <span class="text-danger">*</span></label>
                                 <input type="text" name="nombre" placeholder="Ej. La fotosíntesis" value="<?php echo htmlspecialchars($_POST['nombre'] ?? ''); ?>" required>
                             </div>
 
