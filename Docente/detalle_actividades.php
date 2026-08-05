@@ -38,7 +38,7 @@ $grupo_alumno = "1° A";
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 
                 <!-- "Mas" Activo -->
-                <a href="mas.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Mas</a>
+                
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>

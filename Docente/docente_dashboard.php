@@ -189,7 +189,7 @@ function formatearFecha($fecha) {
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-                <a href="mas.php" class="menu-item"><i class="fa-solid fa-bars"></i> Más</a>
+                
                 <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
