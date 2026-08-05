@@ -1,7 +1,19 @@
 <?php
-// Variables dinámicas
-$usuario = "Profesora Ana"; 
-$rol = "Docente";
+session_start();
+
+// Verificar que el usuario haya iniciado sesión y sea Docente
+if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
+require_once '../Conexion/conexion.php';
+
+$id_docente = $_SESSION['usuario']['id_usuario'];
+$nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
+
+$mensaje = '';
+$tipo_mensaje = '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -30,7 +42,7 @@ $rol = "Docente";
             
             <nav class="menu">
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-                <a href="crear_curso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Curso</a>
+                <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="ver_estudiantes.php" class="menu-item active"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
@@ -39,7 +51,7 @@ $rol = "Docente";
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
-                <a href="login.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
             
         </aside>
@@ -61,8 +73,8 @@ $rol = "Docente";
                     <div class="user-profile">
                         <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
                         <div class="user-info">
-                            <span class="user-name"><?php echo $usuario; ?>!</span>
-                            <span class="user-role"><?php echo $rol; ?></span>
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                            <span class="user-role">Docente</span>
                         </div>
                         <i class="fa-solid fa-chevron-down drop-icon"></i>
                     </div>
@@ -218,38 +230,38 @@ $rol = "Docente";
     <!-- (Tu calendario sigue aquí sin cambios...) -->
 
                 <!-- Calendario -->
-<aside class="calendar-container">
-    <!-- Cabecera y Navegación -->
-    <div class="calendar-header">
-        <div class="nav-left">
-            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
-            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
-        </div>
-        
-        <h2 id="month-year-title">MES AÑO</h2>
-        
-        <div class="nav-right">
-            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
-            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
-        </div>
-    </div>
+                <aside class="calendar-container">
+                    <!-- Cabecera y Navegación -->
+                    <div class="calendar-header">
+                        <div class="nav-left">
+                            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+                            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+                        </div>
+                        
+                        <h2 id="month-year-title">MES AÑO</h2>
+                        
+                        <div class="nav-right">
+                            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+                            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+                        </div>
+                    </div>
 
-    <!-- Días de la semana -->
-    <div class="calendar-weekdays">
-        <div class="weekday">Do</div>
-        <div class="weekday">Lu</div>
-        <div class="weekday">Ma</div>
-        <div class="weekday">Mi</div>
-        <div class="weekday">Ju</div>
-        <div class="weekday">Vi</div>
-        <div class="weekday">Sá</div>
-    </div>
+                    <!-- Días de la semana -->
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Do</div>
+                        <div class="weekday">Lu</div>
+                        <div class="weekday">Ma</div>
+                        <div class="weekday">Mi</div>
+                        <div class="weekday">Ju</div>
+                        <div class="weekday">Vi</div>
+                        <div class="weekday">Sá</div>
+                    </div>
 
-    <!-- Contenedor dinámico de los días -->
-    <div id="calendar-days" class="calendar-days-grid">
-        <!-- JavaScript inyectará los días aquí -->
-    </div>
-</aside>
+                    <!-- Contenedor dinámico de los días -->
+                    <div id="calendar-days" class="calendar-days-grid">
+                        <!-- JavaScript inyectará los días aquí -->
+                    </div>
+                </aside>
 
             <!-- BARRA ACCESIBILIDAD -->
             <footer class="accessibility-bar" style="margin-top: 30px;">
