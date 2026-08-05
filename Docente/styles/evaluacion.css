@@ -6,7 +6,7 @@
     margin-top: 20px;
 }
 
-/* Campos de texto generales (Mismo estilo que actividad para mantener consistencia) */
+/* Campos de texto generales */
 .form-group-clean {
     display: flex;
     flex-direction: column;
@@ -77,12 +77,12 @@
     background-color: #f8fafc;
 }
 
-/* Ocultamos el circulito feo por defecto de HTML */
+/* Ocultamos el radio button por defecto */
 .eval-radio-card input {
-    display: none; 
+    display: none;
 }
 
-/* Creamos nuestro propio circulito */
+/* Radio button personalizado */
 .custom-radio {
     width: 22px;
     height: 22px;
@@ -99,59 +99,74 @@
     color: #1e293b;
 }
 
-/* Lo que pasa cuando seleccionamos una opción (Se pinta de verde) */
+/* Estilo cuando está seleccionado */
 .eval-radio-card input:checked + .custom-radio {
-    border-color: #16a34a; /* Verde oscuro */
-    background-color: #22c55e; /* Verde claro */
+    border-color: #16a34a;
+    background-color: #22c55e;
 }
 
 /* =========================================
-   BOTONES DE ACCIÓN (Derecha Abajo)
+   BOTONES DE ACCIÓN (MISMO TAMAÑO Y COLOR AZUL)
 ========================================= */
 .eval-buttons {
     display: flex;
     gap: 15px;
     margin-top: 40px;
-    justify-content: space-between;
 }
 
+/* Botón "Cancelar" (azul claro) */
+.btn-outline-gray {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid #3b71f3; /* Borde azul */
+    background-color: #f0f5ff; /* Fondo azul claro */
+    color: #3b71f3; /* Texto azul */
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-outline-gray:hover {
+    background-color: #e0ebff; /* Fondo un poco más oscuro */
+    color: #2a5fc8; /* Texto azul más oscuro */
+    border-color: #2a5fc8;
+}
+
+/* Botón "Crear evaluación" (azul sólido) */
 .btn-outline-blue {
     flex: 1;
     padding: 12px 20px;
-    border: 1px solid var(--primary-blue);
-    background-color: transparent;
-    color: var(--primary-blue);
+    border: 1px solid #3b71f3; /* Borde azul */
+    background-color: #3b71f3; /* Fondo azul sólido */
+    color: white; /* Texto blanco */
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
     font-size: 15px;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-outline-blue:hover {
-    background-color: #f1f5f9;
+    background-color: #2a5fc8; /* Azul más oscuro */
+    border-color: #2a5fc8;
 }
 
-.btn-light-blue {
-    flex: 1;
-    padding: 12px 20px;
-    border: 1px solid var(--primary-blue);
-    background-color: #eff6ff; /* Azul muy clarito */
-    color: var(--primary-blue);
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: background 0.3s;
-}
-
-.btn-light-blue:hover {
-    background-color: #dbeafe;
-}
-
-/* Utilidades */
+/* =========================================
+   UTILIDADES
+========================================= */
 .mt-20 { margin-top: 20px; }
 .mt-10 { margin-top: 10px; }
+
 .small-cal .cal-day {
     height: 30px;
     font-size: 12px;
@@ -172,6 +187,248 @@ select.clean-input {
     font-size: 14px;
     margin-top: 5px;
 }
+
 .required-star {
     color: #ef4444;
+}
+
+/* Estilo para el select de materia/curso/periodo */
+.clean-input[type="select"] {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1em;
+    padding-right: 30px;
+}
+
+/* =========================================
+   SECCIONES DINÁMICAS (CUESTIONARIO Y ARCHIVOS)
+========================================= */
+
+/* Sección dinámica */
+.dynamic-section {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.dynamic-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+
+/* Estilos para las preguntas del cuestionario */
+.pregunta-item {
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.pregunta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.pregunta-header label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.btn-remove-pregunta {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.btn-remove-pregunta:hover {
+    color: #dc2626;
+}
+
+.pregunta-type-container {
+    display: flex;
+    gap: 15px;
+    margin: 10px 0;
+}
+
+.pregunta-radio {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.pregunta-radio .custom-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #94a3b8;
+    transition: all 0.2s;
+}
+
+.pregunta-radio input:checked + .custom-radio {
+    border-color: #3b71f3;
+    background-color: #3b71f3;
+}
+
+.pregunta-radio .custom-radio.small {
+    width: 14px;
+    height: 14px;
+}
+
+.opciones-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.opcion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.opcion-item input[type="text"] {
+    flex: 1;
+}
+
+.opcion-radio {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 5px;
+}
+
+.pregunta-actions {
+    margin-top: 10px;
+}
+
+.btn-add-opcion {
+    background: none;
+    border: 1px solid #3b71f3;
+    color: #3b71f3;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-add-opcion:hover {
+    background-color: #eff6ff;
+}
+
+.btn-add-pregunta {
+    background: none;
+    border: 1px solid #3b71f3;
+    color: #3b71f3;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-add-pregunta:hover {
+    background-color: #eff6ff;
+}
+
+/* Estilos para la sección de archivos */
+.file-types-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.file-type-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
+}
+
+.file-type-checkbox .custom-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid #94a3b8;
+    transition: all 0.2s;
+}
+
+.file-type-checkbox input:checked + .custom-checkbox {
+    border-color: #3b71f3;
+    background-color: #3b71f3;
+}
+
+/* Ajustes para los botones de acción */
+.eval-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Botón "Cancelar" (azul claro) */
+.btn-outline-gray {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid #3b71f3;
+    background-color: #f0f5ff;
+    color: #3b71f3;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-outline-gray:hover {
+    background-color: #e0ebff;
+    color: #2a5fc8;
+    border-color: #2a5fc8;
+}
+
+/* Botón "Crear evaluación" (azul sólido) */
+.btn-outline-blue {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid #3b71f3;
+    background-color: #3b71f3;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-outline-blue:hover {
+    background-color: #2a5fc8;
+    border-color: #2a5fc8;
 }

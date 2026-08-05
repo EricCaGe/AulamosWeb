@@ -150,6 +150,7 @@ $conexion->close();
                 <!-- COLUMNA IZQUIERDA -->
                 <div class="left-column">
                     <form class="eval-form" id="evalForm" method="POST" action="procesar_evaluacion.php">
+
                         <!-- Título de evaluación -->
                         <div class="form-group-clean">
                             <label for="titulo">Título de evaluación <span class="required-star">*</span></label>
@@ -192,27 +193,77 @@ $conexion->close();
                             <div class="error-message" id="error-curso"></div>
                         </div>
 
-                        <!-- Tipo de evaluación -->
-                        <div class="form-group-clean mt-20">
-                            <label>Tipo de evaluación <span class="required-star">*</span></label>
-                            <div class="eval-type-container">
-                                <label class="eval-radio-card">
-                                    <input type="radio" name="tipo_evaluacion" value="Cuestionario" checked>
-                                    <span class="custom-radio"></span>
-                                    <span class="radio-label">Cuestionario</span>
-                                </label>
-                                <label class="eval-radio-card">
-                                    <input type="radio" name="tipo_evaluacion" value="Examen">
-                                    <span class="custom-radio"></span>
-                                    <span class="radio-label">Examen</span>
-                                </label>
-                                <label class="eval-radio-card">
-                                    <input type="radio" name="tipo_evaluacion" value="Tarea">
-                                    <span class="custom-radio"></span>
-                                    <span class="radio-label">Tarea evaluada</span>
-                                </label>
+                        <!-- SECCIÓN DE PREGUNTAS (movida aquí) -->
+                        <div id="cuestionario-section" class="dynamic-section">
+                            <h3>Preguntas del cuestionario</h3>
+                            <div id="preguntas-container">
+                                <!-- Pregunta inicial -->
+                                <div class="pregunta-item">
+                                    <div class="pregunta-header">
+                                        <label>Pregunta 1 <span class="required-star">*</span></label>
+                                        <button type="button" class="btn-remove-pregunta" onclick="eliminarPregunta(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <textarea class="clean-input" name="preguntas[0][texto]" placeholder="Escribe la pregunta aquí" rows="2" required></textarea>
+                                    <div class="pregunta-type-container">
+                                        <label class="pregunta-radio">
+                                            <input type="radio" name="preguntas[0][tipo]" value="OpcionMultiple" checked>
+                                            <span class="custom-radio"></span>
+                                            <span>Opción múltiple</span>
+                                        </label>
+                                        <label class="pregunta-radio">
+                                            <input type="radio" name="preguntas[0][tipo]" value="Abierta">
+                                            <span class="custom-radio"></span>
+                                            <span>Pregunta abierta</span>
+                                        </label>
+                                        <label class="pregunta-radio">
+                                            <input type="radio" name="preguntas[0][tipo]" value="VerdaderoFalso">
+                                            <span class="custom-radio"></span>
+                                            <span>Verdadero/Falso</span>
+                                        </label>
+                                    </div>
+                                    <!-- Opciones para pregunta de opción múltiple o verdadero/falso -->
+                                    <div class="opciones-container">
+                                        <div class="opcion-item">
+                                            <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 1" required>
+                                            <label class="opcion-radio">
+                                                <input type="radio" name="preguntas[0][respuesta_correcta]" value="0" checked>
+                                                <span class="custom-radio small"></span>
+                                            </label>
+                                        </div>
+                                        <div class="opcion-item">
+                                            <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 2" required>
+                                            <label class="opcion-radio">
+                                                <input type="radio" name="preguntas[0][respuesta_correcta]" value="1">
+                                                <span class="custom-radio small"></span>
+                                            </label>
+                                        </div>
+                                        <div class="opcion-item">
+                                            <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 3">
+                                            <label class="opcion-radio">
+                                                <input type="radio" name="preguntas[0][respuesta_correcta]" value="2">
+                                                <span class="custom-radio small"></span>
+                                            </label>
+                                        </div>
+                                        <div class="opcion-item">
+                                            <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 4">
+                                            <label class="opcion-radio">
+                                                <input type="radio" name="preguntas[0][respuesta_correcta]" value="3">
+                                                <span class="custom-radio small"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="pregunta-actions">
+                                        <button type="button" class="btn-add-opcion" onclick="agregarOpcion(this)">
+                                            <i class="fa-solid fa-plus"></i> Agregar opción
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="error-message" id="error-tipo"></div>
+                            <button type="button" class="btn-add-pregunta" id="btnAddPregunta">
+                                <i class="fa-solid fa-plus"></i> Agregar otra pregunta
+                            </button>
                         </div>
 
                         <!-- Puntaje máximo -->
@@ -241,6 +292,9 @@ $conexion->close();
                                 <?php endforeach; ?>
                             </select>
                         </div>
+
+                        <!-- Campo oculto para el tipo de evaluación (fijo como Cuestionario) -->
+                        <input type="hidden" id="hidden-tipo" name="tipo_evaluacion" value="Cuestionario">
                     </form>
                 </div>
 
@@ -321,9 +375,7 @@ $conexion->close();
             const descripcionInput = document.getElementById('descripcion');
             const materiaSelect = document.getElementById('id_materia');
             const cursoSelect = document.getElementById('id_curso');
-            const tipoEvaluacionRadios = document.querySelectorAll('input[name="tipo_evaluacion"]');
             const puntajeInput = document.getElementById('puntaje_maximo');
-            const fechaLimiteInput = document.getElementById('fecha_limite');
             const btnCrearEvaluacion = document.getElementById('btnCrearEvaluacion');
             const btnCancelar = document.getElementById('btnCancelar');
 
@@ -332,9 +384,10 @@ $conexion->close();
             const errorDescripcion = document.getElementById('error-descripcion');
             const errorMateria = document.getElementById('error-materia');
             const errorCurso = document.getElementById('error-curso');
-            const errorTipo = document.getElementById('error-tipo');
             const errorPuntaje = document.getElementById('error-puntaje');
-            const errorFecha = document.getElementById('error-fecha');
+
+            // Contador de preguntas
+            let preguntaCount = 1;
 
             // Función para validar el formulario
             function validarFormulario() {
@@ -372,15 +425,6 @@ $conexion->close();
                     errorCurso.textContent = '';
                 }
 
-                // Validar tipo de evaluación
-                const tipoSeleccionado = document.querySelector('input[name="tipo_evaluacion"]:checked');
-                if (!tipoSeleccionado) {
-                    errorTipo.textContent = 'Debe seleccionar un tipo de evaluación.';
-                    isValid = false;
-                } else {
-                    errorTipo.textContent = '';
-                }
-
                 // Validar puntaje máximo
                 if (!puntajeInput.value || parseFloat(puntajeInput.value) <= 0) {
                     errorPuntaje.textContent = 'El puntaje máximo debe ser mayor a 0.';
@@ -389,23 +433,228 @@ $conexion->close();
                     errorPuntaje.textContent = '';
                 }
 
-                // Validar fecha límite (opcional, pero si se ingresa debe ser válida)
-                if (fechaLimiteInput.value && !validarFecha(fechaLimiteInput.value)) {
-                    errorFecha.textContent = 'Formato de fecha no válido.';
-                    isValid = false;
+                // Validar preguntas (solo si hay preguntas)
+                const preguntas = document.querySelectorAll('.pregunta-item');
+                if (preguntas.length > 0) {
+                    preguntas.forEach((pregunta, index) => {
+                        const textoPregunta = pregunta.querySelector('textarea[name^="preguntas"]');
+                        if (textoPregunta && textoPregunta.value.trim() === '') {
+                            isValid = false;
+                        }
+
+                        const tipoPregunta = pregunta.querySelector('input[name^="preguntas"][name$="[tipo]"]:checked');
+                        if (!tipoPregunta) {
+                            isValid = false;
+                        }
+
+                        if (tipoPregunta && (tipoPregunta.value === 'OpcionMultiple' || tipoPregunta.value === 'VerdaderoFalso')) {
+                            const opciones = pregunta.querySelectorAll('input[name^="preguntas"][name$="[opciones][]"]');
+                            let hasEmptyOption = false;
+                            opciones.forEach(opcion => {
+                                if (opcion.value.trim() === '') {
+                                    hasEmptyOption = true;
+                                }
+                            });
+                            if (hasEmptyOption) {
+                                isValid = false;
+                            }
+
+                            const respuestaCorrecta = pregunta.querySelector('input[name^="preguntas"][name$="[respuesta_correcta]"]:checked');
+                            if (!respuestaCorrecta) {
+                                isValid = false;
+                            }
+                        }
+                    });
                 } else {
-                    errorFecha.textContent = '';
+                    isValid = false;
                 }
 
                 // Habilitar/deshabilitar botón de crear evaluación
                 btnCrearEvaluacion.disabled = !isValid;
+                return isValid;
             }
 
-            // Función para validar formato de fecha (YYYY-MM-DDTHH:MM)
-            function validarFecha(fecha) {
-                if (!fecha) return true; // Si está vacío, es válido (es opcional)
-                const date = new Date(fecha);
-                return !isNaN(date.getTime());
+            // Función para limpiar el formulario
+            function limpiarFormulario() {
+                if (confirm("¿Estás seguro de que deseas cancelar la creación de la evaluación? Todos los campos se borrarán.")) {
+                    form.reset();
+                    const preguntasContainer = document.getElementById('preguntas-container');
+                    preguntasContainer.innerHTML = `
+                        <div class="pregunta-item">
+                            <div class="pregunta-header">
+                                <label>Pregunta 1 <span class="required-star">*</span></label>
+                                <button type="button" class="btn-remove-pregunta" onclick="eliminarPregunta(this)">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                            <textarea class="clean-input" name="preguntas[0][texto]" placeholder="Escribe la pregunta aquí" rows="2" required></textarea>
+                            <div class="pregunta-type-container">
+                                <label class="pregunta-radio">
+                                    <input type="radio" name="preguntas[0][tipo]" value="OpcionMultiple" checked>
+                                    <span class="custom-radio"></span>
+                                    <span>Opción múltiple</span>
+                                </label>
+                                <label class="pregunta-radio">
+                                    <input type="radio" name="preguntas[0][tipo]" value="Abierta">
+                                    <span class="custom-radio"></span>
+                                    <span>Pregunta abierta</span>
+                                </label>
+                                <label class="pregunta-radio">
+                                    <input type="radio" name="preguntas[0][tipo]" value="VerdaderoFalso">
+                                    <span class="custom-radio"></span>
+                                    <span>Verdadero/Falso</span>
+                                </label>
+                            </div>
+                            <div class="opciones-container">
+                                <div class="opcion-item">
+                                    <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 1" required>
+                                    <label class="opcion-radio">
+                                        <input type="radio" name="preguntas[0][respuesta_correcta]" value="0" checked>
+                                        <span class="custom-radio small"></span>
+                                    </label>
+                                </div>
+                                <div class="opcion-item">
+                                    <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 2" required>
+                                    <label class="opcion-radio">
+                                        <input type="radio" name="preguntas[0][respuesta_correcta]" value="1">
+                                        <span class="custom-radio small"></span>
+                                    </label>
+                                </div>
+                                <div class="opcion-item">
+                                    <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 3">
+                                    <label class="opcion-radio">
+                                        <input type="radio" name="preguntas[0][respuesta_correcta]" value="2">
+                                        <span class="custom-radio small"></span>
+                                    </label>
+                                </div>
+                                <div class="opcion-item">
+                                    <input type="text" class="clean-input" name="preguntas[0][opciones][]" placeholder="Opción 4">
+                                    <label class="opcion-radio">
+                                        <input type="radio" name="preguntas[0][respuesta_correcta]" value="3">
+                                        <span class="custom-radio small"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="pregunta-actions">
+                                <button type="button" class="btn-add-opcion" onclick="agregarOpcion(this)">
+                                    <i class="fa-solid fa-plus"></i> Agregar opción
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    preguntaCount = 1;
+                    btnCrearEvaluacion.disabled = true;
+                    errorTitulo.textContent = '';
+                    errorDescripcion.textContent = '';
+                    errorMateria.textContent = '';
+                    errorCurso.textContent = '';
+                    errorPuntaje.textContent = '';
+                }
+            }
+
+            // Función para agregar una nueva pregunta
+            function agregarPregunta() {
+                const preguntasContainer = document.getElementById('preguntas-container');
+                const nuevaPregunta = document.createElement('div');
+                nuevaPregunta.className = 'pregunta-item';
+                nuevaPregunta.innerHTML = `
+                    <div class="pregunta-header">
+                        <label>Pregunta ${preguntaCount + 1} <span class="required-star">*</span></label>
+                        <button type="button" class="btn-remove-pregunta" onclick="eliminarPregunta(this)">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <textarea class="clean-input" name="preguntas[${preguntaCount}][texto]" placeholder="Escribe la pregunta aquí" rows="2" required></textarea>
+                    <div class="pregunta-type-container">
+                        <label class="pregunta-radio">
+                            <input type="radio" name="preguntas[${preguntaCount}][tipo]" value="OpcionMultiple" checked>
+                            <span class="custom-radio"></span>
+                            <span>Opción múltiple</span>
+                        </label>
+                        <label class="pregunta-radio">
+                            <input type="radio" name="preguntas[${preguntaCount}][tipo]" value="Abierta">
+                            <span class="custom-radio"></span>
+                            <span>Pregunta abierta</span>
+                        </label>
+                        <label class="pregunta-radio">
+                            <input type="radio" name="preguntas[${preguntaCount}][tipo]" value="VerdaderoFalso">
+                            <span class="custom-radio"></span>
+                            <span>Verdadero/Falso</span>
+                        </label>
+                    </div>
+                    <div class="opciones-container">
+                        <div class="opcion-item">
+                            <input type="text" class="clean-input" name="preguntas[${preguntaCount}][opciones][]" placeholder="Opción 1" required>
+                            <label class="opcion-radio">
+                                <input type="radio" name="preguntas[${preguntaCount}][respuesta_correcta]" value="0" checked>
+                                <span class="custom-radio small"></span>
+                            </label>
+                        </div>
+                        <div class="opcion-item">
+                            <input type="text" class="clean-input" name="preguntas[${preguntaCount}][opciones][]" placeholder="Opción 2" required>
+                            <label class="opcion-radio">
+                                <input type="radio" name="preguntas[${preguntaCount}][respuesta_correcta]" value="1">
+                                <span class="custom-radio small"></span>
+                            </label>
+                        </div>
+                        <div class="opcion-item">
+                            <input type="text" class="clean-input" name="preguntas[${preguntaCount}][opciones][]" placeholder="Opción 3">
+                            <label class="opcion-radio">
+                                <input type="radio" name="preguntas[${preguntaCount}][respuesta_correcta]" value="2">
+                                <span class="custom-radio small"></span>
+                            </label>
+                        </div>
+                        <div class="opcion-item">
+                            <input type="text" class="clean-input" name="preguntas[${preguntaCount}][opciones][]" placeholder="Opción 4">
+                            <label class="opcion-radio">
+                                <input type="radio" name="preguntas[${preguntaCount}][respuesta_correcta]" value="3">
+                                <span class="custom-radio small"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="pregunta-actions">
+                        <button type="button" class="btn-add-opcion" onclick="agregarOpcion(this)">
+                            <i class="fa-solid fa-plus"></i> Agregar opción
+                        </button>
+                    </div>
+                `;
+                preguntasContainer.appendChild(nuevaPregunta);
+                preguntaCount++;
+                validarFormulario();
+            }
+
+            // Función para eliminar una pregunta
+            function eliminarPregunta(button) {
+                if (document.querySelectorAll('.pregunta-item').length > 1) {
+                    button.closest('.pregunta-item').remove();
+                    // Renumerar preguntas
+                    const preguntas = document.querySelectorAll('.pregunta-item');
+                    preguntas.forEach((pregunta, index) => {
+                        pregunta.querySelector('label').textContent = `Pregunta ${index + 1}`;
+                    });
+                    preguntaCount = preguntas.length;
+                    validarFormulario();
+                } else {
+                    alert('Debe haber al menos una pregunta.');
+                }
+            }
+
+            // Función para agregar una opción a una pregunta
+            function agregarOpcion(button) {
+                const opcionesContainer = button.closest('.pregunta-item').querySelector('.opciones-container');
+                const preguntaIndex = Array.from(button.closest('.pregunta-item').parentNode.querySelectorAll('.pregunta-item')).indexOf(button.closest('.pregunta-item'));
+                const nuevaOpcionIndex = opcionesContainer.querySelectorAll('.opcion-item').length;
+
+                const nuevaOpcion = document.createElement('div');
+                nuevaOpcion.className = 'opcion-item';
+                nuevaOpcion.innerHTML = `
+                    <input type="text" class="clean-input" name="preguntas[${preguntaIndex}][opciones][]" placeholder="Opción ${nuevaOpcionIndex + 1}">
+                    <label class="opcion-radio">
+                        <input type="radio" name="preguntas[${preguntaIndex}][respuesta_correcta]" value="${nuevaOpcionIndex}">
+                        <span class="custom-radio small"></span>
+                    </label>
+                `;
+                opcionesContainer.appendChild(nuevaOpcion);
             }
 
             // Event listeners para validar en tiempo real
@@ -414,31 +663,20 @@ $conexion->close();
             materiaSelect.addEventListener('change', validarFormulario);
             cursoSelect.addEventListener('change', validarFormulario);
             puntajeInput.addEventListener('input', validarFormulario);
-            fechaLimiteInput.addEventListener('change', validarFormulario);
-
-            // Event listeners para los radios de tipo de evaluación
-            tipoEvaluacionRadios.forEach(radio => {
-                radio.addEventListener('change', validarFormulario);
-            });
 
             // Event listener para el botón Cancelar
-            btnCancelar.addEventListener('click', function() {
-                if (confirm("¿Estás seguro de que deseas cancelar la creación de la evaluación? Todos los campos se borrarán.")) {
-                    form.reset();
-                    btnCrearEvaluacion.disabled = true;
-                    // Limpiar mensajes de error
-                    errorTitulo.textContent = '';
-                    errorDescripcion.textContent = '';
-                    errorMateria.textContent = '';
-                    errorCurso.textContent = '';
-                    errorTipo.textContent = '';
-                    errorPuntaje.textContent = '';
-                    errorFecha.textContent = '';
+            btnCancelar.addEventListener('click', limpiarFormulario);
+
+            // Event listener para el botón "Agregar otra pregunta"
+            document.getElementById('btnAddPregunta').addEventListener('click', agregarPregunta);
+
+            // Event listener para el envío del formulario
+            form.addEventListener('submit', function(e) {
+                if (!validarFormulario()) {
+                    e.preventDefault();
+                    alert('Por favor, complete todos los campos obligatorios.');
                 }
             });
-
-            // Validar al cargar la página
-            validarFormulario();
         });
     </script>
 
