@@ -181,6 +181,178 @@ if ($apiKey === '') {
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| Recuperar datos reales del docente
+|--------------------------------------------------------------------------
+| Las consultas siempre utilizan el ID obtenido de la sesión PHP.
+| Gemini solamente recibe un resumen; nunca ejecuta consultas SQL.
+*/
+
+$contextoDocente = '';
+
+if ($rol === 'docente') {
+    $resumenDocente = [
+        'clasesActivas' => 0,
+        'actividadesPendientes' => 0,
+        'evaluacionesPendientes' => 0,
+        'estudiantesTotal' => 0,
+        'grupos' => [],
+    ];
+
+    $consultasResumen = [
+        'clasesActivas' => '
+            SELECT COUNT(*) AS total
+            FROM cursos
+            WHERE id_docente = ?
+              AND estado = "Activo"
+        ',
+
+        'actividadesPendientes' => '
+            SELECT COUNT(*) AS total
+            FROM actividades a
+            INNER JOIN inscripciones ce
+                ON a.id_curso = ce.id_curso
+            INNER JOIN actividad_estudiantes ae
+                ON a.id_actividad = ae.id_actividad
+               AND ce.id_alumno = ae.id_alumno
+            WHERE a.id_docente = ?
+              AND ae.estado IN (
+                  "Pendiente",
+                  "En_proceso",
+                  "Entregada"
+              )
+        ',
+
+        'evaluacionesPendientes' => '
+            SELECT COUNT(*) AS total
+            FROM entregas e
+            INNER JOIN actividad_estudiantes ae
+                ON e.id_actividad_estudiante =
+                   ae.id_actividad_estudiante
+            INNER JOIN actividades a
+                ON ae.id_actividad = a.id_actividad
+            WHERE a.id_docente = ?
+              AND e.estado = "Entregada"
+        ',
+
+        'estudiantesTotal' => '
+            SELECT COUNT(DISTINCT i.id_alumno) AS total
+            FROM inscripciones i
+            INNER JOIN cursos c
+                ON i.id_curso = c.id_curso
+            WHERE c.id_docente = ?
+              AND c.estado = "Activo"
+              AND i.estado = "Activo"
+        ',
+    ];
+
+    foreach ($consultasResumen as $clave => $sql) {
+        $consultaResumen =
+            $bdChatbot->prepare($sql);
+
+        $consultaResumen->bind_param(
+            'i',
+            $idUsuario
+        );
+
+        $consultaResumen->execute();
+
+        $resultadoResumen =
+            $consultaResumen->get_result();
+
+        $filaResumen =
+            $resultadoResumen->fetch_assoc();
+
+        $resumenDocente[$clave] =
+            (int) ($filaResumen['total'] ?? 0);
+
+        $consultaResumen->close();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Obtener grupos distintos asignados al docente
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaGrupos = $bdChatbot->prepare(
+        '
+            SELECT DISTINCT
+                g.nombre AS grupo_nombre
+            FROM cursos c
+            INNER JOIN grupos g
+                ON c.id_grupo = g.id_grupo
+            WHERE c.id_docente = ?
+              AND c.estado = "Activo"
+            ORDER BY g.nombre
+        '
+    );
+
+    $consultaGrupos->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaGrupos->execute();
+
+    $resultadoGrupos =
+        $consultaGrupos->get_result();
+
+    while (
+        $filaGrupo =
+            $resultadoGrupos->fetch_assoc()
+    ) {
+        $nombreGrupo = trim(
+            (string) (
+                $filaGrupo['grupo_nombre'] ?? ''
+            )
+        );
+
+        if ($nombreGrupo !== '') {
+            $resumenDocente['grupos'][] =
+                $nombreGrupo;
+        }
+    }
+
+    $consultaGrupos->close();
+
+    $cantidadGrupos = count(
+        $resumenDocente['grupos']
+    );
+
+    $nombresGrupos =
+        $cantidadGrupos > 0
+            ? implode(
+                ', ',
+                $resumenDocente['grupos']
+            )
+            : 'Ninguno';
+
+    $contextoDocente = implode(
+        "\n",
+        [
+            'DATOS REALES DE LA CUENTA DEL DOCENTE:',
+            '- Clases activas: ' .
+                $resumenDocente['clasesActivas'],
+            '- Grupos asignados: ' .
+                $cantidadGrupos,
+            '- Nombres de los grupos: ' .
+                $nombresGrupos,
+            '- Estudiantes inscritos: ' .
+                $resumenDocente['estudiantesTotal'],
+            '- Actividades pendientes: ' .
+                $resumenDocente[
+                    'actividadesPendientes'
+                ],
+            '- Evaluaciones pendientes: ' .
+                $resumenDocente[
+                    'evaluacionesPendientes'
+                ],
+        ]
+    );
+}
+
 $contenidos = [];
 
 $consultaHistorial = $bdChatbot->prepare(
@@ -273,6 +445,23 @@ if ($rol === 'docente') {
         'Incluye ejemplos educativos cuando ayuden a comprender.',
         'No inventes calificaciones, actividades ni datos personales.',
     ];
+}
+
+if (
+    $rol === 'docente' &&
+    $contextoDocente !== ''
+) {
+    $instruccionesRol[] =
+        $contextoDocente;
+
+    $instruccionesRol[] =
+        'Los datos anteriores provienen directamente de la base de datos de AulaMos y pertenecen al docente autenticado.';
+
+    $instruccionesRol[] =
+        'Cuando el docente pregunte por grupos, clases, estudiantes, actividades o evaluaciones, responde directamente con esos datos exactos.';
+
+    $instruccionesRol[] =
+        'No contradigas, modifiques ni completes con cantidades inventadas los datos reales proporcionados.';
 }
 
 $instruccionSistema = implode(
