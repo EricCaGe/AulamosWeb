@@ -10,9 +10,9 @@
 $host = 'localhost';
 $usuario = 'root';
 // .$password = '';
-$password = '12345678';
+//$password = '12345678';
 //$password = 'Jaziel123';
-//$password = 'qwerty1234.'; //Obregon
+$password = 'qwerty1234.'; //Obregon
 $basedatos = 'aulamos_mvp';
 $puerto = 3306;
 
