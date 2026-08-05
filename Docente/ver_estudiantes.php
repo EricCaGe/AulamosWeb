@@ -7,39 +7,87 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     exit;
 }
 
-require_once '../Conexion/conexion.php';
+require_once '../Conexion/conexion.php'; // Aquí se define $conexion
 
 $id_docente = $_SESSION['usuario']['id_usuario'];
 $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 
-$mensaje = '';
-$tipo_mensaje = '';
+// Consultar los cursos del docente
+$query_cursos = "
+    SELECT c.id_curso, g.nombre AS grupo_nombre
+    FROM cursos c
+    JOIN grupos g ON c.id_grupo = g.id_grupo
+    WHERE c.id_docente = ? AND c.estado = 'Activo'
+";
+$stmt_cursos = $conexion->prepare($query_cursos); // Usamos $conexion
+$stmt_cursos->bind_param("i", $id_docente);
+$stmt_cursos->execute();
+$result_cursos = $stmt_cursos->get_result();
+
+$cursos = [];
+while ($row = $result_cursos->fetch_assoc()) {
+    $cursos[] = $row;
+}
+
+// Obtener los grupos únicos para los botones de filtro
+$grupos_unicos = array_unique(array_column($cursos, 'grupo_nombre'));
+sort($grupos_unicos);
+
+// Consultar los estudiantes inscritos en los cursos del docente
+$query_estudiantes = "
+    SELECT
+        u.id_usuario,
+        u.nombre,
+        u.apellido_paterno,
+        u.apellido_materno,
+        g.nombre AS grupo_nombre
+    FROM inscripciones i
+    JOIN cursos c ON i.id_curso = c.id_curso
+    JOIN grupos g ON c.id_grupo = g.id_grupo
+    JOIN usuarios u ON i.id_alumno = u.id_usuario
+    WHERE c.id_docente = ? AND i.estado = 'Activo'
+    ORDER BY g.nombre, u.apellido_paterno, u.nombre
+";
+$stmt_estudiantes = $conexion->prepare($query_estudiantes); // Usamos $conexion
+$stmt_estudiantes->bind_param("i", $id_docente);
+$stmt_estudiantes->execute();
+$result_estudiantes = $stmt_estudiantes->get_result();
+
+$estudiantes = [];
+while ($row = $result_estudiantes->fetch_assoc()) {
+    $estudiantes[] = $row;
+}
+
+// Cerrar conexiones
+$stmt_cursos->close();
+$stmt_estudiantes->close();
+$conexion->close(); // Usamos $conexion
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ver Estudiantes - Aulamos</title>
-    
+
     <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">
     <!-- CSS Específico para esta pantalla -->
     <link rel="stylesheet" href="styles/estudiantes.css">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <div class="dashboard-container">
-        
+
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
-                
             </div>
-            
+
             <nav class="menu">
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
                 <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
@@ -49,16 +97,15 @@ $tipo_mensaje = '';
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="mas.php" class="menu-item "><i class="fa-solid fa-bars"></i> Mas</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
-                
+
                 <div class="menu-spacer"></div>
                 <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
-            
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
         <main class="main-content">
-            
+
             <!-- ENCABEZADO -->
             <header class="content-header">
                 <div class="welcome-text">
@@ -82,152 +129,49 @@ $tipo_mensaje = '';
             </header>
 
             <!-- BARRA DE BÚSQUEDA Y PESTAÑAS (TABS) -->
-<div class="students-header-tools">
-    <div class="search-bar-container">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" class="student-search-input" placeholder="Buscar estudiante">
-    </div>
-    
-    <!-- AGREGAMOS data-filter A CADA BOTÓN -->
-    <div class="group-tabs" id="filter-tabs">
-        <button class="tab-btn active" data-filter="todos">Todos</button>
-        <button class="tab-btn" data-filter="1A">1º A</button>
-        <button class="tab-btn" data-filter="1B">1º B</button>
-        <button class="tab-btn" data-filter="2A">2º A</button>
-        <button class="tab-btn" data-filter="2B">2º B</button>
-        <button class="tab-btn" data-filter="3A">3º A</button>
-        <button class="tab-btn" data-filter="3B">3º B</button>
-    </div>
-</div>
+            <div class="students-header-tools">
+                <div class="search-bar-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" class="student-search-input" placeholder="Buscar estudiante">
+                </div>
 
-<!-- RELLENO: LISTA DE ESTUDIANTES Y CALENDARIO -->
-<div class="main-grid mt-20">
-    <div class="left-column">
-        <div class="students-list-container" id="students-list">
-    
-    <!-- 1. Estudiante original -->
-    <div class="student-card" data-group="1A">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Ana López</h4>
-                <p>1° A</p>
+                <div class="group-tabs" id="filter-tabs">
+                    <!-- Botón "Todos" -->
+                    <button class="tab-btn active" data-filter="todos">Todos</button>
+                    <!-- Botones dinámicos para cada grupo -->
+                    <?php foreach ($grupos_unicos as $grupo): ?>
+                        <button class="tab-btn" data-filter="<?php echo htmlspecialchars($grupo); ?>">
+                            <?php echo htmlspecialchars($grupo); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
 
-    <!-- 2. Estudiante original -->
-    <div class="student-card" data-group="1A">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Carlos Martínez</h4>
-                <p>1° A</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 3. Estudiante original -->
-    <div class="student-card" data-group="1B">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>José Ramírez</h4>
-                <p>1° B</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 4. Estudiante nuevo -->
-    <div class="student-card" data-group="1B">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Valentina Ruiz</h4>
-                <p>1° B</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 5. Estudiante nuevo -->
-    <div class="student-card" data-group="2A">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Mateo Castro</h4>
-                <p>2° A</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 6. Estudiante nuevo -->
-    <div class="student-card" data-group="2A">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Sofía Gómez</h4>
-                <p>2° A</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 7. Estudiante original -->
-    <div class="student-card" data-group="2B">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Eduardo Sanchez</h4>
-                <p>2° B</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 8. Estudiante nuevo -->
-    <div class="student-card" data-group="2B">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Luis Fernando</h4>
-                <p>2° B</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 9. Estudiante nuevo -->
-    <div class="student-card" data-group="3A">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Camila Torres</h4>
-                <p>3° A</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-    <!-- 10. Estudiante nuevo -->
-    <div class="student-card" data-group="3B">
-        <div class="student-info-left">
-            <i class="fa-solid fa-circle-user avatar-icon"></i>
-            <div class="student-details">
-                <h4>Diego Herrera</h4>
-                <p>3° B</p>
-            </div>
-        </div>
-        <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
-    </div>
-
-</div>
-    </div>
-    <!-- (Tu calendario sigue aquí sin cambios...) -->
+            <!-- LISTA DE ESTUDIANTES -->
+            <div class="main-grid mt-20">
+                <div class="left-column">
+                    <div class="students-list-container" id="students-list">
+                        <?php if (empty($estudiantes)): ?>
+                            <div class="no-students-message">
+                                <i class="fa-solid fa-users-slash"></i>
+                                <p>No hay estudiantes inscritos en tus cursos.</p>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($estudiantes as $estudiante): ?>
+                                <div class="student-card" data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>">
+                                    <div class="student-info-left">
+                                        <i class="fa-solid fa-circle-user avatar-icon"></i>
+                                        <div class="student-details">
+                                            <h4><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno']); ?></h4>
+                                            <p><?php echo htmlspecialchars($estudiante['grupo_nombre']); ?></p>
+                                        </div>
+                                    </div>
+                                    <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
                 <!-- Calendario -->
                 <aside class="calendar-container">
@@ -237,9 +181,9 @@ $tipo_mensaje = '';
                             <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
                             <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
                         </div>
-                        
+
                         <h2 id="month-year-title">MES AÑO</h2>
-                        
+
                         <div class="nav-right">
                             <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
                             <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
@@ -262,6 +206,7 @@ $tipo_mensaje = '';
                         <!-- JavaScript inyectará los días aquí -->
                     </div>
                 </aside>
+            </div>
 
             <!-- BARRA ACCESIBILIDAD -->
             <footer class="accessibility-bar" style="margin-top: 30px;">
@@ -284,7 +229,6 @@ $tipo_mensaje = '';
                 </div>
                 <button class="btn-open-config">Abrir configuración</button>
             </footer>
-
         </main>
     </div>
     <script src="jss/ver_estudiantes_ocultos.js?v=2"></script>

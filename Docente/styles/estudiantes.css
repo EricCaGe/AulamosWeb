@@ -165,3 +165,25 @@
 .students-list-container::-webkit-scrollbar-thumb:hover {
     background: #2563eb; /* Azul más oscuro al pasar el ratón */
 }
+
+.no-students-message {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.no-students-message i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #999;
+}
+
+.no-students-message p {
+    font-size: 1.2rem;
+    margin: 0;
+}
