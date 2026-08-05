@@ -242,183 +242,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =====================================================
-  // 7. FUNCIONES DE API Y SESIÓN
-  // =====================================================
-  function peticionAPI(endpoint, options) {
-    const url = `http://localhost:3000/api${endpoint}`;
-    return fetch(url, options)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success === false) {
-                throw new Error(data.message || 'Error en la petición');
-            }
-            return data;
-        });
-  }
-
-  function guardarSesion(token, usuario) {
-    if (token) {
-        localStorage.setItem('token', token);
-    }
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-  }
-
-  // =====================================================
-  // 8. COMPARAR ROLES (CORREGIDO)
-  // =====================================================
-  function rolesEquivalentes(rolSeleccionado, rolReal) {
-    // Normalizar ambos roles (minúsculas y sin espacios)
-    const seleccionado = rolSeleccionado?.toLowerCase().trim() || '';
-    const real = rolReal?.toLowerCase().trim() || '';
-
-    // Mapeo de roles equivalentes
-    const equivalencias = {
-        'alumno': ['alumno', 'estudiante'],
-        'docente': ['docente', 'profesor', 'maestro'],
-        'investigador': ['investigador', 'investigadora'],
-        'admin': ['admin', 'administrador'],
-        'administrador': ['admin', 'administrador'],
-    };
-
-    // Si el rol seleccionado está en el mapeo, verificar si el rol real está en la lista
-    for (const [clave, valores] of Object.entries(equivalencias)) {
-        if (valores.includes(seleccionado)) {
-            return valores.includes(real);
-        }
-    }
-
-    // Si no está en el mapeo, comparar directamente
-    return seleccionado === real;
-  }
-
-  // =====================================================
-  // 9. REDIRECCIÓN (CORREGIDO)
-  // =====================================================
-  function redirigirSegunRol(rol) {
-    const rolLower = rol?.toLowerCase().trim() || '';
-
-    // Admin
-    if (rolLower === 'administrador' || rolLower === 'admin') {
-        window.location.href = '../Administrador/admin_dashboard.php';
-        return;
-    }
-
-    // Docente
-    if (rolLower === 'docente' || rolLower === 'profesor' || rolLower === 'maestro') {
-        window.location.href = '../Docente/docente_dashboard.php';
-        return;
-    }
-
-    // Alumno
-    if (rolLower === 'alumno' || rolLower === 'estudiante') {
-        window.location.href = '../Alumno/alumno.php';
-        return;
-    }
-
-    // Investigador
-    if (rolLower === 'investigador' || rolLower === 'investigadora') {
-        window.location.href = '../Investigador/investigador_dashboard.php';
-        return;
-    }
-
-    throw new Error('El usuario no tiene un rol reconocido.');
-  }
-
-  // =====================================================
-  // 10. ENVIAR FORMULARIO
+  // 7. ENVIAR FORMULARIO (SIN FETCH, SOLO PHP)
   // =====================================================
   formulario.addEventListener(
     'submit',
-    async (evento) => {
-      evento.preventDefault();
-
+    (evento) => {
       const errores = validarFormulario();
 
       if (errores.length > 0) {
+        evento.preventDefault();
         mostrarMensaje(
           errores.join(' '),
           true
         );
-
         return;
       }
 
+      // Si no hay errores, el formulario se envía normalmente a procesar_login.php
       mostrarMensaje('Iniciando sesión...');
-
-      const botonSubmit =
-        formulario.querySelector(
-          'button[type="submit"], input[type="submit"]'
-        );
-
-      if (botonSubmit) {
-        botonSubmit.disabled = true;
-      }
-
-      try {
-        const datos = await peticionAPI(
-          '/auth/login',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              correo: correoInput.value.trim(),
-              password: passwordInput.value,
-            }),
-          }
-        );
-
-        if (!datos.usuario) {
-          throw new Error(
-            'La respuesta del servidor no contiene una sesión válida.'
-          );
-        }
-
-        const rolReal = String(
-          datos.usuario.rol ||
-          datos.usuario.nombre_rol ||
-          datos.rol ||
-          ''
-        );
-
-        const rolSeleccionado = String(
-          rolInput?.value || ''
-        );
-
-        if (
-          rolSeleccionado &&
-          !rolesEquivalentes(
-            rolSeleccionado,
-            rolReal
-          )
-        ) {
-          throw new Error(
-            `La cuenta ingresada no pertenece al rol ${rolSeleccionado}.`
-          );
-        }
-
-        guardarSesion(
-          datos.token || 'sesion_activa',
-          datos.usuario
-        );
-
-        mostrarMensaje(
-          'Inicio de sesión correcto.'
-        );
-
-        redirigirSegunRol(rolReal);
-      } catch (error) {
-        mostrarMensaje(
-          error.message ||
-            'No se pudo iniciar sesión.',
-          true
-        );
-      } finally {
-        if (botonSubmit) {
-          botonSubmit.disabled = false;
-        }
-      }
+      // El formulario se envía solo
     }
   );
+
 });
