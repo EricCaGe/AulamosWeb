@@ -12,14 +12,14 @@ require_once '../Conexion/conexion.php';
 
 // Obtener datos del formulario
 $id_docente = $_SESSION['usuario']['id_usuario'];
-$titulo = $_POST['titulo'] ?? '';
-$descripcion = $_POST['descripcion'] ?? '';
-$instrucciones = $_POST['instrucciones'] ?? '';
+$titulo = trim($_POST['titulo'] ?? '');
+$descripcion = trim($_POST['descripcion'] ?? '');
+$instrucciones = trim($_POST['instrucciones'] ?? '');
 $tipo = $_POST['tipo'] ?? '';
 $puntaje_maximo = $_POST['puntaje_maximo'] ?? 100.00;
 $permite_entrega_archivo = isset($_POST['permite_entrega_archivo']) ? 1 : 0;
 $id_curso = $_POST['id_curso'] ?? '';
-$id_periodo = $_POST['id_periodo'] ?? null;
+$id_periodo = !empty($_POST['id_periodo']) ? $_POST['id_periodo'] : null;
 $fecha_limite = $_POST['fecha_limite'] ?? '';
 
 // Validaciones
@@ -45,18 +45,27 @@ if (empty($id_curso)) {
     $errores[] = "El curso es obligatorio.";
 }
 
-if (empty($puntaje_maximo) || !is_numeric($puntaje_maximo) || $puntaje_maximo <= 0) {
+if (!is_numeric($puntaje_maximo) || $puntaje_maximo <= 0) {
     $errores[] = "El puntaje máximo debe ser un número mayor a 0.";
 }
 
+// Validar y formatear la fecha límite
 if (empty($fecha_limite)) {
     $errores[] = "La fecha límite es obligatoria.";
 } else {
-    // Validar que la fecha límite sea en el futuro
-    $fecha_limite_date = new DateTime($fecha_limite);
-    $ahora = new DateTime();
-    if ($fecha_limite_date <= $ahora) {
-        $errores[] = "La fecha límite debe ser en el futuro.";
+    // Convertir el formato de "YYYY-MM-DDTHH:MM" a "YYYY-MM-DD HH:MM:SS"
+    $fecha_limite_date = DateTime::createFromFormat('Y-m-d\TH:i', $fecha_limite);
+    if (!$fecha_limite_date) {
+        $errores[] = "Formato de fecha no válido. Use el selector de fecha y hora.";
+    } else {
+        // Formatear a MySQL DATETIME (YYYY-MM-DD HH:MM:SS)
+        $fecha_limite_formateada = $fecha_limite_date->format('Y-m-d H:i:s');
+
+        // Validar que la fecha esté en el futuro
+        $ahora = new DateTime();
+        if ($fecha_limite_date <= $ahora) {
+            $errores[] = "La fecha límite debe ser en el futuro.";
+        }
     }
 }
 
@@ -68,9 +77,6 @@ if (!empty($errores)) {
     exit;
 }
 
-// Procesar la fecha límite para guardarla en el formato correcto
-$fecha_limite_formateada = $fecha_limite;
-
 // Insertar la actividad en la base de datos
 $query = "
     INSERT INTO actividades (
@@ -80,8 +86,15 @@ $query = "
 ";
 
 $stmt = $conexion->prepare($query);
+if (!$stmt) {
+    $_SESSION['mensaje'] = "Error al preparar la consulta: " . $conexion->error;
+    $_SESSION['tipo_mensaje'] = "error";
+    header('Location: crear_actividad.php');
+    exit;
+}
+
 $stmt->bind_param(
-    "iissssssdi",
+    "iissssssds",  // Note: 's' para fecha_limite_formateada (string)
     $id_curso,
     $id_periodo,
     $id_docente,
@@ -126,7 +139,7 @@ if ($stmt->execute()) {
     $_SESSION['mensaje'] = "Actividad creada correctamente.";
     $_SESSION['tipo_mensaje'] = "success";
 } else {
-    $_SESSION['mensaje'] = "Error al crear la actividad: " . $conexion->error;
+    $_SESSION['mensaje'] = "Error al crear la actividad: " . $stmt->error;
     $_SESSION['tipo_mensaje'] = "error";
 }
 
