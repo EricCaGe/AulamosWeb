@@ -107,12 +107,7 @@ $tipo = $_GET['tipo'] ?? '';
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
-            <a href="usuarios.php" class="menu-item <?php echo ($pagina_actual == 'usuarios.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-users"></i> Usuarios
-            </a>
-            <a href="reportes.php" class="menu-item <?php echo ($pagina_actual == 'reportes.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-chart-bar"></i> Reportes
-            </a>
+            
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-gear"></i> Configuración
             </a>
@@ -414,5 +409,7 @@ $tipo = $_GET['tipo'] ?? '';
 
 <script src="js/admin.js"></script>
 <script src="js/cursos.js"></script>
+<!-- LECTOR DE PANTALLA -->
+<script src="js/lector.js"></script>
 </body>
 </html>

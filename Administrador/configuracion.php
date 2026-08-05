@@ -15,11 +15,23 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 $ciclo_activo = $conexion->query("SELECT nombre FROM ciclos_escolares WHERE estado = 'Activo' LIMIT 1")->fetch_assoc();
 $ciclo_nombre = $ciclo_activo['nombre'] ?? 'No hay ciclo activo';
 
+// Cargar preferencias del usuario
+$preferencias = $conexion->query("
+    SELECT modo_oscuro, tamano_texto, alto_contraste, idioma 
+    FROM preferencias_accesibilidad 
+    WHERE id_usuario = " . $_SESSION['usuario']['id_usuario']
+)->fetch_assoc();
+
+$tema_actual = $preferencias['modo_oscuro'] ? 'oscuro' : 'claro';
+$idioma_actual = $preferencias['idioma'] ?? 'es';
+$tamano_actual = $preferencias['tamano_texto'] ?? 'normal';
+$contraste_actual = $preferencias['alto_contraste'] ?? 0;
+
 $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,6 +99,13 @@ $tipo = $_GET['tipo'] ?? '';
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
+                <!-- ========================================== -->
+                <!-- BOTÓN DE IDIOMA                           -->
+                <!-- ========================================== -->
+                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
+                    <i class="fa-solid fa-language"></i>
+                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
+                </button>
                 <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
                 </button>
@@ -149,20 +168,20 @@ $tipo = $_GET['tipo'] ?? '';
                     <i class="fa-solid fa-sliders"></i>
                     <h3>Preferencias de la plataforma</h3>
                 </div>
-                <form method="POST" action="logica/procesar_configuracion.php">
+                <form method="POST" action="logica/procesar_configuracion.php" id="formConfiguracion">
                     <div class="form-group">
                         <label>Tema por defecto</label>
                         <div class="radio-group">
                             <label>
-                                <input type="radio" name="tema" value="claro" checked>
+                                <input type="radio" name="tema" value="claro" <?php echo ($tema_actual === 'claro') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-sun"></i> Claro
                             </label>
                             <label>
-                                <input type="radio" name="tema" value="oscuro">
+                                <input type="radio" name="tema" value="oscuro" <?php echo ($tema_actual === 'oscuro') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-moon"></i> Oscuro
                             </label>
                             <label>
-                                <input type="radio" name="tema" value="sistema">
+                                <input type="radio" name="tema" value="sistema" <?php echo ($tema_actual === 'sistema') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-desktop"></i> Sistema
                             </label>
                         </div>
@@ -172,11 +191,11 @@ $tipo = $_GET['tipo'] ?? '';
                         <label>Idioma</label>
                         <div class="radio-group">
                             <label>
-                                <input type="radio" name="idioma" value="es" checked>
+                                <input type="radio" name="idioma" value="es" <?php echo ($idioma_actual === 'es') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-language"></i> Español
                             </label>
                             <label>
-                                <input type="radio" name="idioma" value="en">
+                                <input type="radio" name="idioma" value="en" <?php echo ($idioma_actual === 'en') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-language"></i> Inglés
                             </label>
                         </div>
@@ -186,15 +205,15 @@ $tipo = $_GET['tipo'] ?? '';
                         <label>Tamaño de texto</label>
                         <div class="radio-group">
                             <label>
-                                <input type="radio" name="tamano_texto" value="pequeño">
+                                <input type="radio" name="tamano_texto" value="pequeño" <?php echo ($tamano_actual === 'pequeño') ? 'checked' : ''; ?>>
                                 <span style="font-size: 12px;">A</span> Pequeño
                             </label>
                             <label>
-                                <input type="radio" name="tamano_texto" value="normal" checked>
+                                <input type="radio" name="tamano_texto" value="normal" <?php echo ($tamano_actual === 'normal') ? 'checked' : ''; ?>>
                                 <span style="font-size: 16px;">A</span> Normal
                             </label>
                             <label>
-                                <input type="radio" name="tamano_texto" value="grande">
+                                <input type="radio" name="tamano_texto" value="grande" <?php echo ($tamano_actual === 'grande') ? 'checked' : ''; ?>>
                                 <span style="font-size: 20px;">A</span> Grande
                             </label>
                         </div>
@@ -204,11 +223,11 @@ $tipo = $_GET['tipo'] ?? '';
                         <label>Alto contraste</label>
                         <div class="radio-group">
                             <label>
-                                <input type="radio" name="alto_contraste" value="0" checked>
+                                <input type="radio" name="alto_contraste" value="0" <?php echo ($contraste_actual == 0) ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-eye"></i> Desactivado
                             </label>
                             <label>
-                                <input type="radio" name="alto_contraste" value="1">
+                                <input type="radio" name="alto_contraste" value="1" <?php echo ($contraste_actual == 1) ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-eye-low-vision"></i> Activado
                             </label>
                         </div>
@@ -259,5 +278,7 @@ $tipo = $_GET['tipo'] ?? '';
 
 <script src="js/admin.js"></script>
 <script src="js/configuracion.js"></script>
+<!-- LECTOR DE PANTALLA -->
+<script src="js/lector.js"></script>
 </body>
 </html>

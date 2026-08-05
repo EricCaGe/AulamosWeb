@@ -20,9 +20,10 @@
         </div>
 
         <div class="nav-buttons">
+            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) 
             <button type="button" class="btn btn-chatbot" aria-label="Abrir chatbot">
                 <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
-            </button>
+            </button>-->
         </div>
     </header>
 
@@ -284,5 +285,34 @@
         });
     </script>
 
+<!-- ========================================== -->
+<!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
+<!-- ========================================== -->
+<div class="panel-accesibilidad" id="panelAccesibilidad">
+    <div class="panel-header">
+        <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
+        <button class="panel-cerrar" id="cerrarPanel">&times;</button>
+    </div>
+    <div class="panel-body">
+        <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
+            <i class="fa-solid fa-moon"></i> Modo oscuro
+        </button>
+        <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
+            <i class="fa-solid fa-eye"></i> Alto contraste
+        </button>
+        <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
+            <i class="fa-solid fa-text-height"></i> Texto grande
+        </button>
+        <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
+            <i class="fa-solid fa-volume-high"></i> Lector de pantalla
+        </button>
+        <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
+            <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
+        </button>
+    </div>
+</div>
+
+<script src="./InicioSesion/js/accesibilidad.js"></script>
+<script src="./InicioSesion/js/lector.js"></script>
 </body>
 </html>
