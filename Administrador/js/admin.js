@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // BOTÓN CONFIGURACIÓN
+    // BOTÓN CONFIGURACIÓN (Accesibilidad)
     const btnConfig = document.querySelector('.btn-open-config');
     if (btnConfig) {
         btnConfig.addEventListener('click', function() {
@@ -90,14 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // BOTÓN CONFIGURACIÓN DE GESTIÓN ACADÉMICA
-    const btnConfigGestion = document.querySelector('.btn-configuracion');
-    if (btnConfigGestion) {
-        btnConfigGestion.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('⚙️ Abriendo configuración del ciclo escolar...');
-        });
-    }
+    // ✅ BOTÓN CONFIGURACIÓN DE GESTIÓN ACADÉMICA - ELIMINADO, AHORA REDIRIGE NORMALMENTE
 
 });
 

@@ -1,0 +1,7 @@
+<?php
+
+return [
+   
+    'model' => 'gemini-3.1-flash-lite',
+    
+];

@@ -86,12 +86,7 @@ $usuarios_recientes = $conexion->query("
             <a href="inscripciones.php" class="menu-item">
                 <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
-            <a href="usuarios.php" class="menu-item">
-                <i class="fa-solid fa-users"></i> Usuarios
-            </a>
-            <a href="reportes.php" class="menu-item">
-                <i class="fa-solid fa-chart-bar"></i> Reportes
-            </a>
+           
             <a href="configuracion.php" class="menu-item">
                 <i class="fa-solid fa-gear"></i> Configuración
             </a>

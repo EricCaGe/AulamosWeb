@@ -41,7 +41,7 @@ $nombre_completo = trim($nombre . ' ' . $apellido_paterno);
 
 $configuracionChatbot = json_encode(
     [
-        'endpoint' => 'http://localhost:3000/api/chatbot/mensaje',
+        'endpoint' => 'api/chatbot/responder.php',
         'rol' => 'alumno',
         'nombre' => $nombre,
         'idUsuario' => $id_usuario,

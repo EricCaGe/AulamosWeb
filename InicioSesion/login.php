@@ -147,21 +147,24 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
-    <!-- ========================================== -->
-    <script src="js/login.js"></script>
-    <script>
-        // Actualizar campo oculto al seleccionar rol
-        document.querySelectorAll('.btn-role').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.btn-role').forEach(function(b) {
-                    b.classList.remove('active');
-                });
-                this.classList.add('active');
-                document.getElementById('rol-input').value = this.getAttribute('data-rol');
+<!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
+<!-- ========================================== -->
+<script src="js/login.js"></script>
+<script>
+    // Actualizar campo oculto al seleccionar rol
+    document.querySelectorAll('.btn-role').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.btn-role').forEach(function(b) {
+                b.classList.remove('active');
             });
+            this.classList.add('active');
+            document.getElementById('rol-input').value = this.getAttribute('data-rol');
         });
-    </script>
+    });
+</script>
+</body>
+</html>
+
 
 </body>
 </html>
