@@ -422,3 +422,10 @@ body {
         gap: 10px;
     }
 }
+.btn-chatbot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+}

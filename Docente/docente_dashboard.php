@@ -210,7 +210,15 @@ function formatearFecha($fecha) {
                     <p>Bienvenido a tu espacio docente.</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                    <button
+    type="button"
+    class="btn-assistant"
+    id="btn-asistente"
+    onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'"
+>
+    Asistente Virtual
+    <span class="robot-icon">🤖</span>
+</button>
                     <div class="icon-bell-container">
                         <i class="fa-regular fa-bell"></i>
                     </div>
