@@ -3,7 +3,12 @@ session_start();
 require_once '../Conexion/conexion.php';
 
 // Verificar que el usuario esté logueado
-$id_usuario = $_SESSION['id_usuario'] ?? 1; // Cambia por el ID real de sesión
+if (!isset($_SESSION['usuario'])) {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
+$id_usuario = $_SESSION['usuario']['id_usuario'];
 
 // =============================================
 // 1. OBTENER PREFERENCIAS ACTUALES
@@ -76,7 +81,7 @@ $textSizeMap = [
         
         <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         <div class="menu-spacer"></div>
-    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
