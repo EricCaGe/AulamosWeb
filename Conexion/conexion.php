@@ -7,20 +7,20 @@
 // Configuración de la conexión
 //$host = '10.2.2.43';
 //$host = '10.2.0.234';
-//$host = 'localhost';
-//$usuario = 'root';
+$host = 'localhost';
+$usuario = 'root';
 // .$password = '';
-//$password = '12345678';
+$password = '12345678';
 //$password = 'Jaziel123';
 //$password = 'qwerty1234.'; //Obregon
- //$basedatos = 'aulamos_mvp';
-//$puerto = 3306;
+$basedatos = 'aulamos_mvp';
+$puerto = 3306;
 
-$host = '10.2.2.43';
+/*$host = '10.2.2.43';
 $usuario = 'aulamos';
 $password = 'E12345678!';
 $basedatos = 'aulamos_mvp';
-$puerto = 3306;
+$puerto = 3306;*/
 
 // Crear la conexión
 $conexion = new mysqli($host, $usuario, $password, $basedatos);
