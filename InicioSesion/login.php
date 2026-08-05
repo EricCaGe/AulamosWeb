@@ -22,10 +22,10 @@
 
         <!-- Botones a la derecha -->
         <div class="nav-buttons">
-            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) -->
+            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) 
             <button type="button" class="btn btn-chatbot" aria-label="Abrir chatbot">
                 <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
-            </button>
+            </button>-->
         </div>
     </header>
 
