@@ -155,9 +155,6 @@ $racha_dias = $row['dias_activos'] ?? 0;
         </nav>
         
         <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
-
-        <div class="menu-spacer"></div>
-    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
     </aside>
 
     <main class="main-content">
@@ -253,5 +250,7 @@ $racha_dias = $row['dias_activos'] ?? 0;
 </div>
 
 <script src="js/Inicio.js"></script>
+<script src="js/Accesibilidad.js"></script>
+<script src="../Administrador/js/lector.js"></script>
 </body>
 </html>
