@@ -2260,3 +2260,156 @@ body.modo-oscuro .perfil-modal .btn-cancelar:hover {
         justify-content: center;
     }
 }
+
+/* =========================================================
+   ALTO CONTRASTE PARA ADMINISTRADOR
+   ========================================================= */
+
+/* --- FONDO NEGRO --- */
+body.alto-contraste.fondo-negro,
+body.alto-contraste.fondo-negro .dashboard-container,
+body.alto-contraste.fondo-negro .sidebar,
+body.alto-contraste.fondo-negro .main-content,
+body.alto-contraste.fondo-negro .content-header,
+body.alto-contraste.fondo-negro .config-card,
+body.alto-contraste.fondo-negro .config-header,
+body.alto-contraste.fondo-negro .welcome-text,
+body.alto-contraste.fondo-negro .accessibility-bar,
+body.alto-contraste.fondo-negro .form-group,
+body.alto-contraste.fondo-negro .form-actions,
+body.alto-contraste.fondo-negro .radio-group label,
+body.alto-contraste.fondo-negro .menu-item,
+body.alto-contraste.fondo-negro .stat-box,
+body.alto-contraste.fondo-negro .quick-btn,
+body.alto-contraste.fondo-negro .gestion-card {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro h1,
+body.alto-contraste.fondo-negro h2,
+body.alto-contraste.fondo-negro h3,
+body.alto-contraste.fondo-negro h4,
+body.alto-contraste.fondo-negro p,
+body.alto-contraste.fondo-negro label,
+body.alto-contraste.fondo-negro span,
+body.alto-contraste.fondo-negro .config-header h3,
+body.alto-contraste.fondo-negro .stat-label,
+body.alto-contraste.fondo-negro .stat-number,
+body.alto-contraste.fondo-negro .welcome-text h1,
+body.alto-contraste.fondo-negro .welcome-text p,
+body.alto-contraste.fondo-negro .menu-item {
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro .menu-item:hover,
+body.alto-contraste.fondo-negro .menu-item.active {
+    background: #333333 !important;
+    color: #ffffff !important;
+}
+
+/* --- FONDO BLANCO --- */
+body.alto-contraste.fondo-blanco,
+body.alto-contraste.fondo-blanco .dashboard-container,
+body.alto-contraste.fondo-blanco .sidebar,
+body.alto-contraste.fondo-blanco .main-content,
+body.alto-contraste.fondo-blanco .content-header,
+body.alto-contraste.fondo-blanco .config-card,
+body.alto-contraste.fondo-blanco .config-header,
+body.alto-contraste.fondo-blanco .welcome-text,
+body.alto-contraste.fondo-blanco .accessibility-bar,
+body.alto-contraste.fondo-blanco .form-group,
+body.alto-contraste.fondo-blanco .form-actions,
+body.alto-contraste.fondo-blanco .radio-group label,
+body.alto-contraste.fondo-blanco .menu-item,
+body.alto-contraste.fondo-blanco .stat-box,
+body.alto-contraste.fondo-blanco .quick-btn,
+body.alto-contraste.fondo-blanco .gestion-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco h1,
+body.alto-contraste.fondo-blanco h2,
+body.alto-contraste.fondo-blanco h3,
+body.alto-contraste.fondo-blanco h4,
+body.alto-contraste.fondo-blanco p,
+body.alto-contraste.fondo-blanco label,
+body.alto-contraste.fondo-blanco span,
+body.alto-contraste.fondo-blanco .config-header h3,
+body.alto-contraste.fondo-blanco .stat-label,
+body.alto-contraste.fondo-blanco .stat-number,
+body.alto-contraste.fondo-blanco .welcome-text h1,
+body.alto-contraste.fondo-blanco .welcome-text p,
+body.alto-contraste.fondo-blanco .menu-item {
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco .menu-item:hover,
+body.alto-contraste.fondo-blanco .menu-item.active {
+    background: #e5e5e5 !important;
+    color: #000000 !important;
+}
+
+/* --- COLORES DE ACENTO PARA BOTONES --- */
+body.alto-contraste.color-azul .btn-guardar,
+body.alto-contraste.color-azul .btn-submit-login,
+body.alto-contraste.color-azul .btn-agregar,
+body.alto-contraste.color-azul .btn-primary,
+body.alto-contraste.color-azul .btn-success {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-amarillo .btn-guardar,
+body.alto-contraste.color-amarillo .btn-submit-login,
+body.alto-contraste.color-amarillo .btn-agregar,
+body.alto-contraste.color-amarillo .btn-primary,
+body.alto-contraste.color-amarillo .btn-success {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-verde .btn-guardar,
+body.alto-contraste.color-verde .btn-submit-login,
+body.alto-contraste.color-verde .btn-agregar,
+body.alto-contraste.color-verde .btn-primary,
+body.alto-contraste.color-verde .btn-success {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-guardar,
+body.alto-contraste.color-rojo .btn-submit-login,
+body.alto-contraste.color-rojo .btn-agregar,
+body.alto-contraste.color-rojo .btn-primary,
+body.alto-contraste.color-rojo .btn-success {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-guardar,
+body.alto-contraste.color-naranja .btn-submit-login,
+body.alto-contraste.color-naranja .btn-agregar,
+body.alto-contraste.color-naranja .btn-primary,
+body.alto-contraste.color-naranja .btn-success {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-guardar,
+body.alto-contraste.color-morado .btn-submit-login,
+body.alto-contraste.color-morado .btn-agregar,
+body.alto-contraste.color-morado .btn-primary,
+body.alto-contraste.color-morado .btn-success {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}

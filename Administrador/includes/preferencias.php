@@ -21,6 +21,10 @@ if (isset($_SESSION['preferencias'])) {
     $_SESSION['preferencias'] = $preferencias;
 }
 
+// ✅ NUEVO: Cargar colores de contraste personalizado
+$contraste_fondo = $_SESSION['contraste_fondo'] ?? 'negro';
+$contraste_color = $_SESSION['contraste_color'] ?? 'azul';
+
 $modo_oscuro = $preferencias['modo_oscuro'];
 $tamano_texto = $preferencias['tamano_texto'];
 $alto_contraste = $preferencias['alto_contraste'];
@@ -28,7 +32,14 @@ $idioma_actual = $preferencias['idioma'];
 
 $clases_body = '';
 if ($modo_oscuro == 1) $clases_body .= 'modo-oscuro';
-if ($alto_contraste == 1) $clases_body .= ' alto-contraste';
+if ($alto_contraste == 1) {
+    $clases_body .= ' alto-contraste';
+    // ✅ AGREGAR ESTO: Aplicar fondo y color
+    $fondo = $_SESSION['contraste_fondo'] ?? 'negro';
+    $color = $_SESSION['contraste_color'] ?? 'azul';
+    $clases_body .= ' fondo-' . $fondo;
+    $clases_body .= ' color-' . $color;
+}
 if (strtolower($tamano_texto) == 'grande') $clases_body .= ' texto-grande';
 
 // ========================================== */
@@ -92,7 +103,9 @@ $traducciones = [
         'subtitulos' => 'Subtítulos',
         'navegacion' => 'Navegación',
         'activo' => 'Activo',
-        'inactivo' => 'Inactivo'
+        'inactivo' => 'Inactivo',
+        // ✅ NUEVA TRADUCCIÓN
+        'personalizar_contraste' => 'Personalizar alto contraste'
     ],
     'en' => [
         'configuracion' => 'Settings',
@@ -151,7 +164,9 @@ $traducciones = [
         'subtitulos' => 'Subtitles',
         'navegacion' => 'Navigation',
         'activo' => 'Active',
-        'inactivo' => 'Inactive'
+        'inactivo' => 'Inactive',
+        // ✅ NUEVA TRADUCCIÓN
+        'personalizar_contraste' => 'Customize high contrast'
     ]
 ];
 

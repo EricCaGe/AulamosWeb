@@ -18,6 +18,10 @@ $ciclo_nombre = $ciclo_activo['nombre'] ?? 'No hay ciclo activo';
 $tema_actual = ($modo_oscuro == 1) ? 'oscuro' : 'claro';
 $tamano_actual = strtolower($tamano_texto ?? 'normal');
 $contraste_actual = $alto_contraste ?? 0;
+
+// Cargar colores personalizados de alto contraste
+$fondo_contraste = $_SESSION['contraste_fondo'] ?? 'negro';
+$color_contraste = $_SESSION['contraste_color'] ?? 'azul';
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
@@ -76,9 +80,6 @@ $contraste_actual = $alto_contraste ?? 0;
                 <p><?php echo __('administra_config'); ?></p>
             </div>
             <div class="header-actions">
-                <!-- <button class="btn-assistant" id="btn-asistente">
-                    <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button> -->
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
@@ -86,9 +87,6 @@ $contraste_actual = $alto_contraste ?? 0;
                     <i class="fa-solid fa-language"></i>
                     <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
                 </button>
-                <!--  <button class="btn-accessibility-header">
-                    <i class="fa-solid fa-universal-access"></i>
-                </button>-->
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
@@ -131,24 +129,8 @@ $contraste_actual = $alto_contraste ?? 0;
                     <h3><?php echo __('preferencias'); ?></h3>
                 </div>
                 <form method="POST" action="logica/procesar_configuracion.php" id="formConfiguracion">
-                    <div class="form-group">
-                        <label><?php echo __('tema'); ?></label>
-                        <div class="radio-group">
-                            <label>
-                                <input type="radio" name="tema" value="claro" <?php echo ($tema_actual === 'claro') ? 'checked' : ''; ?>>
-                                <i class="fa-solid fa-sun"></i> <?php echo __('claro'); ?>
-                            </label>
-                            <label>
-                                <input type="radio" name="tema" value="oscuro" <?php echo ($tema_actual === 'oscuro') ? 'checked' : ''; ?>>
-                                <i class="fa-solid fa-moon"></i> <?php echo __('oscuro'); ?>
-                            </label>
-                            <label>
-                                <input type="radio" name="tema" value="sistema" <?php echo ($tema_actual === 'sistema') ? 'checked' : ''; ?>>
-                                <i class="fa-solid fa-desktop"></i> <?php echo __('sistema'); ?>
-                            </label>
-                        </div>
-                    </div>
-
+                    
+                    <!-- IDIOMA -->
                     <div class="form-group">
                         <label><?php echo __('idioma'); ?></label>
                         <div class="radio-group">
@@ -163,6 +145,7 @@ $contraste_actual = $alto_contraste ?? 0;
                         </div>
                     </div>
 
+                    <!-- TAMAÑO DE TEXTO -->
                     <div class="form-group">
                         <label><?php echo __('tamano_texto'); ?></label>
                         <div class="radio-group">
@@ -181,19 +164,57 @@ $contraste_actual = $alto_contraste ?? 0;
                         </div>
                     </div>
 
+                    <!-- PERSONALIZAR ALTO CONTRASTE 
                     <div class="form-group">
-                        <label><?php echo __('alto_contraste'); ?></label>
-                        <div class="radio-group">
-                            <label>
-                                <input type="radio" name="alto_contraste" value="0" <?php echo ($contraste_actual == 0) ? 'checked' : ''; ?>>
-                                <i class="fa-solid fa-eye"></i> <?php echo __('desactivado'); ?>
-                            </label>
-                            <label>
-                                <input type="radio" name="alto_contraste" value="1" <?php echo ($contraste_actual == 1) ? 'checked' : ''; ?>>
-                                <i class="fa-solid fa-eye-low-vision"></i> <?php echo __('activado'); ?>
-                            </label>
+                        <label>🎨 <?php echo __('personalizar_contraste'); ?></label>
+                        <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">Elige el fondo y el color de acento para el modo alto contraste.</p>
+                        
+                        <!-- Fondo 
+                        <div style="margin-bottom: 12px;">
+                            <span style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 6px;">Fondo</span>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="contraste_fondo" value="blanco" <?php echo ($fondo_contraste === 'blanco') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#ffffff; border:2px solid #333;"></span> Blanco
+                                </label>
+                                <label>
+                                    <input type="radio" name="contraste_fondo" value="negro" <?php echo ($fondo_contraste === 'negro') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#000000; border:2px solid #333;"></span> Negro
+                                </label>
+                            </div>
                         </div>
-                    </div>
+
+                        <!-- Color de acento 
+                        <div>
+                            <span style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 6px;">Color de acento</span>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="contraste_color" value="azul" <?php echo ($color_contraste === 'azul') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#1d4ed8;"></span> Azul
+                                </label>
+                                <label>
+                                    <input type="radio" name="contraste_color" value="amarillo" <?php echo ($color_contraste === 'amarillo') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#ca8a04;"></span> Amarillo
+                                </label>
+                                <label>
+                                    <input type="radio" name="contraste_color" value="verde" <?php echo ($color_contraste === 'verde') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#15803d;"></span> Verde
+                                </label>
+                                <label>
+                                    <input type="radio" name="contraste_color" value="rojo" <?php echo ($color_contraste === 'rojo') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#b91c1c;"></span> Rojo
+                                </label>
+                                <label>
+                                    <input type="radio" name="contraste_color" value="naranja" <?php echo ($color_contraste === 'naranja') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#ea580c;"></span> Naranja
+                                </label>
+                                <label>
+                                    <input type="radio" name="contraste_color" value="morado" <?php echo ($color_contraste === 'morado') ? 'checked' : ''; ?>>
+                                    <span class="color-preview" style="background:#7c3aed;"></span> Morado
+                                </label>
+                            </div>
+                        </div>
+                    </div> -->
 
                     <div class="form-actions">
                         <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
@@ -236,6 +257,20 @@ $contraste_actual = $alto_contraste ?? 0;
 
     </main>
 </div>
+
+<!-- ========================================== -->
+<!-- INYECTAR PREFERENCIAS AL JAVASCRIPT        -->
+<!-- ========================================== -->
+<script>
+    window.preferenciasServidor = {
+        modo_oscuro: <?php echo $modo_oscuro ?? 0; ?>,
+        alto_contraste: <?php echo $alto_contraste ?? 0; ?>,
+        contraste_fondo: '<?php echo $contraste_fondo ?? "negro"; ?>',
+        contraste_color: '<?php echo $contraste_color ?? "azul"; ?>',
+        tamano_texto: '<?php echo $tamano_texto ?? "normal"; ?>'
+    };
+    console.log('✅ Preferencias del servidor cargadas:', window.preferenciasServidor);
+</script>
 
 <script src="js/admin.js"></script>
 <script src="js/configuracion.js"></script>

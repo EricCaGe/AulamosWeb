@@ -66,29 +66,29 @@ $usuarios_recientes = $conexion->query("
         </div>
         
         <nav class="menu">
-            <a href="admin_dashboard.php" class="menu-item active">
+            <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-house"></i> Dashboard
             </a>
-            <a href="ciclos_escolares.php" class="menu-item">
+            <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-calendar"></i> Ciclos escolares
             </a>
-            <a href="periodos.php" class="menu-item">
+            <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-clock"></i> Periodos
             </a>
-            <a href="materias.php" class="menu-item">
+            <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-book"></i> Materias
             </a>
-            <a href="grupos.php" class="menu-item">
+            <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-layer-group"></i> Grupos
             </a>
-            <a href="cursos.php" class="menu-item">
+            <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-cubes"></i> Cursos
             </a>
-            <a href="inscripciones.php" class="menu-item">
+            <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
            
-            <a href="configuracion.php" class="menu-item">
+            <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-gear"></i> Configuración
             </a>
         </nav>
@@ -109,19 +109,19 @@ $usuarios_recientes = $conexion->query("
                 <p>Bienvenido a tu espacio administrativo.</p>
             </div>
             <div class="header-actions">
-<<<<<<< HEAD
+                <!-- ✅ BOTÓN CHATBOT CORREGIDO -->
                 <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
-=======
-                <!-- <button class="btn-assistant" id="btn-asistente">
->>>>>>> 713a1ae (Correcciones de accesibilidad en Administrador)
                     <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button> -->
+                </button>
+
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-               <!--  <button class="btn-accessibility-header">
+
+                <!-- <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
-                </button>-->
+                </button> -->
+
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
