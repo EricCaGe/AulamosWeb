@@ -109,15 +109,19 @@ $usuarios_recientes = $conexion->query("
                 <p>Bienvenido a tu espacio administrativo.</p>
             </div>
             <div class="header-actions">
+<<<<<<< HEAD
                 <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+=======
+                <!-- <button class="btn-assistant" id="btn-asistente">
+>>>>>>> 713a1ae (Correcciones de accesibilidad en Administrador)
                     <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button>
+                </button> -->
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-                <button class="btn-accessibility-header">
+               <!--  <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
-                </button>
+                </button>-->
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>

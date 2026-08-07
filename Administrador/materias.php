@@ -101,15 +101,15 @@ $tipo = $_GET['tipo'] ?? '';
                 <p>Administra el catálogo y sus campos formativos.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">
+                <!-- <button class="btn-assistant" id="btn-asistente">
                     <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button>
+                </button> -->
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-                <button class="btn-accessibility-header">
+                <!--  <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
-                </button>
+                </button>-->
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
