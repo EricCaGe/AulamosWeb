@@ -16,8 +16,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 // CONSULTAS A LA BD                          */
 // ========================================== */
 
-// Obtener todos los ciclos para el selector
-$ciclos = $conexion->query("SELECT id_ciclo, nombre, fecha_inicio, fecha_fin FROM ciclos_escolares ORDER BY fecha_inicio DESC")->fetch_all(MYSQLI_ASSOC);
+// ✅ SOLO CICLOS ACTIVOS
+$ciclos = $conexion->query("SELECT id_ciclo, nombre, fecha_inicio, fecha_fin FROM ciclos_escolares WHERE estado = 'Activo' ORDER BY fecha_inicio DESC")->fetch_all(MYSQLI_ASSOC);
 
 // Ciclo seleccionado (por defecto el primero)
 $ciclo_seleccionado = isset($_GET['id_ciclo']) ? intval($_GET['id_ciclo']) : ($ciclos[0]['id_ciclo'] ?? 0);
@@ -45,11 +45,11 @@ $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Periodos de evaluación - Administrador</title>
+    <title><?php echo __('periodos'); ?> - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/periodos.css">
@@ -67,34 +67,33 @@ $tipo = $_GET['tipo'] ?? '';
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> Dashboard
+                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> Ciclos escolares
+                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> Periodos
+                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> Materias
+                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> Grupos
+                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> Cursos
+                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
+                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
             </a>
-            
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> Configuración
+                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
             </a>
         </nav>
         
         <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> Accesibilidad
+            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
         </button>
     </aside>
 
@@ -104,8 +103,8 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ENCABEZADO -->
         <header class="content-header">
             <div class="welcome-text">
-                <h1>Periodos de evaluación</h1>
-                <p>Administra los periodos de cada ciclo escolar.</p>
+                <h1><?php echo __('periodos'); ?></h1>
+                <p><?php echo __('administra_periodos'); ?></p>
             </div>
             <div class="header-actions">
                 <button class="btn-assistant" id="btn-asistente">
@@ -114,14 +113,18 @@ $tipo = $_GET['tipo'] ?? '';
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
+                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
+                    <i class="fa-solid fa-language"></i>
+                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
+                </button>
                 <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
                 </button>
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-    <i class="fa-solid fa-chevron-down drop-icon"></i>
-</a>            
+                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
+                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+                    <i class="fa-solid fa-chevron-down drop-icon"></i>
+                </a>
                 <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
@@ -140,7 +143,7 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ========================================== -->
         <section class="selector-ciclo">
             <div class="ciclo-selector-card">
-                <label class="selector-label">Ciclo escolar</label>
+                <label class="selector-label"><?php echo __('ciclo_escolar'); ?></label>
                 <select class="selector-select" id="selectorCiclo" onchange="window.location.href='periodos.php?id_ciclo='+this.value">
                     <?php foreach ($ciclos as $ciclo): ?>
                         <option value="<?php echo $ciclo['id_ciclo']; ?>" <?php echo ($ciclo['id_ciclo'] == $ciclo_seleccionado) ? 'selected' : ''; ?>>
@@ -165,11 +168,11 @@ $tipo = $_GET['tipo'] ?? '';
         <section class="lista-periodos">
             <div class="periodos-header">
                 <div>
-                    <h3>Periodos registrados</h3>
-                    <p class="periodos-sub"><?php echo count($periodos); ?> periodo<?php echo (count($periodos) != 1) ? 's' : ''; ?> encontrado<?php echo (count($periodos) != 1) ? 's' : ''; ?></p>
+                    <h3><?php echo __('periodos_registrados'); ?></h3>
+                    <p class="periodos-sub"><?php echo count($periodos); ?> <?php echo __('periodos_encontrados'); ?></p>
                 </div>
                 <button class="btn-nuevo-periodo" id="btnNuevoPeriodo">
-                    <i class="fa-solid fa-plus"></i> Nuevo periodo
+                    <i class="fa-solid fa-plus"></i> <?php echo __('nuevo_periodo'); ?>
                 </button>
             </div>
 
@@ -177,10 +180,10 @@ $tipo = $_GET['tipo'] ?? '';
                 <?php if (empty($periodos)): ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-clock"></i>
-                        <h4>No hay periodos registrados</h4>
-                        <p>Comienza creando un nuevo periodo para este ciclo.</p>
+                        <h4><?php echo __('sin_periodos'); ?></h4>
+                        <p><?php echo __('crear_primer_periodo'); ?></p>
                         <button class="btn-agregar-empty" id="btnNuevoPeriodoEmpty">
-                            <i class="fa-solid fa-plus"></i> Crear primer periodo
+                            <i class="fa-solid fa-plus"></i> <?php echo __('crear_periodo'); ?>
                         </button>
                     </div>
                 <?php else: ?>
@@ -201,22 +204,22 @@ $tipo = $_GET['tipo'] ?? '';
 
                         <div class="periodo-fechas">
                             <div class="fecha-item">
-                                <span class="fecha-label">Inicio</span>
+                                <span class="fecha-label"><?php echo __('inicio'); ?></span>
                                 <span class="fecha-valor"><?php echo date('d/m/Y', strtotime($periodo['fecha_inicio'])); ?></span>
                             </div>
                             <div class="fecha-item">
-                                <span class="fecha-label">Fin</span>
+                                <span class="fecha-label"><?php echo __('fin'); ?></span>
                                 <span class="fecha-valor"><?php echo date('d/m/Y', strtotime($periodo['fecha_fin'])); ?></span>
                             </div>
                         </div>
 
                         <div class="periodo-acciones">
                             <button class="btn-editar" data-id="<?php echo $periodo['id_periodo']; ?>">
-                                <i class="fa-regular fa-pen-to-square"></i> Editar
+                                <i class="fa-regular fa-pen-to-square"></i> <?php echo __('editar'); ?>
                             </button>
                             <?php if ($periodo['estado'] !== 'Cerrado'): ?>
                             <button class="btn-cerrar" data-id="<?php echo $periodo['id_periodo']; ?>">
-                                <i class="fa-solid fa-lock"></i> Cerrar
+                                <i class="fa-solid fa-lock"></i> <?php echo __('cerrar'); ?>
                             </button>
                             <?php endif; ?>
                         </div>
@@ -232,7 +235,7 @@ $tipo = $_GET['tipo'] ?? '';
         <div class="modal-overlay" id="modalPeriodo">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="modalTitulo">Nuevo periodo</h2>
+                    <h2 id="modalTitulo"><?php echo __('nuevo_periodo'); ?></h2>
                     <button class="modal-cerrar" id="modalCerrar">&times;</button>
                 </div>
                 <form id="formPeriodo" method="POST" action="logica/procesar_periodos.php">
@@ -241,54 +244,54 @@ $tipo = $_GET['tipo'] ?? '';
                     <input type="hidden" name="id_ciclo" id="modalCicloId" value="<?php echo $ciclo_seleccionado; ?>">
 
                     <div class="form-group">
-                        <label>Ciclo escolar</label>
+                        <label><?php echo __('ciclo_escolar'); ?></label>
                         <p class="ciclo-info">
                             <strong><?php echo htmlspecialchars($ciclo_actual['nombre'] ?? 'Sin ciclo'); ?></strong>
                         </p>
                         <?php if ($ciclo_actual): ?>
                         <p class="fechas-permitidas">
                             <i class="fa-regular fa-calendar"></i>
-                            Fechas permitidas: <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_inicio'])); ?> – <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_fin'])); ?>
+                            <?php echo __('fechas_permitidas'); ?>: <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_inicio'])); ?> – <?php echo date('d/m/Y', strtotime($ciclo_actual['fecha_fin'])); ?>
                         </p>
                         <?php endif; ?>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalNombre">Nombre del periodo <span class="text-danger">*</span></label>
-                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej. Primer periodo" required>
+                        <label for="modalNombre"><?php echo __('nombre_periodo'); ?> <span class="text-danger">*</span></label>
+                        <input type="text" id="modalNombre" name="nombre" placeholder="<?php echo __('ej_periodo'); ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalInicio">Fecha de inicio <span class="text-danger">*</span></label>
+                        <label for="modalInicio"><?php echo __('fecha_inicio'); ?> <span class="text-danger">*</span></label>
                         <input type="date" id="modalInicio" name="fecha_inicio" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalFin">Fecha final <span class="text-danger">*</span></label>
+                        <label for="modalFin"><?php echo __('fecha_fin'); ?> <span class="text-danger">*</span></label>
                         <input type="date" id="modalFin" name="fecha_fin" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Estado</label>
+                        <label><?php echo __('estado'); ?></label>
                         <div class="radio-group">
                             <label>
                                 <input type="radio" name="estado" value="Activo" checked>
-                                <i class="fa-solid fa-circle-check"></i> Activo
+                                <i class="fa-solid fa-circle-check"></i> <?php echo __('activo'); ?>
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Inactivo">
-                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
+                                <i class="fa-solid fa-circle-xmark"></i> <?php echo __('inactivo'); ?>
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Cerrado">
-                                <i class="fa-solid fa-lock"></i> Cerrado
+                                <i class="fa-solid fa-lock"></i> <?php echo __('cerrado'); ?>
                             </label>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
-                        <button type="submit" class="btn-guardar">Guardar</button>
+                        <button type="button" class="btn-cancelar" id="modalCancelar"><?php echo __('cancelar'); ?></button>
+                        <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
                     </div>
                 </form>
             </div>
@@ -299,31 +302,31 @@ $tipo = $_GET['tipo'] ?? '';
             <div class="acc-info">
                 <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
                 <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
+                    <strong><?php echo __('accesibilidad'); ?></strong>
+                    <p><?php echo __('personaliza_experiencia'); ?></p>
                 </div>
             </div>
             <div class="acc-options">
                 <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span>Alto contraste</span>
+                    <i class="fa-solid fa-eye"></i><span><?php echo __('alto_contraste'); ?></span>
                 </button>
                 <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span>Modo oscuro</span>
+                    <i class="fa-solid fa-moon"></i><span><?php echo __('oscuro'); ?></span>
                 </button>
                 <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span>Texto grande</span>
+                    <span class="font-icon">Aa</span><span><?php echo __('grande'); ?></span>
                 </button>
                 <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span>
+                    <i class="fa-solid fa-volume-high"></i><span><?php echo __('leer_pantalla'); ?></span>
                 </button>
                 <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span>
+                    <i class="fa-solid fa-closed-captioning"></i><span><?php echo __('subtitulos'); ?></span>
                 </button>
                 <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span>Navegación</span>
+                    <i class="fa-solid fa-keyboard"></i><span><?php echo __('navegacion'); ?></span>
                 </button>
             </div>
-            <button class="btn-open-config">Abrir configuración</button>
+            <button class="btn-open-config"><?php echo __('configuracion'); ?></button>
         </footer>
 
     </main>
@@ -331,7 +334,6 @@ $tipo = $_GET['tipo'] ?? '';
 
 <script src="js/admin.js"></script>
 <script src="js/periodos.js"></script>
-<!-- LECTOR DE PANTALLA -->
 <script src="js/lector.js"></script>
 </body>
 </html>
