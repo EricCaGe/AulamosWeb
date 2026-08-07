@@ -16,22 +16,13 @@ $mensaje = trim(
     (string) ($entrada['mensaje'] ?? '')
 );
 
-$rol = strtolower(
-    trim((string) ($entrada['rol'] ?? 'alumno'))
-);
+$rol = obtenerRolUsuarioSesion();
 
 $idSesion = (int) (
     $entrada['idSesion'] ?? 0
 );
 
-if (!in_array($rol, ['alumno', 'docente'], true)) {
-    $rol = 'alumno';
-}
-
-$moduloOrigen =
-    $rol === 'docente'
-        ? 'Web Docente'
-        : 'Web Alumno';
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
 
 if ($mensaje === '') {
     responderJson(

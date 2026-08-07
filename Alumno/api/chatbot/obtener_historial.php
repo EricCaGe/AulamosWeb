@@ -7,6 +7,8 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('GET');
 
 $idUsuario = obtenerIdUsuarioSesion();
+$rol = obtenerRolUsuarioSesion();
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
 
 $idSesion = filter_input(
     INPUT_GET,
@@ -36,14 +38,16 @@ $verificacion = $bdChatbot->prepare(
         FROM sesiones_chatbot
         WHERE id_sesion = ?
           AND id_usuario = ?
+          AND modulo_origen = ?
         LIMIT 1
     '
 );
 
 $verificacion->bind_param(
-    'ii',
+    'iis',
     $idSesion,
-    $idUsuario
+    $idUsuario,
+    $moduloOrigen
 );
 
 $verificacion->execute();

@@ -7,6 +7,9 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
+$rol = obtenerRolUsuarioSesion();
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
+
 $datos = obtenerEntradaJson();
 
 $idSesion = filter_var(
@@ -30,14 +33,16 @@ $actualizacion = $bdChatbot->prepare(
         SET fecha_fin = CURRENT_TIMESTAMP
         WHERE id_sesion = ?
           AND id_usuario = ?
+          AND modulo_origen = ?
           AND fecha_fin IS NULL
     '
 );
 
 $actualizacion->bind_param(
-    'ii',
+    'iis',
     $idSesion,
-    $idUsuario
+    $idUsuario,
+    $moduloOrigen
 );
 
 $actualizacion->execute();

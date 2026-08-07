@@ -7,6 +7,9 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
+$rol = obtenerRolUsuarioSesion();
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
+
 $datos = obtenerEntradaJson();
 
 $idSesion = filter_var(
@@ -104,15 +107,17 @@ $verificacion = $bdChatbot->prepare(
         FROM sesiones_chatbot
         WHERE id_sesion = ?
           AND id_usuario = ?
+          AND modulo_origen = ?
           AND fecha_fin IS NULL
         LIMIT 1
     '
 );
 
 $verificacion->bind_param(
-    'ii',
+    'iis',
     $idSesion,
-    $idUsuario
+    $idUsuario,
+    $moduloOrigen
 );
 
 $verificacion->execute();

@@ -7,20 +7,16 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
-$entrada = obtenerEntradaJson();
 
-$rol = strtolower(
-    trim((string) ($entrada['rol'] ?? 'alumno'))
-);
+/*
+|--------------------------------------------------------------------------
+| Rol real del usuario
+|--------------------------------------------------------------------------
+| El rol proviene exclusivamente de la sesion PHP.
+*/
 
-if (!in_array($rol, ['alumno', 'docente'], true)) {
-    $rol = 'alumno';
-}
-
-$moduloOrigen =
-    $rol === 'docente'
-        ? 'Web Docente'
-        : 'Web Alumno';
+$rol = obtenerRolUsuarioSesion();
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
 
 /*
 |--------------------------------------------------------------------------
