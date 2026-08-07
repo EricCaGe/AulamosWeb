@@ -29,9 +29,14 @@ $grupos_inactivos = $resultado->fetch_assoc()['total'] ?? 0;
 
 // Lista de todos los grupos
 $grupos = $conexion->query("
-    SELECT g.*, 
-           (SELECT COUNT(*) FROM cursos WHERE id_grupo = g.id_grupo) AS total_cursos
+    SELECT 
+        g.*, 
+        c.nombre AS ciclo_nombre,
+        CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) AS docente_nombre,
+        (SELECT COUNT(*) FROM cursos WHERE id_grupo = g.id_grupo) AS total_cursos
     FROM grupos g
+    LEFT JOIN ciclos_escolares c ON g.id_ciclo = c.id_ciclo
+    LEFT JOIN usuarios u ON g.id_docente = u.id_usuario
     ORDER BY g.nombre
 ")->fetch_all(MYSQLI_ASSOC);
 
@@ -191,7 +196,23 @@ $tipo = $_GET['tipo'] ?? '';
                     <?php foreach ($grupos as $grupo): ?>
                     <div class="grupo-card" data-estado="<?php echo $grupo['estado']; ?>">
                         <div class="grupo-header">
-                            <h4 class="grupo-nombre"><?php echo htmlspecialchars($grupo['nombre']); ?></h4>
+                            <h4 class="grupo-nombre">
+    <?php 
+    $grado = $grupo['grado'] ?? '';
+    $nombre = htmlspecialchars($grupo['nombre']);
+    
+    // Si el grado no tiene el símbolo °, se lo agregamos
+    if (!empty($grado)) {
+        // Si el grado es "1", "2" o "3", agregamos "°"
+        if (preg_match('/^\d+$/', trim($grado))) {
+            $grado = $grado . '°';
+        }
+        echo htmlspecialchars($grado) . ' ' . $nombre;
+    } else {
+        echo $nombre;
+    }
+    ?>
+</h4>
                             <span class="badge <?php 
                                 echo ($grupo['estado'] === 'Activo') ? 'badge-activo' : 
                                     (($grupo['estado'] === 'Finalizado') ? 'badge-cerrado' : 'badge-inactivo'); 
@@ -201,23 +222,31 @@ $tipo = $_GET['tipo'] ?? '';
                         </div>
 
                         <div class="grupo-detalles">
-                            <div class="detalle-item">
-                                <span class="detalle-label">Turno:</span>
-                                <span class="detalle-valor"><?php echo htmlspecialchars($grupo['turno']); ?></span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Modalidad:</span>
-                                <span class="detalle-valor"><?php echo htmlspecialchars($grupo['modalidad']); ?></span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Cupo:</span>
-                                <span class="detalle-valor"><?php echo $grupo['cupo_maximo']; ?> estudiantes</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Cursos relacionados:</span>
-                                <span class="detalle-valor"><?php echo $grupo['total_cursos'] ?? 0; ?></span>
-                            </div>
-                        </div>
+    <div class="detalle-item">
+        <span class="detalle-label">Ciclo:</span>
+        <span class="detalle-valor"><?php echo htmlspecialchars($grupo['ciclo_nombre'] ?? 'Sin ciclo'); ?></span>
+    </div>
+    <div class="detalle-item">
+        <span class="detalle-label">Docente:</span>
+        <span class="detalle-valor"><?php echo htmlspecialchars($grupo['docente_nombre'] ?? 'Sin docente'); ?></span>
+    </div>
+    <div class="detalle-item">
+        <span class="detalle-label">Turno:</span>
+        <span class="detalle-valor"><?php echo htmlspecialchars($grupo['turno']); ?></span>
+    </div>
+    <div class="detalle-item">
+        <span class="detalle-label">Modalidad:</span>
+        <span class="detalle-valor"><?php echo htmlspecialchars($grupo['modalidad']); ?></span>
+    </div>
+    <div class="detalle-item">
+        <span class="detalle-label">Cupo:</span>
+        <span class="detalle-valor"><?php echo $grupo['cupo_maximo']; ?> estudiantes</span>
+    </div>
+    <div class="detalle-item">
+        <span class="detalle-label">Cursos relacionados:</span>
+        <span class="detalle-valor"><?php echo $grupo['total_cursos'] ?? 0; ?></span>
+    </div>
+</div>
 
                         <div class="grupo-acciones">
                             <button class="btn-editar" data-id="<?php echo $grupo['id_grupo']; ?>">
