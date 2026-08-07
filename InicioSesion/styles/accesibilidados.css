@@ -168,3 +168,180 @@ body.texto-grande .footer-card h3 {
 body.texto-grande .footer-card p {
     font-size: 1rem !important;
 }
+
+/* ========================================================= */
+/* SOBRESCRIBIR BOTONES DE ROL Y SUBMIT EN ALTO CONTRASTE   */
+/* ========================================================= */
+
+/* --- FORZAR COLOR EN BOTONES DE ROL --- */
+body.alto-contraste .btn-role {
+    background: transparent !important;
+    border: 2px solid currentColor !important;
+    color: currentColor !important;
+}
+
+body.alto-contraste .btn-role:hover {
+    opacity: 0.8 !important;
+}
+
+body.alto-contraste .btn-role.active {
+    border-color: currentColor !important;
+    color: #ffffff !important;
+}
+
+/* FONDO BLANCO + ROL ACTIVO */
+body.alto-contraste.fondo-blanco .btn-role.active {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+}
+
+/* FONDO NEGRO + ROL ACTIVO */
+body.alto-contraste.fondo-negro .btn-role.active {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+
+/* --- COLOR DE ACENTO EN BOTONES DE ROL ACTIVOS --- */
+body.alto-contraste.color-azul .btn-role.active {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-amarillo .btn-role.active {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-verde .btn-role.active {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-role.active {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-role.active {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-role.active {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+/* --- FORZAR COLOR EN BOTÓN DE INICIAR SESIÓN --- */
+body.alto-contraste .btn-submit-login,
+body.alto-contraste .btn-submit,
+body.alto-contraste button[type="submit"] {
+    border-color: currentColor !important;
+    color: #ffffff !important;
+}
+
+/* FONDO BLANCO + BOTÓN SUBMIT */
+body.alto-contraste.fondo-blanco .btn-submit-login,
+body.alto-contraste.fondo-blanco .btn-submit,
+body.alto-contraste.fondo-blanco button[type="submit"] {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+}
+
+/* FONDO NEGRO + BOTÓN SUBMIT */
+body.alto-contraste.fondo-negro .btn-submit-login,
+body.alto-contraste.fondo-negro .btn-submit,
+body.alto-contraste.fondo-negro button[type="submit"] {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+
+/* --- COLOR DE ACENTO EN BOTÓN SUBMIT --- */
+body.alto-contraste.color-azul .btn-submit-login,
+body.alto-contraste.color-azul .btn-submit,
+body.alto-contraste.color-azul button[type="submit"] {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-amarillo .btn-submit-login,
+body.alto-contraste.color-amarillo .btn-submit,
+body.alto-contraste.color-amarillo button[type="submit"] {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-verde .btn-submit-login,
+body.alto-contraste.color-verde .btn-submit,
+body.alto-contraste.color-verde button[type="submit"] {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-submit-login,
+body.alto-contraste.color-rojo .btn-submit,
+body.alto-contraste.color-rojo button[type="submit"] {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-submit-login,
+body.alto-contraste.color-naranja .btn-submit,
+body.alto-contraste.color-naranja button[type="submit"] {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-submit-login,
+body.alto-contraste.color-morado .btn-submit,
+body.alto-contraste.color-morado button[type="submit"] {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+/* --- FORZAR HOVER EN BOTÓN SUBMIT --- */
+body.alto-contraste .btn-submit-login:hover,
+body.alto-contraste .btn-submit:hover,
+body.alto-contraste button[type="submit"]:hover {
+    opacity: 0.85 !important;
+    transform: scale(1.02) !important;
+}
+
+/* --- FORZAR QUE EL FOCO NO SEA AMARILLO --- */
+body.alto-contraste input:focus,
+body.alto-contraste select:focus,
+body.alto-contraste textarea:focus,
+body.alto-contraste button:focus {
+    outline: 2px solid currentColor !important;
+    outline-offset: 2px !important;
+}
+
+body.alto-contraste.fondo-blanco input:focus,
+body.alto-contraste.fondo-blanco select:focus,
+body.alto-contraste.fondo-blanco textarea:focus,
+body.alto-contraste.fondo-blanco button:focus {
+    outline-color: #000000 !important;
+}
+
+body.alto-contraste.fondo-negro input:focus,
+body.alto-contraste.fondo-negro select:focus,
+body.alto-contraste.fondo-negro textarea:focus,
+body.alto-contraste.fondo-negro button:focus {
+    outline-color: #ffffff !important;
+}
