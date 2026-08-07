@@ -1,38 +1,52 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
+if (!isset($_SESSION['usuario'])) {
     header('Location: ../../InicioSesion/login.php');
     exit;
 }
 
-require_once '../../Conexion/conexion.php';
+// ========================================== */
+// OBTENER DATOS DEL FORMULARIO              */
+// ========================================== */
 
-$id_usuario = $_SESSION['usuario']['id_usuario'];
-
-// Obtener datos del formulario
-$tema = $_POST['tema'] ?? 'claro';
 $idioma = $_POST['idioma'] ?? 'es';
 $tamano_texto = $_POST['tamano_texto'] ?? 'normal';
-$alto_contraste = isset($_POST['alto_contraste']) ? 1 : 0;
 
-// Guardar en la tabla preferencias_accesibilidad
-$stmt = $conexion->prepare("
-    INSERT INTO preferencias_accesibilidad 
-    (id_usuario, modo_oscuro, tamano_texto, alto_contraste, idioma) 
-    VALUES (?, ?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE 
-    modo_oscuro = VALUES(modo_oscuro),
-    tamano_texto = VALUES(tamano_texto),
-    alto_contraste = VALUES(alto_contraste),
-    idioma = VALUES(idioma)
-");
+// ✅ NUEVAS: Preferencias de contraste personalizado
+$contraste_fondo = $_POST['contraste_fondo'] ?? 'negro';
+$contraste_color = $_POST['contraste_color'] ?? 'azul';
 
-$modo_oscuro = ($tema === 'oscuro') ? 1 : 0;
-$stmt->bind_param("issss", $id_usuario, $modo_oscuro, $tamano_texto, $alto_contraste, $idioma);
-$stmt->execute();
-$stmt->close();
+// Mantener modo oscuro desde la sesión (no se modifica aquí)
+$modo_oscuro = $_SESSION['preferencias']['modo_oscuro'] ?? 0;
 
-header('Location: ../configuracion.php?mensaje=Configuración guardada correctamente&tipo=exito');
+// Mantener alto contraste desde la sesión (no se modifica aquí)
+$alto_contraste = $_SESSION['preferencias']['alto_contraste'] ?? 0;
+
+// ========================================== */
+// GUARDAR EN SESIÓN                         */
+// ========================================== */
+
+$_SESSION['preferencias'] = [
+    'modo_oscuro' => $modo_oscuro,
+    'tamano_texto' => $tamano_texto,
+    'alto_contraste' => $alto_contraste,
+    'idioma' => $idioma
+];
+
+// ✅ NUEVAS: Guardar colores de contraste en sesión
+$_SESSION['contraste_fondo'] = $contraste_fondo;
+$_SESSION['contraste_color'] = $contraste_color;
+
+// ========================================== */
+// REDIRIGIR                                 */
+// ========================================== */
+
+$referer = $_SERVER['HTTP_REFERER'] ?? '../configuracion.php';
+if (empty($referer) || strpos($referer, 'procesar_configuracion.php') !== false) {
+    $referer = '../configuracion.php';
+}
+
+header('Location: ' . $referer);
 exit;
 ?>

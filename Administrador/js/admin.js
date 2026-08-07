@@ -129,6 +129,144 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // ========================================== */
+    // MODAL DE PERFIL DEL ADMIN                  */
+    // ========================================== */
+    const modalPerfil = document.getElementById('modalPerfil');
+    const btnPerfil = document.querySelector('.btn-perfil');
+    const cerrarPerfil = document.getElementById('cerrarPerfil');
+    const cancelarPerfil = document.getElementById('cancelarPerfil');
+    const fotoInput = document.getElementById('perfilFotoInput');
+    const avatarImg = document.getElementById('perfilAvatar');
+
+    // Abrir modal al hacer clic en el perfil
+    if (btnPerfil && modalPerfil) {
+        btnPerfil.addEventListener('click', function(e) {
+            modalPerfil.classList.add('active');
+            modalPerfil.style.display = 'flex';
+            if(lectorActivo) leerEnVozAlta('Abriendo perfil de usuario');
+        });
+    }
+
+    // Cerrar modal
+    function cerrarModalPerfil() {
+        if (modalPerfil) {
+            modalPerfil.classList.remove('active');
+            modalPerfil.style.display = 'none';
+        }
+    }
+
+    if (cerrarPerfil) {
+        cerrarPerfil.addEventListener('click', function() {
+            cerrarModalPerfil();
+            if(lectorActivo) leerEnVozAlta('Cerrando perfil');
+        });
+    }
+
+    if (cancelarPerfil) {
+        cancelarPerfil.addEventListener('click', function() {
+            cerrarModalPerfil();
+            if(lectorActivo) leerEnVozAlta('Cerrando perfil');
+        });
+    }
+
+    // Cerrar al hacer clic fuera
+    if (modalPerfil) {
+        modalPerfil.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModalPerfil();
+                if(lectorActivo) leerEnVozAlta('Cerrando perfil');
+            }
+        });
+    }
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalPerfil && modalPerfil.classList.contains('active')) {
+            cerrarModalPerfil();
+            if(lectorActivo) leerEnVozAlta('Cerrando perfil');
+        }
+    });
+
+    // Subir foto de perfil (previsualización)
+    if (fotoInput && avatarImg) {
+        fotoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarImg.src = e.target.result;
+                    if(lectorActivo) leerEnVozAlta('Foto de perfil actualizada');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Enviar formulario de perfil con AJAX
+    const formPerfil = document.getElementById('formPerfil');
+    if (formPerfil) {
+        formPerfil.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('logica/procesar_perfil.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if(lectorActivo) leerEnVozAlta('Perfil actualizado correctamente');
+                    
+                    // Actualizar nombre en el header
+                    const nombreUsuario = document.querySelector('.user-name');
+                    if (nombreUsuario && data.nombre_completo) {
+                        nombreUsuario.textContent = data.nombre_completo;
+                    }
+                    // Actualizar el nombre en el saludo
+                    const adminName = document.querySelector('.admin-name');
+                    if (adminName && data.nombre_completo) {
+                        adminName.textContent = data.nombre_completo;
+                    }
+                    
+                    // Mostrar mensaje y cerrar modal
+                    mostrarMensaje('✅ Perfil actualizado correctamente.');
+                    setTimeout(() => {
+                        cerrarModalPerfil();
+                        location.reload();
+                    }, 1500);
+                } else {
+                    mostrarMensaje('❌ ' + data.mensaje, true);
+                }
+            })
+            .catch(error => {
+                mostrarMensaje('❌ Error al guardar los cambios.', true);
+                console.error(error);
+            });
+        });
+    }
+
+    function mostrarMensaje(texto, esError = false) {
+        const mensaje = document.querySelector('.mensaje');
+        if (mensaje) {
+            mensaje.textContent = texto;
+            mensaje.style.background = esError ? '#fee2e2' : '#dcfce7';
+            mensaje.style.color = esError ? '#991b1b' : '#166534';
+            mensaje.style.borderLeft = esError ? '4px solid #dc2626' : '4px solid #22c55e';
+            mensaje.style.display = 'block';
+            
+            setTimeout(() => {
+                mensaje.style.opacity = '0';
+                setTimeout(() => {
+                    mensaje.style.display = 'none';
+                    mensaje.style.opacity = '1';
+                }, 500);
+            }, 3000);
+        }
+    }
+
 });
 
 // ========================================== */

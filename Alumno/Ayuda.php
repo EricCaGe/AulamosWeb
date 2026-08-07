@@ -1,26 +1,62 @@
 <?php
 session_start();
+
+// Verificar que exista una sesión válida
+if (
+    !isset($_SESSION['usuario']) ||
+    !isset($_SESSION['usuario']['id_usuario'])
+) {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
 require_once '../Conexion/conexion.php';
 
-// Si no hay sesión, usa un ID por defecto (para pruebas)
-$id_usuario = $_SESSION['id_usuario'] ?? 1;
+$id_usuario = (int) $_SESSION['usuario']['id_usuario'];
 
 // =============================================
-// OBTENER DATOS DEL USUARIO (para mostrar nombre si se desea)
+// OBTENER DATOS DEL USUARIO
 // =============================================
-$stmt = $conexion->prepare("SELECT nombre, apellido_paterno FROM usuarios WHERE id_usuario = ?");
+$stmt = $conexion->prepare(
+    "SELECT nombre, apellido_paterno
+     FROM usuarios
+     WHERE id_usuario = ?"
+);
+
+if (!$stmt) {
+    die("Error al preparar la consulta del usuario.");
+}
+
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
+
 $resultado = $stmt->get_result();
 $usuario = $resultado->fetch_assoc();
-$nombre_completo = $usuario ? $usuario['nombre'] . ' ' . $usuario['apellido_paterno'] : 'Estudiante';
+
+$nombre_completo = $usuario
+    ? trim($usuario['nombre'] . ' ' . ($usuario['apellido_paterno'] ?? ''))
+    : 'Estudiante';
+
+$stmt->close();
 
 // =============================================
-// OPCIONAL: Obtener artículos de ayuda desde la BD (tabla centro_ayuda)
+// OBTENER ARTÍCULOS DEL CENTRO DE AYUDA
 // =============================================
-$sqlAyuda = "SELECT * FROM centro_ayuda WHERE activo = 1 ORDER BY fecha_publicacion DESC LIMIT 5";
+$articulosAyuda = [];
+
+$sqlAyuda = "
+    SELECT *
+    FROM centro_ayuda
+    WHERE activo = 1
+    ORDER BY fecha_publicacion DESC
+    LIMIT 5
+";
+
 $resultAyuda = $conexion->query($sqlAyuda);
-$articulosAyuda = $resultAyuda->fetch_all(MYSQLI_ASSOC);
+
+if ($resultAyuda) {
+    $articulosAyuda = $resultAyuda->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -66,7 +102,15 @@ $articulosAyuda = $resultAyuda->fetch_all(MYSQLI_ASSOC);
                 <p>Encuentra respuestas y recursos para ti</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btnAsistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <a
+    href="Chatbot.php"
+    class="btn-assistant"
+    id="btnAsistente"
+    aria-label="Abrir el asistente virtual AulaBot"
+>
+    Asistente Virtual
+    <span class="robot-icon" aria-hidden="true">🤖</span>
+</a>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
                 <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar" class="avatar">
             </div>
@@ -113,7 +157,11 @@ $articulosAyuda = $resultAyuda->fetch_all(MYSQLI_ASSOC);
                         </div>
                         <div class="article-content">
                             <h3><?= htmlspecialchars($articulo['titulo']) ?></h3>
-                            <p><?= htmlspecialchars(substr($articulo['contenido'], 0, 120)) ?>...</p>
+                            <p><?= htmlspecialchars(
+    mb_substr($articulo['contenido'], 0, 120),
+    ENT_QUOTES,
+    'UTF-8'
+) ?>...</p>
                             <span class="article-tag"><?= htmlspecialchars($articulo['tipo']) ?></span>
                         </div>
                         <button class="article-btn">Leer más</button>

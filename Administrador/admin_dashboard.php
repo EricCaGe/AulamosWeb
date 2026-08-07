@@ -8,6 +8,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../Conexion/conexion.php';
+require_once 'includes/preferencias.php';
 
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -54,7 +55,7 @@ $usuarios_recientes = $conexion->query("
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="<?php echo $clases_body; ?>">
 
 <div class="dashboard-container">
     
@@ -65,29 +66,29 @@ $usuarios_recientes = $conexion->query("
         </div>
         
         <nav class="menu">
-            <a href="admin_dashboard.php" class="menu-item active">
+            <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-house"></i> Dashboard
             </a>
-            <a href="ciclos_escolares.php" class="menu-item">
+            <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-calendar"></i> Ciclos escolares
             </a>
-            <a href="periodos.php" class="menu-item">
+            <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-clock"></i> Periodos
             </a>
-            <a href="materias.php" class="menu-item">
+            <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-book"></i> Materias
             </a>
-            <a href="grupos.php" class="menu-item">
+            <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-layer-group"></i> Grupos
             </a>
-            <a href="cursos.php" class="menu-item">
+            <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-cubes"></i> Cursos
             </a>
-            <a href="inscripciones.php" class="menu-item">
+            <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
            
-            <a href="configuracion.php" class="menu-item">
+            <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-gear"></i> Configuración
             </a>
         </nav>
@@ -108,20 +109,24 @@ $usuarios_recientes = $conexion->query("
                 <p>Bienvenido a tu espacio administrativo.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">
+                <!-- ✅ BOTÓN CHATBOT CORREGIDO -->
+                <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
                     <i class="fa-solid fa-comment-dots"></i> Chatbot
                 </button>
+
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-                <button class="btn-accessibility-header">
+
+                <!-- <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
-                </button>
-                <div class="user-profile">
+                </button> -->
+
+                <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
                     <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </div>
+                </a>
                 <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
@@ -251,7 +256,6 @@ $usuarios_recientes = $conexion->query("
 </div>
 
 <script src="js/admin.js"></script>
-<!-- LECTOR DE PANTALLA -->
 <script src="js/lector.js"></script>
 </body>
 </html>

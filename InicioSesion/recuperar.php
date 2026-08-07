@@ -19,12 +19,8 @@
                 <img src="../img/logogeneral.png" alt="Logo AULAMOS" class="logo-img">
             </a>
         </div>
-
-        <!-- Botones a la derecha 
         <div class="nav-buttons">
-            <button type="button" class="btn btn-chatbot" aria-label="Abrir chatbot">
-                <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
-            </button>-->
+            <!-- BOTÓN CHATBOT -->
         </div>
     </header>
 
@@ -39,7 +35,6 @@
                 <h2 style="font-family: Georgia, serif; font-size: 32px; color: #111827; font-weight: bold; margin-bottom: 10px;">Recupera tu cuenta</h2>
                 <p style="font-size: 15px; color: #4b5563; line-height: 1.4;">Ingresa tu correo electrónico y te enviaremos<br>un enlace para restablecer tu contraseña.</p>
             </div>
-
             <div class="illustration-container">
                 <img src="../img/login.png" alt="Estudiantes usando laptop" class="login-illustration">
             </div>
@@ -55,8 +50,9 @@
                         <h2>Recuperar contraseña</h2>
                         <p>Ingresa el correo electrónico asociado a tu cuenta</p>
                     </div>
-                    <button type="button" class="btn-accessibility-round" aria-label="Opciones de accesibilidad">
-                        <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
+                    <!-- ✅ CORREGIDO: id="btnAccesibilidad" -->
+                    <button type="button" class="btn-accessibility-round" id="btnAccesibilidad" aria-label="Opciones de accesibilidad">
+                        <i class="fa-solid fa-universal-access" aria-hidden="true"></i>
                     </button>
                 </div>
 
@@ -118,37 +114,107 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
+    <!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
+    <!-- ========================================== -->
+    <div class="panel-accesibilidad" id="panelAccesibilidad">
+        <div class="panel-header">
+            <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
+            <button class="panel-cerrar" id="cerrarPanel">&times;</button>
+        </div>
+        <div class="panel-body">
+            <!-- ✅ AGREGADO: Botón Personalizar alto contraste -->
+            <button class="btn-accesibilidad-opcion" id="btnPersonalizarContraste">
+                <i class="fa-solid fa-palette"></i> Personalizar alto contraste
+                <span class="badge-nuevo">Nuevo</span>
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
+                <i class="fa-solid fa-moon"></i> Modo oscuro
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
+                <i class="fa-solid fa-eye"></i> Alto contraste
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
+                <i class="fa-solid fa-text-height"></i> Texto grande
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
+                <i class="fa-solid fa-volume-high"></i> Lector de pantalla
+            </button>
+            <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
+                <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ✅ AGREGADO: MODAL PERSONALIZAR ALTO CONTRASTE -->
+    <!-- ========================================== -->
+    <div class="modal-overlay" id="modalContraste">
+        <div class="modal-content modal-contraste">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-palette"></i> Personalizar alto contraste</h3>
+                <button class="modal-cerrar" id="cerrarModalContraste">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Elige el fondo y el color de acento para el modo alto contraste.</p>
+                
+                <div class="opcion-grupo">
+                    <label class="opcion-label">Fondo</label>
+                    <div class="opciones-botones">
+                        <button class="btn-opt fondo-blanco" data-fondo="blanco">
+                            <span class="preview" style="background:#ffffff; border:2px solid #333;"></span> Blanco
+                        </button>
+                        <button class="btn-opt fondo-negro" data-fondo="negro">
+                            <span class="preview" style="background:#000000; border:2px solid #333;"></span> Negro
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="opcion-grupo">
+                    <label class="opcion-label">Color de acento</label>
+                    <div class="opciones-botones">
+                        <button class="btn-opt acento-azul" data-color="azul">
+                            <span class="preview" style="background:#3b82f6;"></span> Azul
+                        </button>
+                        <button class="btn-opt acento-amarillo" data-color="amarillo">
+                            <span class="preview" style="background:#eab308;"></span> Amarillo
+                        </button>
+                        <button class="btn-opt acento-verde" data-color="verde">
+                            <span class="preview" style="background:#22c55e;"></span> Verde
+                        </button>
+                        <button class="btn-opt acento-rojo" data-color="rojo">
+                            <span class="preview" style="background:#ef4444;"></span> Rojo
+                        </button>
+                        <button class="btn-opt acento-naranja" data-color="naranja">
+                            <span class="preview" style="background:#f97316;"></span> Naranja
+                        </button>
+                        <button class="btn-opt acento-morado" data-color="morado">
+                            <span class="preview" style="background:#8b5cf6;"></span> Morado
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="vista-previa" id="vistaPrevia">
+                    <p class="vista-titulo">Vista previa</p>
+                    <div class="vista-ejemplo">
+                        <span class="vista-texto">Texto de ejemplo</span>
+                        <button class="vista-boton">Botón</button>
+                        <span class="vista-badge">Activo</span>
+                    </div>
+                </div>
+                
+                <div class="modal-acciones">
+                    <button class="btn-cancelar-modal" id="cancelarContraste">Cancelar</button>
+                    <button class="btn-aplicar-modal" id="aplicarContraste">Aplicar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCRIPTS                                    -->
     <!-- ========================================== -->
     <script src="js/recuperar.js"></script>
-<!-- ========================================== -->
-<!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
-<!-- ========================================== -->
-<div class="panel-accesibilidad" id="panelAccesibilidad">
-    <div class="panel-header">
-        <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
-        <button class="panel-cerrar" id="cerrarPanel">&times;</button>
-    </div>
-    <div class="panel-body">
-        <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
-            <i class="fa-solid fa-moon"></i> Modo oscuro
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
-            <i class="fa-solid fa-eye"></i> Alto contraste
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
-            <i class="fa-solid fa-text-height"></i> Texto grande
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
-            <i class="fa-solid fa-volume-high"></i> Lector de pantalla
-        </button>
-        <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
-            <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
-        </button>
-    </div>
-</div>
-
-<script src="js/accesibilidad.js"></script>
-<script src="js/lector.js"></script>
+    <script src="js/accesibilidad.js"></script>
+    <script src="js/lector.js"></script>
 </body>
 </html>

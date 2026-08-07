@@ -7,6 +7,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../Conexion/conexion.php';
+require_once 'includes/preferencias.php';
 
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -48,7 +49,7 @@ $tipo = $_GET['tipo'] ?? '';
     <link rel="stylesheet" href="styles/ciclos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="<?php echo $clases_body; ?>">
 
 <div class="dashboard-container">
     
@@ -95,31 +96,32 @@ $tipo = $_GET['tipo'] ?? '';
     <main class="main-content">
         
         <!-- ENCABEZADO -->
-        <header class="content-header">
-            <div class="welcome-text">
-                <h1>Ciclos escolares</h1>
-                <p>Administración académica</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">
+        <!-- ENCABEZADO -->
+<header class="content-header">
+    <div class="welcome-text">
+        <h1>Ciclos escolares</h1>
+        <p>Administración académica</p>
+    </div>
+    <div class="header-actions">
+        <!-- <button class="btn-assistant" id="btn-asistente">
                     <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button>
-                <div class="icon-bell">
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-                <button class="btn-accessibility-header">
+                </button> -->
+        <div class="icon-bell">
+            <i class="fa-regular fa-bell"></i>
+        </div>
+        <!--  <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
-                </button>
-                <div class="user-profile">
-                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </div>
-                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </header>
+                </button>-->
+        <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
+            <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
+            <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+            <i class="fa-solid fa-chevron-down drop-icon"></i>
+        </a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+    </div>
+</header>
 
         <!-- MENSAJES -->
         <?php if ($mensaje): ?>

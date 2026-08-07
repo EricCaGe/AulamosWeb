@@ -2089,3 +2089,327 @@ body.modo-oscuro .detalle-valor {
         gap: 8px;
     }
 }
+
+
+
+
+/* =========================================================
+   MODAL DE PERFIL DEL ADMIN
+   ========================================================= */
+
+.perfil-modal {
+    max-width: 550px !important;
+}
+
+.perfil-foto-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.perfil-foto {
+    position: relative;
+    display: inline-block;
+}
+
+.perfil-foto img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e2e8f0;
+    transition: border-color 0.3s;
+}
+
+.perfil-foto:hover img {
+    border-color: #3b71f3;
+}
+
+.btn-cambiar-foto {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #3b71f3;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(59, 113, 243, 0.3);
+}
+
+.btn-cambiar-foto:hover {
+    background: #2563eb;
+}
+
+.perfil-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.perfil-campos .form-group:nth-child(4) {
+    grid-column: 1 / -1;
+}
+
+.perfil-campos .form-group:nth-child(5) {
+    grid-column: 1 / -1;
+}
+
+.perfil-campos .form-group input[readonly] {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.perfil-campos .help-text {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.perfil-modal .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.perfil-modal .btn-guardar {
+    background: #3b71f3;
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.perfil-modal .btn-guardar:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(59, 113, 243, 0.35);
+}
+
+.perfil-modal .btn-cancelar {
+    background: #f1f5f9;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.perfil-modal .btn-cancelar:hover {
+    background: #e2e8f0;
+}
+
+/* Modo oscuro */
+body.modo-oscuro .perfil-foto img {
+    border-color: #334155;
+}
+
+body.modo-oscuro .perfil-foto:hover img {
+    border-color: #3b71f3;
+}
+
+body.modo-oscuro .perfil-campos .form-group input[readonly] {
+    background-color: #2d2d44;
+    color: #64748b;
+}
+
+body.modo-oscuro .perfil-modal .form-actions {
+    border-color: #334155;
+}
+
+body.modo-oscuro .perfil-modal .btn-cancelar {
+    background: #334155;
+    color: #94a3b8;
+}
+
+body.modo-oscuro .perfil-modal .btn-cancelar:hover {
+    background: #475569;
+    color: #e2e8f0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .perfil-campos {
+        grid-template-columns: 1fr;
+    }
+    
+    .perfil-modal .form-actions {
+        flex-direction: column;
+    }
+    
+    .perfil-modal .btn-guardar,
+    .perfil-modal .btn-cancelar {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =========================================================
+   ALTO CONTRASTE PARA ADMINISTRADOR
+   ========================================================= */
+
+/* --- FONDO NEGRO --- */
+body.alto-contraste.fondo-negro,
+body.alto-contraste.fondo-negro .dashboard-container,
+body.alto-contraste.fondo-negro .sidebar,
+body.alto-contraste.fondo-negro .main-content,
+body.alto-contraste.fondo-negro .content-header,
+body.alto-contraste.fondo-negro .config-card,
+body.alto-contraste.fondo-negro .config-header,
+body.alto-contraste.fondo-negro .welcome-text,
+body.alto-contraste.fondo-negro .accessibility-bar,
+body.alto-contraste.fondo-negro .form-group,
+body.alto-contraste.fondo-negro .form-actions,
+body.alto-contraste.fondo-negro .radio-group label,
+body.alto-contraste.fondo-negro .menu-item,
+body.alto-contraste.fondo-negro .stat-box,
+body.alto-contraste.fondo-negro .quick-btn,
+body.alto-contraste.fondo-negro .gestion-card {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro h1,
+body.alto-contraste.fondo-negro h2,
+body.alto-contraste.fondo-negro h3,
+body.alto-contraste.fondo-negro h4,
+body.alto-contraste.fondo-negro p,
+body.alto-contraste.fondo-negro label,
+body.alto-contraste.fondo-negro span,
+body.alto-contraste.fondo-negro .config-header h3,
+body.alto-contraste.fondo-negro .stat-label,
+body.alto-contraste.fondo-negro .stat-number,
+body.alto-contraste.fondo-negro .welcome-text h1,
+body.alto-contraste.fondo-negro .welcome-text p,
+body.alto-contraste.fondo-negro .menu-item {
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro .menu-item:hover,
+body.alto-contraste.fondo-negro .menu-item.active {
+    background: #333333 !important;
+    color: #ffffff !important;
+}
+
+/* --- FONDO BLANCO --- */
+body.alto-contraste.fondo-blanco,
+body.alto-contraste.fondo-blanco .dashboard-container,
+body.alto-contraste.fondo-blanco .sidebar,
+body.alto-contraste.fondo-blanco .main-content,
+body.alto-contraste.fondo-blanco .content-header,
+body.alto-contraste.fondo-blanco .config-card,
+body.alto-contraste.fondo-blanco .config-header,
+body.alto-contraste.fondo-blanco .welcome-text,
+body.alto-contraste.fondo-blanco .accessibility-bar,
+body.alto-contraste.fondo-blanco .form-group,
+body.alto-contraste.fondo-blanco .form-actions,
+body.alto-contraste.fondo-blanco .radio-group label,
+body.alto-contraste.fondo-blanco .menu-item,
+body.alto-contraste.fondo-blanco .stat-box,
+body.alto-contraste.fondo-blanco .quick-btn,
+body.alto-contraste.fondo-blanco .gestion-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco h1,
+body.alto-contraste.fondo-blanco h2,
+body.alto-contraste.fondo-blanco h3,
+body.alto-contraste.fondo-blanco h4,
+body.alto-contraste.fondo-blanco p,
+body.alto-contraste.fondo-blanco label,
+body.alto-contraste.fondo-blanco span,
+body.alto-contraste.fondo-blanco .config-header h3,
+body.alto-contraste.fondo-blanco .stat-label,
+body.alto-contraste.fondo-blanco .stat-number,
+body.alto-contraste.fondo-blanco .welcome-text h1,
+body.alto-contraste.fondo-blanco .welcome-text p,
+body.alto-contraste.fondo-blanco .menu-item {
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco .menu-item:hover,
+body.alto-contraste.fondo-blanco .menu-item.active {
+    background: #e5e5e5 !important;
+    color: #000000 !important;
+}
+
+/* --- COLORES DE ACENTO PARA BOTONES --- */
+body.alto-contraste.color-azul .btn-guardar,
+body.alto-contraste.color-azul .btn-submit-login,
+body.alto-contraste.color-azul .btn-agregar,
+body.alto-contraste.color-azul .btn-primary,
+body.alto-contraste.color-azul .btn-success {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-amarillo .btn-guardar,
+body.alto-contraste.color-amarillo .btn-submit-login,
+body.alto-contraste.color-amarillo .btn-agregar,
+body.alto-contraste.color-amarillo .btn-primary,
+body.alto-contraste.color-amarillo .btn-success {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-verde .btn-guardar,
+body.alto-contraste.color-verde .btn-submit-login,
+body.alto-contraste.color-verde .btn-agregar,
+body.alto-contraste.color-verde .btn-primary,
+body.alto-contraste.color-verde .btn-success {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-guardar,
+body.alto-contraste.color-rojo .btn-submit-login,
+body.alto-contraste.color-rojo .btn-agregar,
+body.alto-contraste.color-rojo .btn-primary,
+body.alto-contraste.color-rojo .btn-success {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-guardar,
+body.alto-contraste.color-naranja .btn-submit-login,
+body.alto-contraste.color-naranja .btn-agregar,
+body.alto-contraste.color-naranja .btn-primary,
+body.alto-contraste.color-naranja .btn-success {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-guardar,
+body.alto-contraste.color-morado .btn-submit-login,
+body.alto-contraste.color-morado .btn-agregar,
+body.alto-contraste.color-morado .btn-primary,
+body.alto-contraste.color-morado .btn-success {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}

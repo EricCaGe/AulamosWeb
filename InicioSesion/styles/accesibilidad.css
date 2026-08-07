@@ -100,14 +100,6 @@
     overflow-y: auto;
 }
 
-.panel-descripcion {
-    font-size: 13px;
-    color: #6b7280;
-    padding: 0 16px 12px;
-    margin: 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
 .btn-accesibilidad-opcion {
     padding: 12px 16px;
     border: 2px solid #e2e8f0;
@@ -166,14 +158,281 @@
     color: #ef4444;
 }
 
-/* Modo oscuro del panel */
-body.modo-oscuro .panel-accesibilidad {
-    background: #1e1e32;
-    border-color: #334155;
+.badge-nuevo {
+    background: #ef4444;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: auto;
+    animation: pulse 2s infinite;
 }
 
-body.modo-oscuro .panel-accesibilidad .panel-descripcion {
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+#btnPersonalizarContraste {
+    border: 2px dashed #5a189a;
+    background: #faf5ff;
+    position: relative;
+}
+
+#btnPersonalizarContraste:hover {
+    background: #f3e8ff;
+}
+
+body.modo-oscuro #btnPersonalizarContraste {
+    border-color: #5a189a;
+    background: #2d2d44;
+}
+
+/* =========================================================
+   MODAL PERSONALIZAR ALTO CONTRASTE
+   ========================================================= */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+    display: flex !important;
+}
+
+.modal-contraste {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 0;
+    max-width: 500px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: modalEntrada 0.3s ease;
+}
+
+@keyframes modalEntrada {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-contraste .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    background: #5a189a;
+    color: white;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-contraste .modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-contraste .modal-cerrar {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+}
+
+.modal-contraste .modal-cerrar:hover {
+    transform: rotate(90deg);
+    transition: transform 0.3s;
+}
+
+.modal-contraste .modal-body {
+    padding: 24px;
+}
+
+.modal-desc {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 20px 0;
+}
+
+.opcion-grupo {
+    margin-bottom: 20px;
+}
+
+.opcion-label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.opciones-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.btn-opt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-opt:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    transform: scale(1.03);
+}
+
+.btn-opt.active {
+    border-color: #5a189a;
+    background: #f3e8ff;
+    box-shadow: 0 0 0 3px rgba(90, 24, 154, 0.2);
+}
+
+.btn-opt .preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.vista-previa {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.vista-titulo {
+    font-size: 12px;
+    font-weight: 600;
     color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 12px 0;
+}
+
+.vista-ejemplo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.vista-texto {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.vista-boton {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #5a189a;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.vista-badge {
+    padding: 4px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #22c55e;
+    color: white;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancelar-modal {
+    padding: 10px 28px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: transparent;
+    font-weight: 600;
+    font-size: 14px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancelar-modal:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.btn-aplicar-modal {
+    padding: 10px 32px;
+    border: none;
+    border-radius: 10px;
+    background: #5a189a;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-aplicar-modal:hover {
+    background: #3b0764;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(90, 24, 154, 0.35);
+}
+
+/* =========================================================
+   MODO OSCURO
+   ========================================================= */
+
+body.modo-oscuro .panel-accesibilidad {
+    background: #1e1e32;
     border-color: #334155;
 }
 
@@ -198,7 +457,529 @@ body.modo-oscuro .btn-accesibilidad-opcion.active {
     color: #d4b0f7;
 }
 
-/* Responsive */
+body.modo-oscuro .modal-contraste {
+    background: #1e1e32;
+}
+
+body.modo-oscuro .modal-contraste .modal-body {
+    background: #1e1e32;
+}
+
+body.modo-oscuro .opcion-label {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .btn-opt {
+    background: #2d2d44;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .btn-opt:hover {
+    background: #3d3d5c;
+    border-color: #4a4a6a;
+}
+
+body.modo-oscuro .btn-opt.active {
+    border-color: #5a189a;
+    background: #3b0764;
+}
+
+body.modo-oscuro .modal-desc {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .vista-previa {
+    background: #2d2d44;
+    border-color: #334155;
+}
+
+body.modo-oscuro .modal-acciones {
+    border-color: #334155;
+}
+
+body.modo-oscuro .btn-cancelar-modal {
+    color: #94a3b8;
+    border-color: #334155;
+}
+
+body.modo-oscuro .btn-cancelar-modal:hover {
+    background: #3d3d5c;
+}
+
+/* =========================================================
+   ALTO CONTRASTE PERSONALIZADO - COMPLETO
+   ========================================================= */
+
+/* --- FONDO NEGRO --- */
+body.alto-contraste.fondo-negro {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro .sidebar,
+body.alto-contraste.fondo-negro .main-content,
+body.alto-contraste.fondo-negro .dashboard-container,
+body.alto-contraste.fondo-negro .content-header,
+body.alto-contraste.fondo-negro .config-card,
+body.alto-contraste.fondo-negro .ciclo-card,
+body.alto-contraste.fondo-negro .periodo-card,
+body.alto-contraste.fondo-negro .card,
+body.alto-contraste.fondo-negro .modal-content,
+body.alto-contraste.fondo-negro .panel-accesibilidad,
+body.alto-contraste.fondo-negro .resumen-card,
+body.alto-contraste.fondo-negro .stats-grid .stat-card,
+body.alto-contraste.fondo-negro .welcome-text,
+body.alto-contraste.fondo-negro .resumen-info,
+body.alto-contraste.fondo-negro .panel-body,
+body.alto-contraste.fondo-negro .modal-body,
+body.alto-contraste.fondo-negro .modal-contraste {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro h1,
+body.alto-contraste.fondo-negro h2,
+body.alto-contraste.fondo-negro h3,
+body.alto-contraste.fondo-negro h4,
+body.alto-contraste.fondo-negro h5,
+body.alto-contraste.fondo-negro h6,
+body.alto-contraste.fondo-negro p,
+body.alto-contraste.fondo-negro label,
+body.alto-contraste.fondo-negro span,
+body.alto-contraste.fondo-negro div,
+body.alto-contraste.fondo-negro .texto,
+body.alto-contraste.fondo-negro .welcome-text h1,
+body.alto-contraste.fondo-negro .welcome-text p,
+body.alto-contraste.fondo-negro .resumen-titulo,
+body.alto-contraste.fondo-negro .resumen-sub,
+body.alto-contraste.fondo-negro .ciclo-nombre,
+body.alto-contraste.fondo-negro .periodo-nombre,
+body.alto-contraste.fondo-negro .stat-numero,
+body.alto-contraste.fondo-negro .stat-etiqueta {
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro .menu-item {
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro .menu-item:hover {
+    background: #333333 !important;
+}
+
+body.alto-contraste.fondo-negro .menu-item.active {
+    background: #333333 !important;
+    color: #ffffff !important;
+}
+
+/* --- FONDO BLANCO --- */
+body.alto-contraste.fondo-blanco {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco .sidebar,
+body.alto-contraste.fondo-blanco .main-content,
+body.alto-contraste.fondo-blanco .dashboard-container,
+body.alto-contraste.fondo-blanco .content-header,
+body.alto-contraste.fondo-blanco .config-card,
+body.alto-contraste.fondo-blanco .ciclo-card,
+body.alto-contraste.fondo-blanco .periodo-card,
+body.alto-contraste.fondo-blanco .card,
+body.alto-contraste.fondo-blanco .modal-content,
+body.alto-contraste.fondo-blanco .panel-accesibilidad,
+body.alto-contraste.fondo-blanco .resumen-card,
+body.alto-contraste.fondo-blanco .stats-grid .stat-card,
+body.alto-contraste.fondo-blanco .welcome-text,
+body.alto-contraste.fondo-blanco .resumen-info,
+body.alto-contraste.fondo-blanco .panel-body,
+body.alto-contraste.fondo-blanco .modal-body,
+body.alto-contraste.fondo-blanco .modal-contraste {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco h1,
+body.alto-contraste.fondo-blanco h2,
+body.alto-contraste.fondo-blanco h3,
+body.alto-contraste.fondo-blanco h4,
+body.alto-contraste.fondo-blanco h5,
+body.alto-contraste.fondo-blanco h6,
+body.alto-contraste.fondo-blanco p,
+body.alto-contraste.fondo-blanco label,
+body.alto-contraste.fondo-blanco span,
+body.alto-contraste.fondo-blanco div,
+body.alto-contraste.fondo-blanco .texto,
+body.alto-contraste.fondo-blanco .welcome-text h1,
+body.alto-contraste.fondo-blanco .welcome-text p,
+body.alto-contraste.fondo-blanco .resumen-titulo,
+body.alto-contraste.fondo-blanco .resumen-sub,
+body.alto-contraste.fondo-blanco .ciclo-nombre,
+body.alto-contraste.fondo-blanco .periodo-nombre,
+body.alto-contraste.fondo-blanco .stat-numero,
+body.alto-contraste.fondo-blanco .stat-etiqueta {
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco .menu-item {
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco .menu-item:hover {
+    background: #e5e5e5 !important;
+}
+
+body.alto-contraste.fondo-blanco .menu-item.active {
+    background: #e5e5e5 !important;
+    color: #000000 !important;
+}
+
+/* --- BORDES Y LÍNEAS --- */
+body.alto-contraste .borde,
+body.alto-contraste .border,
+body.alto-contraste hr,
+body.alto-contraste .separator,
+body.alto-contraste .divider,
+body.alto-contraste .linea,
+body.alto-contraste .sidebar,
+body.alto-contraste .menu-item,
+body.alto-contraste .config-card,
+body.alto-contraste .ciclo-card,
+body.alto-contraste .periodo-card,
+body.alto-contraste .card,
+body.alto-contraste .modal-content,
+body.alto-contraste .panel-accesibilidad,
+body.alto-contraste .content-header,
+body.alto-contraste .resumen-card,
+body.alto-contraste .stats-grid .stat-card,
+body.alto-contraste .form-group input,
+body.alto-contraste .form-group textarea,
+body.alto-contraste .form-group select,
+body.alto-contraste .ciclo-fechas,
+body.alto-contraste .periodo-fechas,
+body.alto-contraste .modal-acciones,
+body.alto-contraste .form-actions,
+body.alto-contraste .btn-accesibilidad-opcion,
+body.alto-contraste .btn-opt,
+body.alto-contraste .vista-previa,
+body.alto-contraste .modal-header,
+body.alto-contraste .panel-header {
+    border-color: currentColor !important;
+}
+
+body.alto-contraste .btn-accesibilidad-opcion i,
+body.alto-contraste .fa-solid,
+body.alto-contraste .fa-regular,
+body.alto-contraste .fa-brands {
+    color: currentColor !important;
+}
+
+/* --- COLORES DE ACENTO - AZUL --- */
+body.alto-contraste.color-azul .btn-guardar,
+body.alto-contraste.color-azul .btn-agregar,
+body.alto-contraste.color-azul .btn-accessibility-round,
+body.alto-contraste.color-azul .btn-nuevo-periodo,
+body.alto-contraste.color-azul .btn-aplicar-modal,
+body.alto-contraste.color-azul .btn-primary,
+body.alto-contraste.color-azul .btn-success,
+body.alto-contraste.color-azul .btn-editar,
+body.alto-contraste.color-azul .btn-activar,
+body.alto-contraste.color-azul .btn-cerrar,
+body.alto-contraste.color-azul .btn-inactivar,
+body.alto-contraste.color-azul .btn-guardar-cambios,
+body.alto-contraste.color-azul .btn-submit {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-azul .badge-activo,
+body.alto-contraste.color-azul .badge-success,
+body.alto-contraste.color-azul .badge {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-azul .panel-header,
+body.alto-contraste.color-azul .modal-header,
+body.alto-contraste.color-azul .sidebar .logo-section {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-azul .btn-accesibilidad-opcion.active {
+    border-color: #1d4ed8 !important;
+    background: #dbeafe !important;
+    color: #1e3a8a !important;
+}
+
+body.alto-contraste.color-azul .btn-opt.active {
+    border-color: #1d4ed8 !important;
+    background: #dbeafe !important;
+}
+
+/* --- COLORES DE ACENTO - AMARILLO --- */
+body.alto-contraste.color-amarillo .btn-guardar,
+body.alto-contraste.color-amarillo .btn-agregar,
+body.alto-contraste.color-amarillo .btn-accessibility-round,
+body.alto-contraste.color-amarillo .btn-nuevo-periodo,
+body.alto-contraste.color-amarillo .btn-aplicar-modal,
+body.alto-contraste.color-amarillo .btn-primary,
+body.alto-contraste.color-amarillo .btn-success,
+body.alto-contraste.color-amarillo .btn-editar,
+body.alto-contraste.color-amarillo .btn-activar,
+body.alto-contraste.color-amarillo .btn-cerrar,
+body.alto-contraste.color-amarillo .btn-inactivar,
+body.alto-contraste.color-amarillo .btn-guardar-cambios,
+body.alto-contraste.color-amarillo .btn-submit {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-amarillo .badge-activo,
+body.alto-contraste.color-amarillo .badge-success,
+body.alto-contraste.color-amarillo .badge {
+    background: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-amarillo .panel-header,
+body.alto-contraste.color-amarillo .modal-header,
+body.alto-contraste.color-amarillo .sidebar .logo-section {
+    background: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-amarillo .btn-accesibilidad-opcion.active {
+    border-color: #ca8a04 !important;
+    background: #fef9c3 !important;
+    color: #713f12 !important;
+}
+
+body.alto-contraste.color-amarillo .btn-opt.active {
+    border-color: #ca8a04 !important;
+    background: #fef9c3 !important;
+}
+
+/* --- COLORES DE ACENTO - VERDE --- */
+body.alto-contraste.color-verde .btn-guardar,
+body.alto-contraste.color-verde .btn-agregar,
+body.alto-contraste.color-verde .btn-accessibility-round,
+body.alto-contraste.color-verde .btn-nuevo-periodo,
+body.alto-contraste.color-verde .btn-aplicar-modal,
+body.alto-contraste.color-verde .btn-primary,
+body.alto-contraste.color-verde .btn-success,
+body.alto-contraste.color-verde .btn-editar,
+body.alto-contraste.color-verde .btn-activar,
+body.alto-contraste.color-verde .btn-cerrar,
+body.alto-contraste.color-verde .btn-inactivar,
+body.alto-contraste.color-verde .btn-guardar-cambios,
+body.alto-contraste.color-verde .btn-submit {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-verde .badge-activo,
+body.alto-contraste.color-verde .badge-success,
+body.alto-contraste.color-verde .badge {
+    background: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-verde .panel-header,
+body.alto-contraste.color-verde .modal-header,
+body.alto-contraste.color-verde .sidebar .logo-section {
+    background: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-verde .btn-accesibilidad-opcion.active {
+    border-color: #15803d !important;
+    background: #dcfce7 !important;
+    color: #14532d !important;
+}
+
+body.alto-contraste.color-verde .btn-opt.active {
+    border-color: #15803d !important;
+    background: #dcfce7 !important;
+}
+
+/* --- COLORES DE ACENTO - ROJO --- */
+body.alto-contraste.color-rojo .btn-guardar,
+body.alto-contraste.color-rojo .btn-agregar,
+body.alto-contraste.color-rojo .btn-accessibility-round,
+body.alto-contraste.color-rojo .btn-nuevo-periodo,
+body.alto-contraste.color-rojo .btn-aplicar-modal,
+body.alto-contraste.color-rojo .btn-primary,
+body.alto-contraste.color-rojo .btn-success,
+body.alto-contraste.color-rojo .btn-editar,
+body.alto-contraste.color-rojo .btn-activar,
+body.alto-contraste.color-rojo .btn-cerrar,
+body.alto-contraste.color-rojo .btn-inactivar,
+body.alto-contraste.color-rojo .btn-guardar-cambios,
+body.alto-contraste.color-rojo .btn-submit {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .badge-activo,
+body.alto-contraste.color-rojo .badge-success,
+body.alto-contraste.color-rojo .badge {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .panel-header,
+body.alto-contraste.color-rojo .modal-header,
+body.alto-contraste.color-rojo .sidebar .logo-section {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-accesibilidad-opcion.active {
+    border-color: #b91c1c !important;
+    background: #fecaca !important;
+    color: #7f1d1d !important;
+}
+
+body.alto-contraste.color-rojo .btn-opt.active {
+    border-color: #b91c1c !important;
+    background: #fecaca !important;
+}
+
+/* --- COLORES DE ACENTO - NARANJA --- */
+body.alto-contraste.color-naranja .btn-guardar,
+body.alto-contraste.color-naranja .btn-agregar,
+body.alto-contraste.color-naranja .btn-accessibility-round,
+body.alto-contraste.color-naranja .btn-nuevo-periodo,
+body.alto-contraste.color-naranja .btn-aplicar-modal,
+body.alto-contraste.color-naranja .btn-primary,
+body.alto-contraste.color-naranja .btn-success,
+body.alto-contraste.color-naranja .btn-editar,
+body.alto-contraste.color-naranja .btn-activar,
+body.alto-contraste.color-naranja .btn-cerrar,
+body.alto-contraste.color-naranja .btn-inactivar,
+body.alto-contraste.color-naranja .btn-guardar-cambios,
+body.alto-contraste.color-naranja .btn-submit {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .badge-activo,
+body.alto-contraste.color-naranja .badge-success,
+body.alto-contraste.color-naranja .badge {
+    background: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .panel-header,
+body.alto-contraste.color-naranja .modal-header,
+body.alto-contraste.color-naranja .sidebar .logo-section {
+    background: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-accesibilidad-opcion.active {
+    border-color: #ea580c !important;
+    background: #ffedd5 !important;
+    color: #9a3412 !important;
+}
+
+body.alto-contraste.color-naranja .btn-opt.active {
+    border-color: #ea580c !important;
+    background: #ffedd5 !important;
+}
+
+/* --- COLORES DE ACENTO - MORADO --- */
+body.alto-contraste.color-morado .btn-guardar,
+body.alto-contraste.color-morado .btn-agregar,
+body.alto-contraste.color-morado .btn-accessibility-round,
+body.alto-contraste.color-morado .btn-nuevo-periodo,
+body.alto-contraste.color-morado .btn-aplicar-modal,
+body.alto-contraste.color-morado .btn-primary,
+body.alto-contraste.color-morado .btn-success,
+body.alto-contraste.color-morado .btn-editar,
+body.alto-contraste.color-morado .btn-activar,
+body.alto-contraste.color-morado .btn-cerrar,
+body.alto-contraste.color-morado .btn-inactivar,
+body.alto-contraste.color-morado .btn-guardar-cambios,
+body.alto-contraste.color-morado .btn-submit {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .badge-activo,
+body.alto-contraste.color-morado .badge-success,
+body.alto-contraste.color-morado .badge {
+    background: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .panel-header,
+body.alto-contraste.color-morado .modal-header,
+body.alto-contraste.color-morado .sidebar .logo-section {
+    background: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-accesibilidad-opcion.active {
+    border-color: #7c3aed !important;
+    background: #ede9fe !important;
+    color: #4c1d95 !important;
+}
+
+body.alto-contraste.color-morado .btn-opt.active {
+    border-color: #7c3aed !important;
+    background: #ede9fe !important;
+}
+
+/* --- COLORES DE ACENTO EN BADGES Y ETIQUETAS --- */
+body.alto-contraste.color-azul .badge-activo,
+body.alto-contraste.color-azul .badge-success {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-amarillo .badge-activo,
+body.alto-contraste.color-amarillo .badge-success {
+    background: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-verde .badge-activo,
+body.alto-contraste.color-verde .badge-success {
+    background: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .badge-activo,
+body.alto-contraste.color-rojo .badge-success {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .badge-activo,
+body.alto-contraste.color-naranja .badge-success {
+    background: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .badge-activo,
+body.alto-contraste.color-morado .badge-success {
+    background: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
 @media (max-width: 480px) {
     .panel-accesibilidad {
         width: calc(100% - 40px);
@@ -213,4 +994,852 @@ body.modo-oscuro .btn-accesibilidad-opcion.active {
         left: 20px;
         bottom: 20px;
     }
+    
+    .modal-contraste {
+        max-width: 100%;
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .opciones-botones {
+        gap: 6px;
+    }
+    
+    .btn-opt {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .btn-opt .preview {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .modal-acciones {
+        flex-direction: column;
+    }
+    
+    .btn-cancelar-modal,
+    .btn-aplicar-modal {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* ========================================================= */
+/* SOBRESCRIBIR ALTO CONTRASTE POR DEFECTO                   */
+/* ========================================================= */
+
+/* --- FONDO BLANCO --- */
+body.alto-contraste.fondo-blanco .sidebar,
+body.alto-contraste.fondo-blanco .main-content,
+body.alto-contraste.fondo-blanco .dashboard-container,
+body.alto-contraste.fondo-blanco .content-header,
+body.alto-contraste.fondo-blanco .welcome-text,
+body.alto-contraste.fondo-blanco .resumen-card,
+body.alto-contraste.fondo-blanco .resumen-info,
+body.alto-contraste.fondo-blanco .config-card,
+body.alto-contraste.fondo-blanco .ciclo-card,
+body.alto-contraste.fondo-blanco .periodo-card,
+body.alto-contraste.fondo-blanco .card {
+    background: #ffffff !important;
+    border-color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco h1,
+body.alto-contraste.fondo-blanco h2,
+body.alto-contraste.fondo-blanco h3,
+body.alto-contraste.fondo-blanco h4,
+body.alto-contraste.fondo-blanco p,
+body.alto-contraste.fondo-blanco label,
+body.alto-contraste.fondo-blanco span,
+body.alto-contraste.fondo-blanco .texto,
+body.alto-contraste.fondo-blanco .welcome-text h1,
+body.alto-contraste.fondo-blanco .welcome-text p,
+body.alto-contraste.fondo-blanco .resumen-titulo,
+body.alto-contraste.fondo-blanco .resumen-sub {
+    color: #000000 !important;
+}
+
+/* --- FONDO NEGRO --- */
+body.alto-contraste.fondo-negro .sidebar,
+body.alto-contraste.fondo-negro .main-content,
+body.alto-contraste.fondo-negro .dashboard-container,
+body.alto-contraste.fondo-negro .content-header,
+body.alto-contraste.fondo-negro .welcome-text,
+body.alto-contraste.fondo-negro .resumen-card,
+body.alto-contraste.fondo-negro .resumen-info,
+body.alto-contraste.fondo-negro .config-card,
+body.alto-contraste.fondo-negro .ciclo-card,
+body.alto-contraste.fondo-negro .periodo-card,
+body.alto-contraste.fondo-negro .card {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro h1,
+body.alto-contraste.fondo-negro h2,
+body.alto-contraste.fondo-negro h3,
+body.alto-contraste.fondo-negro h4,
+body.alto-contraste.fondo-negro p,
+body.alto-contraste.fondo-negro label,
+body.alto-contraste.fondo-negro span,
+body.alto-contraste.fondo-negro .texto,
+body.alto-contraste.fondo-negro .welcome-text h1,
+body.alto-contraste.fondo-negro .welcome-text p,
+body.alto-contraste.fondo-negro .resumen-titulo,
+body.alto-contraste.fondo-negro .resumen-sub {
+    color: #ffffff !important;
+}
+
+/* --- COLORES DE ACENTO PARA BORDES Y LÍNEAS --- */
+
+/* AZUL */
+body.alto-contraste.color-azul .sidebar,
+body.alto-contraste.color-azul .main-content,
+body.alto-contraste.color-azul .dashboard-container,
+body.alto-contraste.color-azul .content-header,
+body.alto-contraste.color-azul .config-card,
+body.alto-contraste.color-azul .ciclo-card,
+body.alto-contraste.color-azul .periodo-card,
+body.alto-contraste.color-azul .card,
+body.alto-contraste.color-azul .resumen-card,
+body.alto-contraste.color-azul .panel-accesibilidad,
+body.alto-contraste.color-azul .modal-content,
+body.alto-contraste.color-azul .welcome-text,
+body.alto-contraste.color-azul .resumen-info,
+body.alto-contraste.color-azul .stats-grid .stat-card,
+body.alto-contraste.color-azul .modal-acciones,
+body.alto-contraste.color-azul .form-actions {
+    border-color: #1d4ed8 !important;
+}
+
+body.alto-contraste.color-azul .btn-accesibilidad-opcion,
+body.alto-contraste.color-azul .btn-opt {
+    border-color: #1d4ed8 !important;
+}
+
+/* AMARILLO */
+body.alto-contraste.color-amarillo .sidebar,
+body.alto-contraste.color-amarillo .main-content,
+body.alto-contraste.color-amarillo .dashboard-container,
+body.alto-contraste.color-amarillo .content-header,
+body.alto-contraste.color-amarillo .config-card,
+body.alto-contraste.color-amarillo .ciclo-card,
+body.alto-contraste.color-amarillo .periodo-card,
+body.alto-contraste.color-amarillo .card,
+body.alto-contraste.color-amarillo .resumen-card,
+body.alto-contraste.color-amarillo .panel-accesibilidad,
+body.alto-contraste.color-amarillo .modal-content,
+body.alto-contraste.color-amarillo .welcome-text,
+body.alto-contraste.color-amarillo .resumen-info,
+body.alto-contraste.color-amarillo .stats-grid .stat-card,
+body.alto-contraste.color-amarillo .modal-acciones,
+body.alto-contraste.color-amarillo .form-actions {
+    border-color: #ca8a04 !important;
+}
+
+body.alto-contraste.color-amarillo .btn-accesibilidad-opcion,
+body.alto-contraste.color-amarillo .btn-opt {
+    border-color: #ca8a04 !important;
+}
+
+/* VERDE */
+body.alto-contraste.color-verde .sidebar,
+body.alto-contraste.color-verde .main-content,
+body.alto-contraste.color-verde .dashboard-container,
+body.alto-contraste.color-verde .content-header,
+body.alto-contraste.color-verde .config-card,
+body.alto-contraste.color-verde .ciclo-card,
+body.alto-contraste.color-verde .periodo-card,
+body.alto-contraste.color-verde .card,
+body.alto-contraste.color-verde .resumen-card,
+body.alto-contraste.color-verde .panel-accesibilidad,
+body.alto-contraste.color-verde .modal-content,
+body.alto-contraste.color-verde .welcome-text,
+body.alto-contraste.color-verde .resumen-info,
+body.alto-contraste.color-verde .stats-grid .stat-card,
+body.alto-contraste.color-verde .modal-acciones,
+body.alto-contraste.color-verde .form-actions {
+    border-color: #15803d !important;
+}
+
+body.alto-contraste.color-verde .btn-accesibilidad-opcion,
+body.alto-contraste.color-verde .btn-opt {
+    border-color: #15803d !important;
+}
+
+/* ROJO */
+body.alto-contraste.color-rojo .sidebar,
+body.alto-contraste.color-rojo .main-content,
+body.alto-contraste.color-rojo .dashboard-container,
+body.alto-contraste.color-rojo .content-header,
+body.alto-contraste.color-rojo .config-card,
+body.alto-contraste.color-rojo .ciclo-card,
+body.alto-contraste.color-rojo .periodo-card,
+body.alto-contraste.color-rojo .card,
+body.alto-contraste.color-rojo .resumen-card,
+body.alto-contraste.color-rojo .panel-accesibilidad,
+body.alto-contraste.color-rojo .modal-content,
+body.alto-contraste.color-rojo .welcome-text,
+body.alto-contraste.color-rojo .resumen-info,
+body.alto-contraste.color-rojo .stats-grid .stat-card,
+body.alto-contraste.color-rojo .modal-acciones,
+body.alto-contraste.color-rojo .form-actions {
+    border-color: #b91c1c !important;
+}
+
+body.alto-contraste.color-rojo .btn-accesibilidad-opcion,
+body.alto-contraste.color-rojo .btn-opt {
+    border-color: #b91c1c !important;
+}
+
+/* NARANJA */
+body.alto-contraste.color-naranja .sidebar,
+body.alto-contraste.color-naranja .main-content,
+body.alto-contraste.color-naranja .dashboard-container,
+body.alto-contraste.color-naranja .content-header,
+body.alto-contraste.color-naranja .config-card,
+body.alto-contraste.color-naranja .ciclo-card,
+body.alto-contraste.color-naranja .periodo-card,
+body.alto-contraste.color-naranja .card,
+body.alto-contraste.color-naranja .resumen-card,
+body.alto-contraste.color-naranja .panel-accesibilidad,
+body.alto-contraste.color-naranja .modal-content,
+body.alto-contraste.color-naranja .welcome-text,
+body.alto-contraste.color-naranja .resumen-info,
+body.alto-contraste.color-naranja .stats-grid .stat-card,
+body.alto-contraste.color-naranja .modal-acciones,
+body.alto-contraste.color-naranja .form-actions {
+    border-color: #ea580c !important;
+}
+
+body.alto-contraste.color-naranja .btn-accesibilidad-opcion,
+body.alto-contraste.color-naranja .btn-opt {
+    border-color: #ea580c !important;
+}
+
+/* MORADO */
+body.alto-contraste.color-morado .sidebar,
+body.alto-contraste.color-morado .main-content,
+body.alto-contraste.color-morado .dashboard-container,
+body.alto-contraste.color-morado .content-header,
+body.alto-contraste.color-morado .config-card,
+body.alto-contraste.color-morado .ciclo-card,
+body.alto-contraste.color-morado .periodo-card,
+body.alto-contraste.color-morado .card,
+body.alto-contraste.color-morado .resumen-card,
+body.alto-contraste.color-morado .panel-accesibilidad,
+body.alto-contraste.color-morado .modal-content,
+body.alto-contraste.color-morado .welcome-text,
+body.alto-contraste.color-morado .resumen-info,
+body.alto-contraste.color-morado .stats-grid .stat-card,
+body.alto-contraste.color-morado .modal-acciones,
+body.alto-contraste.color-morado .form-actions {
+    border-color: #7c3aed !important;
+}
+
+body.alto-contraste.color-morado .btn-accesibilidad-opcion,
+body.alto-contraste.color-morado .btn-opt {
+    border-color: #7c3aed !important;
+}
+
+/* ========================================================= */
+/* FORZAR SOBRESCRITURA DE COLORES EN ALTO CONTRASTE        */
+/* ========================================================= */
+
+/* --- FORZAR FONDO BLANCO EN TODO --- */
+body.alto-contraste.fondo-blanco,
+body.alto-contraste.fondo-blanco * {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+}
+
+/* --- FORZAR FONDO NEGRO EN TODO --- */
+body.alto-contraste.fondo-negro,
+body.alto-contraste.fondo-negro * {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* --- FORZAR COLORES DE ACENTO --- */
+
+/* AZUL - Forzar en todos los elementos */
+body.alto-contraste.color-azul * {
+    border-color: #1d4ed8 !important;
+}
+
+body.alto-contraste.color-azul .btn,
+body.alto-contraste.color-azul .btn-guardar,
+body.alto-contraste.color-azul .btn-agregar,
+body.alto-contraste.color-azul .btn-accessibility-round,
+body.alto-contraste.color-azul .btn-nuevo-periodo,
+body.alto-contraste.color-azul .btn-aplicar-modal,
+body.alto-contraste.color-azul .btn-primary,
+body.alto-contraste.color-azul .btn-success,
+body.alto-contraste.color-azul .btn-editar,
+body.alto-contraste.color-azul .btn-activar,
+body.alto-contraste.color-azul .btn-cerrar,
+body.alto-contraste.color-azul .btn-inactivar {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-azul .badge,
+body.alto-contraste.color-azul .badge-activo,
+body.alto-contraste.color-azul .badge-success {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    border-color: #1d4ed8 !important;
+}
+
+/* AMARILLO */
+body.alto-contraste.color-amarillo * {
+    border-color: #ca8a04 !important;
+}
+
+body.alto-contraste.color-amarillo .btn,
+body.alto-contraste.color-amarillo .btn-guardar,
+body.alto-contraste.color-amarillo .btn-agregar,
+body.alto-contraste.color-amarillo .btn-accessibility-round,
+body.alto-contraste.color-amarillo .btn-nuevo-periodo,
+body.alto-contraste.color-amarillo .btn-aplicar-modal,
+body.alto-contraste.color-amarillo .btn-primary,
+body.alto-contraste.color-amarillo .btn-success,
+body.alto-contraste.color-amarillo .btn-editar,
+body.alto-contraste.color-amarillo .btn-activar,
+body.alto-contraste.color-amarillo .btn-cerrar,
+body.alto-contraste.color-amarillo .btn-inactivar {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-amarillo .badge,
+body.alto-contraste.color-amarillo .badge-activo,
+body.alto-contraste.color-amarillo .badge-success {
+    background: #ca8a04 !important;
+    color: #000000 !important;
+    border-color: #ca8a04 !important;
+}
+
+/* VERDE */
+body.alto-contraste.color-verde * {
+    border-color: #15803d !important;
+}
+
+body.alto-contraste.color-verde .btn,
+body.alto-contraste.color-verde .btn-guardar,
+body.alto-contraste.color-verde .btn-agregar,
+body.alto-contraste.color-verde .btn-accessibility-round,
+body.alto-contraste.color-verde .btn-nuevo-periodo,
+body.alto-contraste.color-verde .btn-aplicar-modal,
+body.alto-contraste.color-verde .btn-primary,
+body.alto-contraste.color-verde .btn-success,
+body.alto-contraste.color-verde .btn-editar,
+body.alto-contraste.color-verde .btn-activar,
+body.alto-contraste.color-verde .btn-cerrar,
+body.alto-contraste.color-verde .btn-inactivar {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-verde .badge,
+body.alto-contraste.color-verde .badge-activo,
+body.alto-contraste.color-verde .badge-success {
+    background: #15803d !important;
+    color: #ffffff !important;
+    border-color: #15803d !important;
+}
+
+/* ROJO */
+body.alto-contraste.color-rojo * {
+    border-color: #b91c1c !important;
+}
+
+body.alto-contraste.color-rojo .btn,
+body.alto-contraste.color-rojo .btn-guardar,
+body.alto-contraste.color-rojo .btn-agregar,
+body.alto-contraste.color-rojo .btn-accessibility-round,
+body.alto-contraste.color-rojo .btn-nuevo-periodo,
+body.alto-contraste.color-rojo .btn-aplicar-modal,
+body.alto-contraste.color-rojo .btn-primary,
+body.alto-contraste.color-rojo .btn-success,
+body.alto-contraste.color-rojo .btn-editar,
+body.alto-contraste.color-rojo .btn-activar,
+body.alto-contraste.color-rojo .btn-cerrar,
+body.alto-contraste.color-rojo .btn-inactivar {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .badge,
+body.alto-contraste.color-rojo .badge-activo,
+body.alto-contraste.color-rojo .badge-success {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    border-color: #b91c1c !important;
+}
+
+/* NARANJA */
+body.alto-contraste.color-naranja * {
+    border-color: #ea580c !important;
+}
+
+body.alto-contraste.color-naranja .btn,
+body.alto-contraste.color-naranja .btn-guardar,
+body.alto-contraste.color-naranja .btn-agregar,
+body.alto-contraste.color-naranja .btn-accessibility-round,
+body.alto-contraste.color-naranja .btn-nuevo-periodo,
+body.alto-contraste.color-naranja .btn-aplicar-modal,
+body.alto-contraste.color-naranja .btn-primary,
+body.alto-contraste.color-naranja .btn-success,
+body.alto-contraste.color-naranja .btn-editar,
+body.alto-contraste.color-naranja .btn-activar,
+body.alto-contraste.color-naranja .btn-cerrar,
+body.alto-contraste.color-naranja .btn-inactivar {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .badge,
+body.alto-contraste.color-naranja .badge-activo,
+body.alto-contraste.color-naranja .badge-success {
+    background: #ea580c !important;
+    color: #ffffff !important;
+    border-color: #ea580c !important;
+}
+
+/* MORADO */
+body.alto-contraste.color-morado * {
+    border-color: #7c3aed !important;
+}
+
+body.alto-contraste.color-morado .btn,
+body.alto-contraste.color-morado .btn-guardar,
+body.alto-contraste.color-morado .btn-agregar,
+body.alto-contraste.color-morado .btn-accessibility-round,
+body.alto-contraste.color-morado .btn-nuevo-periodo,
+body.alto-contraste.color-morado .btn-aplicar-modal,
+body.alto-contraste.color-morado .btn-primary,
+body.alto-contraste.color-morado .btn-success,
+body.alto-contraste.color-morado .btn-editar,
+body.alto-contraste.color-morado .btn-activar,
+body.alto-contraste.color-morado .btn-cerrar,
+body.alto-contraste.color-morado .btn-inactivar {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .badge,
+body.alto-contraste.color-morado .badge-activo,
+body.alto-contraste.color-morado .badge-success {
+    background: #7c3aed !important;
+    color: #ffffff !important;
+    border-color: #7c3aed !important;
+}
+
+/* ========================================================= */
+/* SOBRESCRIBIR INPUTS Y SELECTS EN ALTO CONTRASTE          */
+/* ========================================================= */
+
+/* --- FORZAR COLOR EN INPUTS --- */
+body.alto-contraste input,
+body.alto-contraste select,
+body.alto-contraste textarea,
+body.alto-contraste .input-wrapper,
+body.alto-contraste .input-group {
+    background: transparent !important;
+    color: currentColor !important;
+    border-color: currentColor !important;
+}
+
+/* --- FORZAR FONDO BLANCO EN INPUTS --- */
+body.alto-contraste.fondo-blanco input,
+body.alto-contraste.fondo-blanco select,
+body.alto-contraste.fondo-blanco textarea,
+body.alto-contraste.fondo-blanco .input-wrapper {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco input::placeholder {
+    color: #666666 !important;
+}
+
+/* --- FORZAR FONDO NEGRO EN INPUTS --- */
+body.alto-contraste.fondo-negro input,
+body.alto-contraste.fondo-negro select,
+body.alto-contraste.fondo-negro textarea,
+body.alto-contraste.fondo-negro .input-wrapper {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro input::placeholder {
+    color: #999999 !important;
+}
+
+/* --- COLOR DE ACENTO EN INPUTS --- */
+body.alto-contraste.color-azul input:focus,
+body.alto-contraste.color-azul select:focus,
+body.alto-contraste.color-azul textarea:focus {
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.3) !important;
+}
+
+body.alto-contraste.color-amarillo input:focus,
+body.alto-contraste.color-amarillo select:focus,
+body.alto-contraste.color-amarillo textarea:focus {
+    border-color: #ca8a04 !important;
+    box-shadow: 0 0 0 2px rgba(202, 138, 4, 0.3) !important;
+}
+
+body.alto-contraste.color-verde input:focus,
+body.alto-contraste.color-verde select:focus,
+body.alto-contraste.color-verde textarea:focus {
+    border-color: #15803d !important;
+    box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.3) !important;
+}
+
+body.alto-contraste.color-rojo input:focus,
+body.alto-contraste.color-rojo select:focus,
+body.alto-contraste.color-rojo textarea:focus {
+    border-color: #b91c1c !important;
+    box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.3) !important;
+}
+
+body.alto-contraste.color-naranja input:focus,
+body.alto-contraste.color-naranja select:focus,
+body.alto-contraste.color-naranja textarea:focus {
+    border-color: #ea580c !important;
+    box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.3) !important;
+}
+
+body.alto-contraste.color-morado input:focus,
+body.alto-contraste.color-morado select:focus,
+body.alto-contraste.color-morado textarea:focus {
+    border-color: #7c3aed !important;
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3) !important;
+}
+
+/* --- FORZAR COLOR EN BOTONES DE ROL --- */
+body.alto-contraste .btn-role {
+    background: transparent !important;
+    border-color: currentColor !important;
+    color: currentColor !important;
+}
+
+body.alto-contraste .btn-role.active {
+    border-color: currentColor !important;
+    background: currentColor !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-negro .btn-role.active {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.fondo-blanco .btn-role.active {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+/* ========================================================= */
+/* FORZAR COLORES EN BOTONES Y FORMULARIOS                  */
+/* ========================================================= */
+
+/* --- BOTÓN DE INICIO DE SESIÓN / REGISTRO / RESTABLECER --- */
+body.alto-contraste .btn-submit-login,
+body.alto-contraste .btn-submit,
+body.alto-contraste button[type="submit"],
+body.alto-contraste .btn-guardar,
+body.alto-contraste .btn-agregar,
+body.alto-contraste .btn-crear,
+body.alto-contraste .btn-enviar,
+body.alto-contraste .btn-restablecer,
+body.alto-contraste .btn-cambiar {
+    border: 2px solid !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* --- COLORES DE ACENTO EN BOTONES DE FORMULARIO --- */
+
+/* AZUL */
+body.alto-contraste.color-azul .btn-submit-login,
+body.alto-contraste.color-azul .btn-submit,
+body.alto-contraste.color-azul button[type="submit"],
+body.alto-contraste.color-azul .btn-guardar,
+body.alto-contraste.color-azul .btn-agregar,
+body.alto-contraste.color-azul .btn-crear,
+body.alto-contraste.color-azul .btn-enviar,
+body.alto-contraste.color-azul .btn-restablecer,
+body.alto-contraste.color-azul .btn-cambiar {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-azul .btn-submit-login:hover,
+body.alto-contraste.color-azul .btn-submit:hover,
+body.alto-contraste.color-azul button[type="submit"]:hover {
+    background: #1e3a8a !important;
+    border-color: #1e3a8a !important;
+    color: #ffffff !important;
+}
+
+/* AMARILLO */
+body.alto-contraste.color-amarillo .btn-submit-login,
+body.alto-contraste.color-amarillo .btn-submit,
+body.alto-contraste.color-amarillo button[type="submit"],
+body.alto-contraste.color-amarillo .btn-guardar,
+body.alto-contraste.color-amarillo .btn-agregar,
+body.alto-contraste.color-amarillo .btn-crear,
+body.alto-contraste.color-amarillo .btn-enviar,
+body.alto-contraste.color-amarillo .btn-restablecer,
+body.alto-contraste.color-amarillo .btn-cambiar {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-amarillo .btn-submit-login:hover,
+body.alto-contraste.color-amarillo .btn-submit:hover,
+body.alto-contraste.color-amarillo button[type="submit"]:hover {
+    background: #713f12 !important;
+    border-color: #713f12 !important;
+    color: #ffffff !important;
+}
+
+/* VERDE */
+body.alto-contraste.color-verde .btn-submit-login,
+body.alto-contraste.color-verde .btn-submit,
+body.alto-contraste.color-verde button[type="submit"],
+body.alto-contraste.color-verde .btn-guardar,
+body.alto-contraste.color-verde .btn-agregar,
+body.alto-contraste.color-verde .btn-crear,
+body.alto-contraste.color-verde .btn-enviar,
+body.alto-contraste.color-verde .btn-restablecer,
+body.alto-contraste.color-verde .btn-cambiar {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-verde .btn-submit-login:hover,
+body.alto-contraste.color-verde .btn-submit:hover,
+body.alto-contraste.color-verde button[type="submit"]:hover {
+    background: #14532d !important;
+    border-color: #14532d !important;
+    color: #ffffff !important;
+}
+
+/* ROJO */
+body.alto-contraste.color-rojo .btn-submit-login,
+body.alto-contraste.color-rojo .btn-submit,
+body.alto-contraste.color-rojo button[type="submit"],
+body.alto-contraste.color-rojo .btn-guardar,
+body.alto-contraste.color-rojo .btn-agregar,
+body.alto-contraste.color-rojo .btn-crear,
+body.alto-contraste.color-rojo .btn-enviar,
+body.alto-contraste.color-rojo .btn-restablecer,
+body.alto-contraste.color-rojo .btn-cambiar {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-submit-login:hover,
+body.alto-contraste.color-rojo .btn-submit:hover,
+body.alto-contraste.color-rojo button[type="submit"]:hover {
+    background: #7f1d1d !important;
+    border-color: #7f1d1d !important;
+    color: #ffffff !important;
+}
+
+/* NARANJA */
+body.alto-contraste.color-naranja .btn-submit-login,
+body.alto-contraste.color-naranja .btn-submit,
+body.alto-contraste.color-naranja button[type="submit"],
+body.alto-contraste.color-naranja .btn-guardar,
+body.alto-contraste.color-naranja .btn-agregar,
+body.alto-contraste.color-naranja .btn-crear,
+body.alto-contraste.color-naranja .btn-enviar,
+body.alto-contraste.color-naranja .btn-restablecer,
+body.alto-contraste.color-naranja .btn-cambiar {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-submit-login:hover,
+body.alto-contraste.color-naranja .btn-submit:hover,
+body.alto-contraste.color-naranja button[type="submit"]:hover {
+    background: #9a3412 !important;
+    border-color: #9a3412 !important;
+    color: #ffffff !important;
+}
+
+/* MORADO */
+body.alto-contraste.color-morado .btn-submit-login,
+body.alto-contraste.color-morado .btn-submit,
+body.alto-contraste.color-morado button[type="submit"],
+body.alto-contraste.color-morado .btn-guardar,
+body.alto-contraste.color-morado .btn-agregar,
+body.alto-contraste.color-morado .btn-crear,
+body.alto-contraste.color-morado .btn-enviar,
+body.alto-contraste.color-morado .btn-restablecer,
+body.alto-contraste.color-morado .btn-cambiar {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-submit-login:hover,
+body.alto-contraste.color-morado .btn-submit:hover,
+body.alto-contraste.color-morado button[type="submit"]:hover {
+    background: #4c1d95 !important;
+    border-color: #4c1d95 !important;
+    color: #ffffff !important;
+}
+
+/* --- BOTONES DE ROL --- */
+body.alto-contraste .btn-role {
+    border: 2px solid currentColor !important;
+    background: transparent !important;
+    color: currentColor !important;
+}
+
+body.alto-contraste .btn-role:hover {
+    opacity: 0.8 !important;
+}
+
+body.alto-contraste .btn-role.active {
+    border-color: currentColor !important;
+}
+
+/* COLORES DE ACENTO EN BOTONES DE ROL ACTIVOS */
+body.alto-contraste.color-azul .btn-role.active {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-amarillo .btn-role.active {
+    background: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste.color-verde .btn-role.active {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-rojo .btn-role.active {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-naranja .btn-role.active {
+    background: #ea580c !important;
+    border-color: #ea580c !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.color-morado .btn-role.active {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: #ffffff !important;
+}
+
+/* --- BOTONES DE ENLACE (Volver, Olvidé contraseña, etc.) --- */
+body.alto-contraste .link-forgot,
+body.alto-contraste .link-register,
+body.alto-contraste a:not(.btn):not(.btn-role):not(.btn-accesibilidad-opcion) {
+    color: currentColor !important;
+}
+
+body.alto-contraste .link-forgot:hover,
+body.alto-contraste .link-register:hover,
+body.alto-contraste a:not(.btn):not(.btn-role):not(.btn-accesibilidad-opcion):hover {
+    text-decoration: underline !important;
+    opacity: 0.8 !important;
+}
+
+/* --- FORZAR QUE EL FOCO NO SEA AMARILLO --- */
+body.alto-contraste input:focus,
+body.alto-contraste select:focus,
+body.alto-contraste textarea:focus,
+body.alto-contraste button:focus {
+    outline: 2px solid currentColor !important;
+    outline-offset: 2px !important;
+}
+
+body.alto-contraste.fondo-blanco input:focus,
+body.alto-contraste.fondo-blanco select:focus,
+body.alto-contraste.fondo-blanco textarea:focus,
+body.alto-contraste.fondo-blanco button:focus {
+    outline-color: #000000 !important;
+}
+
+body.alto-contraste.fondo-negro input:focus,
+body.alto-contraste.fondo-negro select:focus,
+body.alto-contraste.fondo-negro textarea:focus,
+body.alto-contraste.fondo-negro button:focus {
+    outline-color: #ffffff !important;
+}
+
+/* --- COLOR DE ACENTO EN FOCUS --- */
+body.alto-contraste.color-azul input:focus,
+body.alto-contraste.color-azul select:focus,
+body.alto-contraste.color-azul textarea:focus {
+    outline-color: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+}
+
+body.alto-contraste.color-amarillo input:focus,
+body.alto-contraste.color-amarillo select:focus,
+body.alto-contraste.color-amarillo textarea:focus {
+    outline-color: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+}
+
+body.alto-contraste.color-verde input:focus,
+body.alto-contraste.color-verde select:focus,
+body.alto-contraste.color-verde textarea:focus {
+    outline-color: #15803d !important;
+    border-color: #15803d !important;
+}
+
+body.alto-contraste.color-rojo input:focus,
+body.alto-contraste.color-rojo select:focus,
+body.alto-contraste.color-rojo textarea:focus {
+    outline-color: #b91c1c !important;
+    border-color: #b91c1c !important;
+}
+
+body.alto-contraste.color-naranja input:focus,
+body.alto-contraste.color-naranja select:focus,
+body.alto-contraste.color-naranja textarea:focus {
+    outline-color: #ea580c !important;
+    border-color: #ea580c !important;
+}
+
+body.alto-contraste.color-morado input:focus,
+body.alto-contraste.color-morado select:focus,
+body.alto-contraste.color-morado textarea:focus {
+    outline-color: #7c3aed !important;
+    border-color: #7c3aed !important;
 }

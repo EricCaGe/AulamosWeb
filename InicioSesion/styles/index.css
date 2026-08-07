@@ -230,3 +230,174 @@ body {
     color: #5a189a;
     margin-top: 3px;
 }
+
+/* ========================================== */
+/* MODO OSCURO - APLICADO A TODA LA PÁGINA   */
+/* ========================================== */
+
+body.modo-oscuro {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+body.modo-oscuro .main-header {
+    background-color: #1e1e1e !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
+}
+
+body.modo-oscuro .logo-container {
+    color: #e0e0e0 !important;
+}
+
+body.modo-oscuro .btn-primary {
+    background-color: #4a6cf7 !important;
+}
+
+body.modo-oscuro .btn-secondary {
+    background-color: #1e1e1e !important;
+    color: #4a6cf7 !important;
+    border-color: #4a6cf7 !important;
+}
+
+body.modo-oscuro .btn-secondary:hover {
+    background-color: #2a2a2a !important;
+}
+
+body.modo-oscuro .btn-chatbot {
+    background-color: #1e1e1e !important;
+    color: #4a6cf7 !important;
+    border-color: #4a6cf7 !important;
+}
+
+body.modo-oscuro .btn-chatbot:hover {
+    background-color: #2a2a2a !important;
+}
+
+body.modo-oscuro .hero-title {
+    color: #e0e0e0 !important;
+}
+
+body.modo-oscuro .hero-subtitle {
+    color: #a0a0a0 !important;
+}
+
+body.modo-oscuro .main-footer {
+    background-color: #1a1a2e !important;
+}
+
+body.modo-oscuro .footer-card {
+    background-color: #2a2a44 !important;
+    border-color: #4a4a6a !important;
+    color: #e0e0e0 !important;
+}
+
+body.modo-oscuro .footer-card h3 {
+    color: #e0e0e0 !important;
+}
+
+body.modo-oscuro .footer-card p {
+    color: #b0b0b0 !important;
+}
+
+body.modo-oscuro .contact-info i {
+    color: #8b5cf6 !important;
+}
+
+body.modo-oscuro .btn-accessibility-round {
+    background-color: #7b2cbf !important;
+}
+
+body.modo-oscuro .btn-accessibility-round:hover {
+    background-color: #9b4dff !important;
+}
+
+/* ========================================== */
+/* ALTO CONTRASTE - APLICADO A TODA LA PÁGINA */
+/* ========================================== */
+
+body.alto-contraste {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+}
+
+body.alto-contraste * {
+    background-color: transparent !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+
+body.alto-contraste .btn-primary {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste .btn-secondary {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+
+body.alto-contraste .main-header {
+    background-color: #000000 !important;
+    border-bottom: 2px solid #ffff00 !important;
+}
+
+body.alto-contraste .main-footer {
+    background-color: #000000 !important;
+    border-top: 2px solid #ffff00 !important;
+}
+
+body.alto-contraste .footer-card {
+    background-color: #000000 !important;
+    border-color: #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+body.alto-contraste .btn-accessibility-round {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste .btn-accessibility-round:hover {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+
+body.alto-contraste .hero-title {
+    color: #ffff00 !important;
+}
+
+body.alto-contraste .hero-subtitle {
+    color: #ffff00 !important;
+}
+
+/* ========================================== */
+/* TEXTO GRANDE                              */
+/* ========================================== */
+
+body.texto-grande {
+    font-size: 1.2rem !important;
+}
+
+body.texto-grande .hero-title {
+    font-size: 3.5rem !important;
+}
+
+body.texto-grande .hero-subtitle {
+    font-size: 1.3rem !important;
+}
+
+body.texto-grande .btn-primary,
+body.texto-grande .btn-secondary,
+body.texto-grande .btn-chatbot {
+    font-size: 1.1rem !important;
+    padding: 12px 28px !important;
+}
+
+body.texto-grande .footer-card h3 {
+    font-size: 1.5rem !important;
+}
+
+body.texto-grande .footer-card p {
+    font-size: 1rem !important;
+}

@@ -140,3 +140,52 @@ function requerirMetodo(string $metodo): void
         );
     }
 }
+
+/**
+ * Obtiene el rol verdadero del usuario desde la sesion PHP.
+ * El navegador no controla los permisos de AulaBot.
+ */
+function obtenerRolUsuarioSesion(): string
+{
+    $rolSesion = strtolower(
+        trim(
+            (string) (
+                $_SESSION['usuario']['rol'] ??
+                ''
+            )
+        )
+    );
+
+    $rolesPermitidos = [
+        'alumno',
+        'docente',
+        'admin',
+        'investigador',
+    ];
+
+    if (!in_array($rolSesion, $rolesPermitidos, true)) {
+        responderJson(
+            [
+                'success' => false,
+                'message' => 'El rol de la sesion no es valido para AulaBot.',
+            ],
+            403
+        );
+    }
+
+    return $rolSesion;
+}
+
+/**
+ * Obtiene el modulo correspondiente al rol autenticado.
+ */
+function obtenerModuloOrigenPorRol(string $rol): string
+{
+    return match ($rol) {
+        'alumno' => 'Web Alumno',
+        'docente' => 'Web Docente',
+        'admin' => 'Web Admin',
+        'investigador' => 'Web Investigador',
+        default => 'Web Desconocido',
+    };
+}

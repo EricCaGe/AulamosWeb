@@ -15,110 +15,119 @@ $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['a
 // ========================================== */
 // 1. CONTAR CLASES ACTIVAS DEL DOCENTE      */
 // ========================================== */
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total 
-    FROM cursos 
-    WHERE id_docente = ? AND estado = 'Activo'
-");
-$stmt->bind_param("i", $id_docente);
-$stmt->execute();
-$resultado = $stmt->get_result();
-$row = $resultado->fetch_assoc();
-$clases_activas = $row['total'] ?? 0;
-$stmt->close();
+$clases_activas = 0;
+$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM cursos WHERE id_docente = ? AND estado = 'Activo'");
+if ($stmt) {
+    $stmt->bind_param("i", $id_docente);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $row = $resultado->fetch_assoc();
+    $clases_activas = $row['total'] ?? 0;
+    $stmt->close();
+}
 
 // ========================================== */
 // 2. CONTAR ACTIVIDADES PENDIENTES          */
-// (Actividades creadas por el docente que no han sido calificadas)
 // ========================================== */
+$actividades_pendientes = 0;
 $stmt = $conexion->prepare("
     SELECT COUNT(*) AS total 
     FROM actividades a
-    INNER JOIN inscripciones ce ON a.id_curso = ce.id_curso
-    INNER JOIN actividad_estudiantes ae ON a.id_actividad = ae.id_actividad AND ce.id_alumno = ae.id_alumno
-    WHERE a.id_docente = ? AND ae.estado IN ('Pendiente', 'En_proceso', 'Entregada')
+    WHERE a.id_docente = ? AND a.estado = 'Publicada'
 ");
-$stmt->bind_param("i", $id_docente);
-$stmt->execute();
-$resultado = $stmt->get_result();
-$row = $resultado->fetch_assoc();
-$actividades_pendientes = $row['total'] ?? 0;
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $id_docente);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $row = $resultado->fetch_assoc();
+    $actividades_pendientes = $row['total'] ?? 0;
+    $stmt->close();
+}
 
 // ========================================== */
 // 3. CONTAR EVALUACIONES PENDIENTES         */
 // ========================================== */
+$evaluaciones_pendientes = 0;
 $stmt = $conexion->prepare("
     SELECT COUNT(*) AS total 
-    FROM entregas e
-    INNER JOIN actividad_estudiantes ae ON e.id_actividad_estudiante = ae.id_actividad_estudiante
-    INNER JOIN actividades a ON ae.id_actividad = a.id_actividad
-    WHERE a.id_docente = ? AND e.estado = 'Entregada'
+    FROM actividades a
+    WHERE a.id_docente = ? AND a.tipo = 'Evaluacion' AND a.estado = 'Publicada'
 ");
-$stmt->bind_param("i", $id_docente);
-$stmt->execute();
-$resultado = $stmt->get_result();
-$row = $resultado->fetch_assoc();
-$evaluaciones_pendientes = $row['total'] ?? 0;
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $id_docente);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $row = $resultado->fetch_assoc();
+    $evaluaciones_pendientes = $row['total'] ?? 0;
+    $stmt->close();
+}
 
 // ========================================== */
 // 4. CONTAR ESTUDIANTES TOTAL               */
 // ========================================== */
+$estudiantes_total = 0;
 $stmt = $conexion->prepare("
-    SELECT COUNT(DISTINCT ce.id_alumno) AS total 
-    FROM inscripciones ce
-    INNER JOIN cursos c ON ce.id_curso = c.id_curso
+    SELECT COUNT(DISTINCT i.id_alumno) AS total 
+    FROM inscripciones i
+    INNER JOIN cursos c ON i.id_curso = c.id_curso
     WHERE c.id_docente = ?
 ");
-$stmt->bind_param("i", $id_docente);
-$stmt->execute();
-$resultado = $stmt->get_result();
-$row = $resultado->fetch_assoc();
-$estudiantes_total = $row['total'] ?? 0;
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $id_docente);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $row = $resultado->fetch_assoc();
+    $estudiantes_total = $row['total'] ?? 0;
+    $stmt->close();
+}
 
 // ========================================== */
-// 5. CONTENIDO RECIENTE (últimas 5 actividades creadas)
+// 5. CONTENIDO RECIENTE                     */
 // ========================================== */
+$contenido_reciente = [];
 $stmt = $conexion->prepare("
     SELECT 
-        a.titulo,
-        a.tipo,
-        a.fecha_publicacion,
-        a.estado
-    FROM actividades a
-    WHERE a.id_docente = ?
-    ORDER BY a.fecha_publicacion DESC
+        titulo,
+        tipo,
+        fecha_publicacion,
+        estado
+    FROM actividades
+    WHERE id_docente = ?
+    ORDER BY fecha_publicacion DESC
     LIMIT 5
 ");
-$stmt->bind_param("i", $id_docente);
-$stmt->execute();
-$resultado = $stmt->get_result();
-$contenido_reciente = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $id_docente);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $contenido_reciente = $resultado->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+}
 
 // ========================================== */
-// 6. PRÓXIMAS ACTIVIDADES (con fecha límite próxima)
+// 6. PRÓXIMAS ACTIVIDADES                   */
 // ========================================== */
+$proximas_actividades = [];
 $stmt = $conexion->prepare("
     SELECT 
-        a.titulo,
-        a.fecha_limite,
-        a.tipo
-    FROM actividades a
-    WHERE a.id_docente = ? AND a.fecha_limite >= NOW() AND a.estado != 'Cerrada'
-    ORDER BY a.fecha_limite ASC
+        titulo,
+        fecha_limite,
+        tipo
+    FROM actividades
+    WHERE id_docente = ? AND fecha_limite >= NOW() AND estado != 'Cerrada'
+    ORDER BY fecha_limite ASC
     LIMIT 3
 ");
-$stmt->bind_param("i", $id_docente);
-$stmt->execute();
-$resultado = $stmt->get_result();
-$proximas_actividades = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $id_docente);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $proximas_actividades = $resultado->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+}
 
 // ========================================== */
-// 7. OBTENER ÍCONO SEGÚN TIPO DE ACTIVIDAD  */
+// FUNCIONES AUXILIARES                      */
 // ========================================== */
 function getIconoActividad($tipo) {
     switch ($tipo) {
@@ -151,7 +160,6 @@ function getBadgeEstado($estado) {
     }
 }
 
-// Función para formatear fecha
 function formatearFecha($fecha) {
     if (!$fecha) return 'Sin fecha';
     $dias = round((time() - strtotime($fecha)) / 86400);
@@ -179,7 +187,6 @@ function formatearFecha($fecha) {
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../img/logo_g.png" alt="Logo Aulamos" class="logo-img">
-                
             </div>
             
             <nav class="menu">
@@ -189,14 +196,13 @@ function formatearFecha($fecha) {
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-                
+                <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Configuración</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 
                 <div class="menu-spacer"></div>
-    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-</nav>
-            
+                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
@@ -210,7 +216,15 @@ function formatearFecha($fecha) {
                     <p>Bienvenido a tu espacio docente.</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                    <button
+    type="button"
+    class="btn-assistant"
+    id="btn-asistente"
+    onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'"
+>
+    Asistente Virtual
+    <span class="robot-icon">🤖</span>
+</button>
                     <div class="icon-bell-container">
                         <i class="fa-regular fa-bell"></i>
                     </div>
@@ -339,39 +353,31 @@ function formatearFecha($fecha) {
                 <div class="right-column">
                     
                     <!-- Calendario -->
-                     <!-- Calendario -->
-<aside class="calendar-container">
-    <!-- Cabecera y Navegación -->
-    <div class="calendar-header">
-        <div class="nav-left">
-            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
-            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
-        </div>
-        
-        <h2 id="month-year-title">MES AÑO</h2>
-        
-        <div class="nav-right">
-            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
-            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
-        </div>
-    </div>
+                    <aside class="calendar-container">
+                        <div class="calendar-header">
+                            <div class="nav-left">
+                                <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+                                <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+                            </div>
+                            <h2 id="month-year-title">MES AÑO</h2>
+                            <div class="nav-right">
+                                <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+                                <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+                            </div>
+                        </div>
 
-    <!-- Días de la semana -->
-    <div class="calendar-weekdays">
-        <div class="weekday">Do</div>
-        <div class="weekday">Lu</div>
-        <div class="weekday">Ma</div>
-        <div class="weekday">Mi</div>
-        <div class="weekday">Ju</div>
-        <div class="weekday">Vi</div>
-        <div class="weekday">Sá</div>
-    </div>
+                        <div class="calendar-weekdays">
+                            <div class="weekday">Do</div>
+                            <div class="weekday">Lu</div>
+                            <div class="weekday">Ma</div>
+                            <div class="weekday">Mi</div>
+                            <div class="weekday">Ju</div>
+                            <div class="weekday">Vi</div>
+                            <div class="weekday">Sá</div>
+                        </div>
 
-    <!-- Contenedor dinámico de los días -->
-    <div id="calendar-days" class="calendar-days-grid">
-        <!-- JavaScript inyectará los días aquí -->
-    </div>
-</aside>
+                        <div id="calendar-days" class="calendar-days-grid"></div>
+                    </aside>
 
                     <!-- Próximas actividades -->
                     <aside class="upcoming-activities border-container">

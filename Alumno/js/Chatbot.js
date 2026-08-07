@@ -20,12 +20,18 @@ document.addEventListener("DOMContentLoaded", () => {
             ? config.rol.trim()
             : "alumno";
 
+            const moduloOrigen =
+    rol === "docente"
+        ? "Web Docente"
+        : "Web Alumno";
+
     const idUsuario =
         Number.isInteger(Number(config.idUsuario))
             ? Number(config.idUsuario)
             : "anonimo";
 
-    const claveHistorial = `aulamos_chatbot_historial_${idUsuario}`;
+    const claveHistorial =
+    `aulamos_chatbot_historial_${idUsuario}_${rol}`;
     const apiPersistencia = {
     iniciar: "api/chatbot/iniciar_sesion.php",
     guardar: "api/chatbot/guardar_interaccion.php",
@@ -158,8 +164,13 @@ async function iniciarSesionChatbot() {
             method: "POST",
             credentials: "same-origin",
             headers: {
+                "Content-Type": "application/json",
                 Accept: "application/json",
             },
+            body: JSON.stringify({
+                rol,
+                moduloOrigen,
+            }),
         },
     );
 
@@ -181,7 +192,7 @@ async function iniciarSesionChatbot() {
     idSesionChatbot = idRecibido;
 
     console.log(
-        `Sesión de AulaBot activa: ${idSesionChatbot}`,
+        `Sesión activa: ${idSesionChatbot} - ${moduloOrigen}`,
     );
 
     return idSesionChatbot;
@@ -500,52 +511,60 @@ async function cerrarSesionChatbot() {
     }
 
     async function consultarAulaBot(mensaje) {
-        const controlador = new AbortController();
+    const controlador = new AbortController();
 
-        const temporizador = window.setTimeout(() => {
-            controlador.abort();
-        }, 30000);
+    const temporizador = window.setTimeout(() => {
+        controlador.abort();
+    }, 45000);
+
+    try {
+        const idSesion =
+            await iniciarSesionChatbot();
+
+        const respuesta = await fetch(endpoint, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify({
+                mensaje,
+                rol,
+                moduloOrigen,
+                idSesion,
+            }),
+            signal: controlador.signal,
+        });
+
+        let datos = null;
 
         try {
-            const respuesta = await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    mensaje,
-                    rol,
-                }),
-                signal: controlador.signal,
-            });
+            datos = await respuesta.json();
+        } catch {
+            throw new Error(
+                "El servidor devolvió una respuesta inválida.",
+            );
+        }
 
-            let datos = null;
-
-            try {
-                datos = await respuesta.json();
-            } catch {
-                throw new Error(
-                    "El servidor devolvió una respuesta que no es válida.",
-                );
-            }
-
-            if (!respuesta.ok) {
-                const mensajeError =
-                    typeof datos?.error === "string"
-                        ? datos.error
-                        : typeof datos?.mensaje === "string"
-                            ? datos.mensaje
+        if (!respuesta.ok) {
+            const mensajeError =
+                typeof datos?.message === "string"
+                    ? datos.message
+                    : typeof datos?.mensaje === "string"
+                        ? datos.mensaje
+                        : typeof datos?.error === "string"
+                            ? datos.error
                             : `Error del servidor: ${respuesta.status}`;
 
-                throw new Error(mensajeError);
-            }
-
-            return obtenerRespuestaTexto(datos);
-        } finally {
-            window.clearTimeout(temporizador);
+            throw new Error(mensajeError);
         }
+
+        return obtenerRespuestaTexto(datos);
+    } finally {
+        window.clearTimeout(temporizador);
     }
+}
 
     function describirError(error) {
         if (error?.name === "AbortError") {

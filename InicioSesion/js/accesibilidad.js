@@ -15,6 +15,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnRestablecer = document.getElementById('btnRestablecer');
 
     // ========================================== */
+    // 0. CARGAR PREFERENCIAS AL INICIO          */
+    // ========================================== */
+    
+    function cargarPreferencias() {
+        console.log('🔍 Cargando preferencias desde localStorage...');
+        
+        // Cargar modo oscuro
+        if (localStorage.getItem('modo-oscuro') === 'true') {
+            body.classList.add('modo-oscuro');
+            if (btnModoOscuro) btnModoOscuro.classList.add('active');
+        }
+        
+        // Cargar alto contraste
+        if (localStorage.getItem('alto-contraste') === 'true') {
+            body.classList.add('alto-contraste');
+            if (btnAltoContraste) btnAltoContraste.classList.add('active');
+            
+            // Cargar fondo personalizado
+            const fondo = localStorage.getItem('contraste_fondo') || 'negro';
+            body.classList.add('fondo-' + fondo);
+            
+            // Cargar color personalizado
+            const color = localStorage.getItem('contraste_color') || 'azul';
+            body.classList.add('color-' + color);
+        }
+        
+        // Cargar texto grande
+        if (localStorage.getItem('texto-grande') === 'true') {
+            body.classList.add('texto-grande');
+            if (btnTextoGrande) btnTextoGrande.classList.add('active');
+        }
+        
+        // Cargar lector de pantalla
+        if (localStorage.getItem('lector_pantalla') === 'true') {
+            if (btnLectorPantalla) {
+                btnLectorPantalla.classList.add('active');
+                const icon = btnLectorPantalla.querySelector('i');
+                if (icon) {
+                    icon.className = 'fa-solid fa-volume-high';
+                }
+            }
+        }
+        
+        console.log('✅ Preferencias cargadas:', {
+            'modo-oscuro': localStorage.getItem('modo-oscuro'),
+            'alto-contraste': localStorage.getItem('alto-contraste'),
+            'contraste_fondo': localStorage.getItem('contraste_fondo'),
+            'contraste_color': localStorage.getItem('contraste_color'),
+            'texto-grande': localStorage.getItem('texto-grande')
+        });
+    }
+
+    // ========================================== */
     // 1. TOGGLE PANEL                           */
     // ========================================== */
     function togglePanel() {
@@ -68,24 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return activo;
     }
 
-    function cargarPreferencias() {
-        const preferencias = ['modo-oscuro', 'alto-contraste', 'texto-grande'];
-        const botones = {
-            'modo-oscuro': btnModoOscuro,
-            'alto-contraste': btnAltoContraste,
-            'texto-grande': btnTextoGrande
-        };
-        
-        preferencias.forEach(clase => {
-            if (localStorage.getItem(clase) === 'true') {
-                body.classList.add(clase);
-                if (botones[clase]) {
-                    botones[clase].classList.add('active');
-                }
-            }
-        });
-    }
-
     // ========================================== */
     // 3. EVENTOS DE LOS BOTONES                 */
     // ========================================== */
@@ -98,7 +133,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (btnAltoContraste) {
         btnAltoContraste.addEventListener('click', function() {
-            toggleClase(body, 'alto-contraste', this);
+            // Si el alto contraste está activo, lo quitamos todo
+            if (body.classList.contains('alto-contraste')) {
+                body.classList.remove('alto-contraste');
+                body.classList.remove('fondo-blanco', 'fondo-negro');
+                ['azul', 'amarillo', 'verde', 'rojo', 'naranja', 'morado'].forEach(c => {
+                    body.classList.remove('color-' + c);
+                });
+                this.classList.remove('active');
+                localStorage.setItem('alto-contraste', 'false');
+            } else {
+                // Si NO está activo, lo activamos con los colores personalizados
+                body.classList.add('alto-contraste');
+                this.classList.add('active');
+                localStorage.setItem('alto-contraste', 'true');
+                
+                // Aplicar el fondo y color guardados
+                const fondo = localStorage.getItem('contraste_fondo') || 'negro';
+                const color = localStorage.getItem('contraste_color') || 'azul';
+                
+                body.classList.remove('fondo-blanco', 'fondo-negro');
+                body.classList.add('fondo-' + fondo);
+                
+                ['azul', 'amarillo', 'verde', 'rojo', 'naranja', 'morado'].forEach(c => {
+                    body.classList.remove('color-' + c);
+                });
+                body.classList.add('color-' + color);
+            }
         });
     }
 
@@ -135,10 +196,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnRestablecer) {
         btnRestablecer.addEventListener('click', function() {
             body.classList.remove('modo-oscuro', 'alto-contraste', 'texto-grande');
+            body.classList.remove('fondo-blanco', 'fondo-negro');
+            ['azul', 'amarillo', 'verde', 'rojo', 'naranja', 'morado'].forEach(c => {
+                body.classList.remove('color-' + c);
+            });
             document.querySelectorAll('.btn-accesibilidad-opcion').forEach(btn => {
                 btn.classList.remove('active');
             });
-            ['modo-oscuro', 'alto-contraste', 'texto-grande', 'lector_pantalla'].forEach(key => {
+            ['modo-oscuro', 'alto-contraste', 'texto-grande', 'lector_pantalla', 'contraste_fondo', 'contraste_color'].forEach(key => {
                 localStorage.removeItem(key);
             });
             if (typeof lector !== 'undefined' && lector && lector.activado) {
@@ -156,9 +221,214 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ========================================== */
+    // 4. MODAL PERSONALIZAR ALTO CONTRASTE      */
+    // ========================================== */
+
+    console.log('🔍 Inicializando modal de contraste...');
+
+    const modalContraste = document.getElementById('modalContraste');
+    const btnPersonalizar = document.getElementById('btnPersonalizarContraste');
+    const cerrarModalBtn = document.getElementById('cerrarModalContraste');
+    const cancelarModalBtn = document.getElementById('cancelarContraste');
+    const aplicarModalBtn = document.getElementById('aplicarContraste');
+
+    // Variables para guardar selecciones
+    let seleccionFondo = localStorage.getItem('contraste_fondo') || 'negro';
+    let seleccionColor = localStorage.getItem('contraste_color') || 'azul';
+
+    // Función para abrir modal
+    function abrirModalContraste() {
+        console.log('🟣 Abriendo modal...');
+        if (!modalContraste) {
+            console.error('❌ No existe el modal #modalContraste');
+            alert('Error: No se encontró el modal. Revisa el HTML.');
+            return;
+        }
+        // Cargar selecciones actuales
+        seleccionFondo = localStorage.getItem('contraste_fondo') || 'negro';
+        seleccionColor = localStorage.getItem('contraste_color') || 'azul';
+        
+        // Marcar botones activos
+        document.querySelectorAll('.btn-opt[data-fondo]').forEach(b => {
+            b.classList.toggle('active', b.dataset.fondo === seleccionFondo);
+        });
+        document.querySelectorAll('.btn-opt[data-color]').forEach(b => {
+            b.classList.toggle('active', b.dataset.color === seleccionColor);
+        });
+        
+        actualizarVistaPrevia(seleccionFondo, seleccionColor);
+        modalContraste.classList.add('active');
+        console.log('✅ Modal abierto');
+    }
+
+    // Función para cerrar modal
+    function cerrarModalContraste() {
+        console.log('🔴 Cerrando modal...');
+        if (modalContraste) {
+            modalContraste.classList.remove('active');
+        }
+    }
+
+    // Evento del botón personalizar
+    if (btnPersonalizar) {
+        btnPersonalizar.addEventListener('click', function(e) {
+            console.log('🖱️ Click en Personalizar alto contraste');
+            e.preventDefault();
+            e.stopPropagation();
+            abrirModalContraste();
+        });
+    }
+
+    // Eventos para cerrar
+    if (cerrarModalBtn) {
+        cerrarModalBtn.addEventListener('click', cerrarModalContraste);
+    }
+
+    if (cancelarModalBtn) {
+        cancelarModalBtn.addEventListener('click', cerrarModalContraste);
+    }
+
+    // Cerrar al hacer clic fuera del modal
+    if (modalContraste) {
+        modalContraste.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModalContraste();
+            }
+        });
+    }
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalContraste && modalContraste.classList.contains('active')) {
+            cerrarModalContraste();
+        }
+    });
+
+    // ========================================== */
+    // 5. SELECCIONAR OPCIONES                    */
+    // ========================================== */
+
+    // Seleccionar fondo
+    document.querySelectorAll('.btn-opt[data-fondo]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.btn-opt[data-fondo]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            seleccionFondo = this.dataset.fondo;
+            actualizarVistaPrevia(seleccionFondo, seleccionColor);
+        });
+    });
+
+    // Seleccionar color
+    document.querySelectorAll('.btn-opt[data-color]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.btn-opt[data-color]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            seleccionColor = this.dataset.color;
+            actualizarVistaPrevia(seleccionFondo, seleccionColor);
+        });
+    });
+
+    // Vista previa
+    function actualizarVistaPrevia(fondo, color) {
+        const vista = document.getElementById('vistaPrevia');
+        if (!vista) return;
+        
+        const colores = {
+            'azul': '#3b82f6',
+            'amarillo': '#eab308',
+            'verde': '#22c55e',
+            'rojo': '#ef4444',
+            'naranja': '#f97316',
+            'morado': '#8b5cf6'
+        };
+        
+        const colorHex = colores[color] || '#5a189a';
+        const fondoHex = fondo === 'blanco' ? '#ffffff' : '#000000';
+        const textoHex = fondo === 'blanco' ? '#000000' : '#ffffff';
+        
+        vista.style.background = fondoHex;
+        vista.style.borderColor = textoHex;
+        vista.style.color = textoHex;
+        
+        const texto = vista.querySelector('.vista-texto');
+        if (texto) texto.style.color = textoHex;
+        
+        const boton = vista.querySelector('.vista-boton');
+        if (boton) {
+            boton.style.background = colorHex;
+            boton.style.color = fondo === 'blanco' ? '#000000' : '#ffffff';
+        }
+        
+        const badge = vista.querySelector('.vista-badge');
+        if (badge) {
+            badge.style.background = colorHex;
+            badge.style.color = fondo === 'blanco' ? '#000000' : '#ffffff';
+        }
+    }
+
+    // Aplicar cambios
+    if (aplicarModalBtn) {
+        aplicarModalBtn.addEventListener('click', function() {
+            console.log('🟢 Aplicando cambios...');
+            
+            localStorage.setItem('contraste_fondo', seleccionFondo);
+            localStorage.setItem('contraste_color', seleccionColor);
+            
+            body.classList.remove('fondo-blanco', 'fondo-negro');
+            body.classList.add('fondo-' + seleccionFondo);
+            
+            ['azul', 'amarillo', 'verde', 'rojo', 'naranja', 'morado'].forEach(c => {
+                body.classList.remove('color-' + c);
+            });
+            body.classList.add('color-' + seleccionColor);
+            
+            if (!body.classList.contains('alto-contraste')) {
+                body.classList.add('alto-contraste');
+                if (btnAltoContraste) btnAltoContraste.classList.add('active');
+                localStorage.setItem('alto-contraste', 'true');
+            }
+            
+            cerrarModalContraste();
+            
+            // Feedback
+            const mensaje = document.createElement('div');
+            mensaje.style.cssText = `
+                position: fixed;
+                bottom: 120px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #22c55e;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 999999;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                animation: fadeInUp 0.3s ease;
+            `;
+            mensaje.textContent = '✅ Alto contraste personalizado aplicado';
+            document.body.appendChild(mensaje);
+            
+            setTimeout(() => {
+                mensaje.style.opacity = '0';
+                mensaje.style.transition = 'opacity 0.5s';
+                setTimeout(() => mensaje.remove(), 500);
+            }, 3000);
+        });
+    }
+
+    // ========================================== */
+    // 6. INICIALIZAR                            */
+    // ========================================== */
+    
+    // Cargar preferencias al inicio
     cargarPreferencias();
+    
+    // Inicializar vista previa
+    setTimeout(() => {
+        actualizarVistaPrevia(seleccionFondo, seleccionColor);
+    }, 200);
 
-    window.togglePanel = togglePanel;
-    window.cerrarPanel = cerrarPanel;
-
+    console.log('✅ Accesibilidad cargada correctamente');
 });

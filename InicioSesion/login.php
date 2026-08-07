@@ -19,13 +19,8 @@
                 <img src="../img/logogeneral.png" alt="Logo AULAMOS" class="logo-img">
             </a>
         </div>
-
-        <!-- Botones a la derecha -->
         <div class="nav-buttons">
-            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) 
-            <button type="button" class="btn btn-chatbot" aria-label="Abrir chatbot">
-                <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
-            </button>-->
+            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) -->
         </div>
     </header>
 
@@ -51,9 +46,9 @@
                         <h2>Iniciar Sesión</h2>
                         <p>Ingresa tus datos para acceder a tu cuenta</p>
                     </div>
-                    <!-- BOTÓN REDONDO MORADO (SOLO VISTA, NO HACE NADA) -->
-                    <button type="button" class="btn-accessibility-round" aria-label="Opciones de accesibilidad">
-                        <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
+                    <!-- BOTÓN REDONDO MORADO (YA ESTÁ) -->
+                    <button type="button" class="btn-accessibility-round" id="btnAccesibilidad" aria-label="Opciones de accesibilidad">
+                        <i class="fa-solid fa-universal-access" aria-hidden="true"></i>
                     </button>
                 </div>
 
@@ -84,30 +79,29 @@
                 <?php endif; ?>
 
                 <!-- Selector de Rol -->
-<div class="role-selector">
-    <div class="role-row">
-        <button type="button" class="btn-role active" data-rol="Alumno" aria-label="Seleccionar rol Alumno">
-            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
-        </button>
-        <button type="button" class="btn-role" data-rol="Docente" aria-label="Seleccionar rol Docente">
-            <i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Soy Docente
-        </button>
-    </div>
-    <div class="role-row">
-        <button type="button" class="btn-role" data-rol="Investigador" aria-label="Seleccionar rol Investigador">
-            <i class="fa-solid fa-microscope" aria-hidden="true"></i> Soy Investigador
-        </button>
-        <button type="button" class="btn-role" data-rol="Admin" aria-label="Seleccionar rol Administrador">
-            <i class="fa-solid fa-user-gear" aria-hidden="true"></i> Soy Administrador
-        </button>
-    </div>
-</div>
-
+                <div class="role-selector">
+                    <div class="role-row">
+                        <button type="button" class="btn-role active" data-rol="Alumno" aria-label="Seleccionar rol Alumno">
+                            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Soy Alumno
+                        </button>
+                        <button type="button" class="btn-role" data-rol="Docente" aria-label="Seleccionar rol Docente">
+                            <i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Soy Docente
+                        </button>
+                    </div>
+                    <div class="role-row">
+                        <button type="button" class="btn-role" data-rol="Investigador" aria-label="Seleccionar rol Investigador">
+                            <i class="fa-solid fa-microscope" aria-hidden="true"></i> Soy Investigador
+                        </button>
+                        <button type="button" class="btn-role" data-rol="Admin" aria-label="Seleccionar rol Administrador">
+                            <i class="fa-solid fa-user-gear" aria-hidden="true"></i> Soy Administrador
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Formulario -->
                 <form class="login-form" action="procesar_login.php" method="POST" novalidate>
-                    <!-- Campo oculto para el rol -->
-                <input type="hidden" name="rol" id="rol-input" value="Alumno">
+                    <input type="hidden" name="rol" id="rol-input" value="Alumno">
+                    
                     <div class="input-group">
                         <label for="login-email">Correo electrónico</label>
                         <div class="input-wrapper">
@@ -148,52 +142,125 @@
     </div>
 
     <!-- ========================================== -->
-<!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
-<!-- ========================================== -->
-<script src="js/login.js"></script>
-<script>
-    // Actualizar campo oculto al seleccionar rol
-    document.querySelectorAll('.btn-role').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.btn-role').forEach(function(b) {
-                b.classList.remove('active');
+    <!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
+    <!-- ========================================== -->
+    <div class="panel-accesibilidad" id="panelAccesibilidad">
+        <div class="panel-header">
+            <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
+            <button class="panel-cerrar" id="cerrarPanel">&times;</button>
+        </div>
+        <div class="panel-body">
+            <!-- ✅ NUEVO: Botón para personalizar alto contraste -->
+            <button class="btn-accesibilidad-opcion" id="btnPersonalizarContraste">
+                <i class="fa-solid fa-palette"></i> Personalizar alto contraste
+                <span class="badge-nuevo">Nuevo</span>
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
+                <i class="fa-solid fa-moon"></i> Modo oscuro
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
+                <i class="fa-solid fa-eye"></i> Alto contraste
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
+                <i class="fa-solid fa-text-height"></i> Texto grande
+            </button>
+            <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
+                <i class="fa-solid fa-volume-high"></i> Lector de pantalla
+            </button>
+            <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
+                <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ✅ NUEVO: MODAL PERSONALIZAR ALTO CONTRASTE -->
+    <!-- ========================================== -->
+    <div class="modal-overlay" id="modalContraste">
+        <div class="modal-content modal-contraste">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-palette"></i> Personalizar alto contraste</h3>
+                <button class="modal-cerrar" id="cerrarModalContraste">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Elige el fondo y el color de acento para el modo alto contraste.</p>
+                
+                <!-- Fondo -->
+                <div class="opcion-grupo">
+                    <label class="opcion-label">Fondo</label>
+                    <div class="opciones-botones">
+                        <button class="btn-opt fondo-blanco" data-fondo="blanco">
+                            <span class="preview" style="background:#ffffff; border:2px solid #333;"></span>
+                            Blanco
+                        </button>
+                        <button class="btn-opt fondo-negro" data-fondo="negro">
+                            <span class="preview" style="background:#000000; border:2px solid #333;"></span>
+                            Negro
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Color de acento -->
+                <div class="opcion-grupo">
+                    <label class="opcion-label">Color de acento</label>
+                    <div class="opciones-botones">
+                        <button class="btn-opt acento-azul" data-color="azul">
+                            <span class="preview" style="background:#3b82f6;"></span> Azul
+                        </button>
+                        <button class="btn-opt acento-amarillo" data-color="amarillo">
+                            <span class="preview" style="background:#eab308;"></span> Amarillo
+                        </button>
+                        <button class="btn-opt acento-verde" data-color="verde">
+                            <span class="preview" style="background:#22c55e;"></span> Verde
+                        </button>
+                        <button class="btn-opt acento-rojo" data-color="rojo">
+                            <span class="preview" style="background:#ef4444;"></span> Rojo
+                        </button>
+                        <button class="btn-opt acento-naranja" data-color="naranja">
+                            <span class="preview" style="background:#f97316;"></span> Naranja
+                        </button>
+                        <button class="btn-opt acento-morado" data-color="morado">
+                            <span class="preview" style="background:#8b5cf6;"></span> Morado
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Vista previa -->
+                <div class="vista-previa" id="vistaPrevia">
+                    <p class="vista-titulo">Vista previa</p>
+                    <div class="vista-ejemplo">
+                        <span class="vista-texto">Texto de ejemplo</span>
+                        <button class="vista-boton">Botón</button>
+                        <span class="vista-badge">Activo</span>
+                    </div>
+                </div>
+                
+                <div class="modal-acciones">
+                    <button class="btn-cancelar-modal" id="cancelarContraste">Cancelar</button>
+                    <button class="btn-aplicar-modal" id="aplicarContraste">Aplicar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- BLOQUE 3: SCRIPTS (JAVASCRIPT)             -->
+    <!-- ========================================== -->
+    <script src="js/login.js"></script>
+    <script src="js/accesibilidad.js"></script>
+    <script src="js/lector.js"></script>
+    
+    <script>
+        // Actualizar campo oculto al seleccionar rol
+        document.querySelectorAll('.btn-role').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-role').forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                document.getElementById('rol-input').value = this.getAttribute('data-rol');
             });
-            this.classList.add('active');
-            document.getElementById('rol-input').value = this.getAttribute('data-rol');
         });
-    });
-</script>
-</body>
-</html>
-
-<!-- ========================================== -->
-<!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
-<!-- ========================================== -->
-<div class="panel-accesibilidad" id="panelAccesibilidad">
-    <div class="panel-header">
-        <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
-        <button class="panel-cerrar" id="cerrarPanel">&times;</button>
-    </div>
-    <div class="panel-body">
-        <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
-            <i class="fa-solid fa-moon"></i> Modo oscuro
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
-            <i class="fa-solid fa-eye"></i> Alto contraste
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
-            <i class="fa-solid fa-text-height"></i> Texto grande
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
-            <i class="fa-solid fa-volume-high"></i> Lector de pantalla
-        </button>
-        <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
-            <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
-        </button>
-    </div>
-</div>
-
-<script src="js/accesibilidad.js"></script>
-<script src="js/lector.js"></script>
+    </script>
 </body>
 </html>

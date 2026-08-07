@@ -7,11 +7,20 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
-$moduloOrigen = 'Web Alumno';
 
 /*
 |--------------------------------------------------------------------------
-| Buscar una sesión abierta
+| Rol real del usuario
+|--------------------------------------------------------------------------
+| El rol proviene exclusivamente de la sesion PHP.
+*/
+
+$rol = obtenerRolUsuarioSesion();
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
+
+/*
+|--------------------------------------------------------------------------
+| Buscar una sesión abierta del módulo correcto
 |--------------------------------------------------------------------------
 */
 
@@ -43,6 +52,8 @@ if ($consulta->fetch()) {
         'success' => true,
         'idSesion' => (int) $idSesionExistente,
         'nuevaSesion' => false,
+        'moduloOrigen' => $moduloOrigen,
+        'rol' => $rol,
     ]);
 }
 
@@ -72,15 +83,17 @@ $insercion->bind_param(
 
 $insercion->execute();
 
-$idSesionNueva = $insercion->insert_id;
+$idSesionNueva = (int) $insercion->insert_id;
 
 $insercion->close();
 
 responderJson(
     [
         'success' => true,
-        'idSesion' => (int) $idSesionNueva,
+        'idSesion' => $idSesionNueva,
         'nuevaSesion' => true,
+        'moduloOrigen' => $moduloOrigen,
+        'rol' => $rol,
     ],
     201
 );
