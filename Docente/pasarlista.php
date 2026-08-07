@@ -68,9 +68,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_asistencia'])
     $mensaje_exito = "Lista de asistencia guardada correctamente.";
 }
 
-// Obtener fecha actual
-$fecha_hoy = date('Y-m-d');
-$fecha_formateada = date('l, d \d\e F \d\e Y', strtotime($fecha_hoy));
+// Configurar zona horaria
+date_default_timezone_set('America/Mexico_City');
+
+// Traductores de días y meses en español
+$dias_semana = [
+    'Sunday'    => 'Domingo',
+    'Monday'    => 'Lunes',
+    'Tuesday'   => 'Martes',
+    'Wednesday' => 'Miércoles',
+    'Thursday'  => 'Jueves',
+    'Friday'    => 'Viernes',
+    'Saturday'  => 'Sábado'
+];
+
+$meses_año = [
+    'January'   => 'Enero',
+    'February'  => 'Febrero',
+    'March'     => 'Marzo',
+    'April'     => 'Abril',
+    'May'       => 'Mayo',
+    'June'      => 'Junio',
+    'July'      => 'Julio',
+    'August'    => 'Agosto',
+    'September' => 'Septiembre',
+    'October'   => 'Octubre',
+    'November'  => 'Noviembre',
+    'December'  => 'Diciembre'
+];
+
+$timestamp = time();
+$dia_nombre = $dias_semana[date('l', $timestamp)];
+$dia_num    = date('d', $timestamp);
+$mes_nombre = $meses_año[date('F', $timestamp)];
+$anio       = date('Y', $timestamp);
+
+// Resultado: "Viernes, 07 de Agosto de 2026"
+$fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -279,43 +313,26 @@ $fecha_formateada = date('l, d \d\e F \d\e Y', strtotime($fecha_hoy));
 <body>
     <!-- Sidebar -->
     <div class="dashboard-container">
-        <div class="sidebar">
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar">
             <div class="logo-section">
                 <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
-                
             </div>
-            <div class="menu">
-                <a href="docente_dashboard.php" class="menu-item">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Crear Recurso</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-tasks"></i>
-                    <span>Crear Actividad</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Crear Evaluación</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-users"></i>
-                    <span>Ver Estudiantes</span>
-                </a>
-                <a href="pasarlista.php" class="menu-item active">
-                    <i class="fas fa-list"></i>
-                    <span>Pasar Lista</span>
-                </a>
+
+            <nav class="menu">
+                <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
+                <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
+                <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
+                <a href="ver_estudiantes.php" class="menu-item active"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
+                <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
+                <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
+                <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
+
                 <div class="menu-spacer"></div>
-                <button class="btn-accessibility-main">
-                    <i class="fas fa-universal-access"></i>
-                    <span>Accesibilidad</span>
-                </button>
-            </div>
-        </div>
+                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -326,22 +343,17 @@ $fecha_formateada = date('l, d \d\e F \d\e Y', strtotime($fecha_hoy));
                     <p>Registra la asistencia de tus estudiantes</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-assistant" id="btn-asistente">
-                        <div class="robot-icon">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <span>Asistente Virtual</span>
-                    </button>
+                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
                     <div class="icon-bell-container">
-                        <i class="fas fa-bell"></i>
+                        <i class="fa-regular fa-bell"></i>
                     </div>
                     <div class="user-profile">
-                        <img src="https://via.placeholder.com/45x45" alt="Avatar" class="avatar">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
                         <div class="user-info">
-                            <span class="user-name"><?= htmlspecialchars($nombre_docente) ?></span>
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                             <span class="user-role">Docente</span>
                         </div>
-                        <i class="fas fa-chevron-down drop-icon"></i>
+                        <i class="fa-solid fa-chevron-down drop-icon"></i>
                     </div>
                 </div>
             </div>
@@ -476,40 +488,47 @@ $fecha_formateada = date('l, d \d\e F \d\e Y', strtotime($fecha_hoy));
                 <!-- Calendario (Right Column) -->
                 <div class="right-column">
                     <div class="border-container">
-                        <div class="calendar-container">
-                            <div class="calendar-header">
-                                <div class="nav-left">
-                                    <button class="nav-btn" id="prev-year">«</button>
-                                    <button class="nav-btn" id="prev-month">‹</button>
-                                </div>
-                                <h3 id="month-year-title">AGOSTO 2026</h3>
-                                <div class="nav-right">
-                                    <button class="nav-btn" id="next-month">›</button>
-                                    <button class="nav-btn" id="next-year">»</button>
-                                </div>
-                            </div>
-                            <div class="calendar-weekdays">
-                                <div class="weekday">Do</div>
-                                <div class="weekday">Lu</div>
-                                <div class="weekday">Ma</div>
-                                <div class="weekday">Mi</div>
-                                <div class="weekday">Ju</div>
-                                <div class="weekday">Vi</div>
-                                <div class="weekday">Sá</div>
-                            </div>
-                            <div class="calendar-days-grid" id="calendar-days">
-                                <!-- Días se generan con JavaScript -->
-                            </div>
+                        <aside class="calendar-container">
+                    <!-- Cabecera y Navegación -->
+                    <div class="calendar-header">
+                        <div class="nav-left">
+                            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+                            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
                         </div>
+
+                        <h2 id="month-year-title">MES AÑO</h2>
+
+                        <div class="nav-right">
+                            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+                            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+                        </div>
+                    </div>
+
+                    <!-- Días de la semana -->
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Do</div>
+                        <div class="weekday">Lu</div>
+                        <div class="weekday">Ma</div>
+                        <div class="weekday">Mi</div>
+                        <div class="weekday">Ju</div>
+                        <div class="weekday">Vi</div>
+                        <div class="weekday">Sá</div>
+                    </div>
+
+                    <!-- Contenedor dinámico de los días -->
+                    <div id="calendar-days" class="calendar-days-grid">
+                        <!-- JavaScript inyectará los días aquí -->
+                    </div>
+                </aside>
                     </div>
                 </div>
             </div>
 
-            <!-- Barra de Accesibilidad -->
-            <div class="accessibility-bar">
+            <!-- BARRA ACCESIBILIDAD -->
+            <footer class="accessibility-bar" style="margin-top: 30px;">
                 <div class="acc-info">
                     <div class="acc-icon-box">
-                        <i class="fas fa-universal-access acc-icon-main"></i>
+                        <i class="fa-solid fa-universal-access acc-icon-main"></i>
                     </div>
                     <div>
                         <strong>Accesibilidad siempre disponible</strong>
@@ -517,37 +536,15 @@ $fecha_formateada = date('l, d \d\e F \d\e Y', strtotime($fecha_hoy));
                     </div>
                 </div>
                 <div class="acc-options">
-                    <button class="acc-opt-btn" id="btn-contrast">
-                        <i class="fas fa-adjust"></i>
-                        <span class="font-icon">Aa</span>
-                        <span>Alto contraste</span>
-                    </button>
-                    <button class="acc-opt-btn" id="btn-darkmode">
-                        <i class="fas fa-moon"></i>
-                        <span>Modo oscuro</span>
-                    </button>
-                    <button class="acc-opt-btn" id="btn-text-size">
-                        <i class="fas fa-text-height"></i>
-                        <span>Texto grande</span>
-                    </button>
-                    <button class="acc-opt-btn">
-                        <i class="fas fa-volume-up"></i>
-                        <span>Leer pantalla</span>
-                    </button>
-                    <button class="acc-opt-btn">
-                        <i class="fas fa-closed-captioning"></i>
-                        <span>Subtítulos</span>
-                    </button>
-                    <button class="acc-opt-btn">
-                        <i class="fas fa-keyboard"></i>
-                        <span>Navegación por teclado</span>
-                    </button>
+                    <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
+                    <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
+                    <button class="acc-opt-btn" id="btn-text-size"><span class="font-icon">Aa</span><span>Texto grande</span></button>
+                    <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
+                    <button class="acc-opt-btn"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
+                    <button class="acc-opt-btn"><i class="fa-solid fa-keyboard"></i><span>Navegación<br>por teclado</span></button>
                 </div>
-                <button class="btn-open-config">
-                    <i class="fas fa-cog"></i>
-                    <span>Abrir configuración</span>
-                </button>
-            </div>
+                <button class="btn-open-config">Abrir configuración</button>
+            </footer>
         </div>
     </div>
 
