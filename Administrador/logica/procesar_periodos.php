@@ -7,6 +7,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../../Conexion/conexion.php';
+ 
 
 $accion = $_POST['accion'] ?? $_GET['accion'] ?? '';
 
