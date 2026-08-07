@@ -821,3 +821,53 @@ body {
 .acc-opt-btn.active .font-icon {
     color: white;
 }
+/* ========================================== */
+/* MENSAJES DE VACÍO                         */
+/* ========================================== */
+.vacio-mensaje {
+    text-align: center;
+    padding: 30px 20px;
+    color: #94a3b8;
+}
+
+.vacio-mensaje i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 12px;
+    color: #cbd5e1;
+}
+
+.vacio-mensaje p {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.vacio-mensaje .link-blue {
+    font-size: 14px;
+}
+
+.text-muted {
+    color: #94a3b8;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Modo oscuro */
+.dark-theme .vacio-mensaje {
+    color: #64748b;
+}
+
+.dark-theme .vacio-mensaje i {
+    color: #475569;
+}
+
+/* Alto contraste */
+.high-contrast-theme .vacio-mensaje {
+    color: #ffff00;
+}
+
+.high-contrast-theme .vacio-mensaje i {
+    color: #ffff00;
+}
