@@ -68,9 +68,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_asistencia'])
     $mensaje_exito = "Lista de asistencia guardada correctamente.";
 }
 
-// Obtener fecha actual
-$fecha_hoy = date('Y-m-d');
-$fecha_formateada = date('l, d \d\e F \d\e Y', strtotime($fecha_hoy));
+// Configurar zona horaria
+date_default_timezone_set('America/Mexico_City');
+
+// Traductores de días y meses en español
+$dias_semana = [
+    'Sunday'    => 'Domingo',
+    'Monday'    => 'Lunes',
+    'Tuesday'   => 'Martes',
+    'Wednesday' => 'Miércoles',
+    'Thursday'  => 'Jueves',
+    'Friday'    => 'Viernes',
+    'Saturday'  => 'Sábado'
+];
+
+$meses_año = [
+    'January'   => 'Enero',
+    'February'  => 'Febrero',
+    'March'     => 'Marzo',
+    'April'     => 'Abril',
+    'May'       => 'Mayo',
+    'June'      => 'Junio',
+    'July'      => 'Julio',
+    'August'    => 'Agosto',
+    'September' => 'Septiembre',
+    'October'   => 'Octubre',
+    'November'  => 'Noviembre',
+    'December'  => 'Diciembre'
+];
+
+$timestamp = time();
+$dia_nombre = $dias_semana[date('l', $timestamp)];
+$dia_num    = date('d', $timestamp);
+$mes_nombre = $meses_año[date('F', $timestamp)];
+$anio       = date('Y', $timestamp);
+
+// Resultado: "Viernes, 07 de Agosto de 2026"
+$fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
 ?>
 <!DOCTYPE html>
 <html lang="es">
