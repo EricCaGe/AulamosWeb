@@ -1063,6 +1063,294 @@ if ($rol === 'alumno') {
     );
 }
 
+/*
+|--------------------------------------------------------------------------
+| Recuperar datos reales del administrador
+|--------------------------------------------------------------------------
+| Estas consultas solo se ejecutan cuando el rol autenticado es Admin.
+| Gemini recibe un resumen y nunca ejecuta SQL directamente.
+*/
+
+$contextoAdmin = '';
+
+if ($rol === 'admin') {
+
+    $resumenAdmin = [
+        'usuariosTotal' => 0,
+        'alumnosTotal' => 0,
+        'docentesTotal' => 0,
+        'administradoresTotal' => 0,
+        'investigadoresTotal' => 0,
+        'ciclosActivos' => 0,
+        'materiasActivas' => 0,
+        'estudiantesInscritos' => 0,
+        'cursosActivos' => 0,
+        'inscripcionesActivas' => 0,
+        'gruposTotal' => 0,
+        'usuariosRecientes' => [],
+    ];
+
+    $consultasAdmin = [
+        'usuariosTotal' => '
+            SELECT COUNT(*) AS total
+            FROM usuarios
+        ',
+
+        'alumnosTotal' => '
+            SELECT COUNT(
+                DISTINCT ur.id_usuario
+            ) AS total
+            FROM usuario_roles ur
+            INNER JOIN roles r
+                ON ur.id_rol = r.id_rol
+            WHERE r.nombre = "Alumno"
+        ',
+
+        'docentesTotal' => '
+            SELECT COUNT(
+                DISTINCT ur.id_usuario
+            ) AS total
+            FROM usuario_roles ur
+            INNER JOIN roles r
+                ON ur.id_rol = r.id_rol
+            WHERE r.nombre = "Docente"
+        ',
+
+        'administradoresTotal' => '
+            SELECT COUNT(
+                DISTINCT ur.id_usuario
+            ) AS total
+            FROM usuario_roles ur
+            INNER JOIN roles r
+                ON ur.id_rol = r.id_rol
+            WHERE r.nombre = "Admin"
+        ',
+
+        'investigadoresTotal' => '
+            SELECT COUNT(
+                DISTINCT ur.id_usuario
+            ) AS total
+            FROM usuario_roles ur
+            INNER JOIN roles r
+                ON ur.id_rol = r.id_rol
+            WHERE r.nombre = "Investigador"
+        ',
+
+        'ciclosActivos' => '
+            SELECT COUNT(*) AS total
+            FROM ciclos_escolares
+            WHERE estado = "Activo"
+        ',
+
+        'materiasActivas' => '
+            SELECT COUNT(*) AS total
+            FROM materias
+            WHERE estado = "Activa"
+        ',
+
+        'estudiantesInscritos' => '
+            SELECT COUNT(
+                DISTINCT id_alumno
+            ) AS total
+            FROM inscripciones
+            WHERE estado = "Activo"
+        ',
+
+        'cursosActivos' => '
+            SELECT COUNT(*) AS total
+            FROM cursos
+            WHERE estado = "Activo"
+        ',
+
+        'inscripcionesActivas' => '
+            SELECT COUNT(*) AS total
+            FROM inscripciones
+            WHERE estado = "Activo"
+        ',
+
+        'gruposTotal' => '
+            SELECT COUNT(*) AS total
+            FROM grupos
+        ',
+    ];
+
+    foreach (
+        $consultasAdmin as $clave => $sql
+    ) {
+
+        $consultaAdmin =
+            $bdChatbot->prepare($sql);
+
+        $consultaAdmin->execute();
+
+        $resultadoAdmin =
+            $consultaAdmin->get_result();
+
+        $filaAdmin =
+            $resultadoAdmin->fetch_assoc();
+
+        $resumenAdmin[$clave] =
+            (int) (
+                $filaAdmin['total'] ?? 0
+            );
+
+        $consultaAdmin->close();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Usuarios registrados recientemente
+    |--------------------------------------------------------------------------
+    | No se envían correos electrónicos ni credenciales a Gemini.
+    */
+
+    $consultaUsuariosRecientes =
+        $bdChatbot->prepare(
+            '
+                SELECT
+                    u.nombre,
+                    u.apellido_paterno,
+                    GROUP_CONCAT(
+                        DISTINCT r.nombre
+                        ORDER BY r.nombre
+                        SEPARATOR ", "
+                    ) AS rol,
+                    u.fecha_registro
+                FROM usuarios u
+                LEFT JOIN usuario_roles ur
+                    ON u.id_usuario = ur.id_usuario
+                LEFT JOIN roles r
+                    ON ur.id_rol = r.id_rol
+                GROUP BY
+                    u.id_usuario,
+                    u.nombre,
+                    u.apellido_paterno,
+                    u.fecha_registro
+                ORDER BY u.fecha_registro DESC
+                LIMIT 5
+            '
+        );
+
+    $consultaUsuariosRecientes->execute();
+
+    $resultadoUsuariosRecientes =
+        $consultaUsuariosRecientes->get_result();
+
+    while (
+        $filaUsuario =
+            $resultadoUsuariosRecientes->fetch_assoc()
+    ) {
+
+        $nombreUsuario = trim(
+            (string) (
+                $filaUsuario['nombre'] ?? ''
+            ) .
+            ' ' .
+            (string) (
+                $filaUsuario[
+                    'apellido_paterno'
+                ] ?? ''
+            )
+        );
+
+        $fechaRegistro =
+            (string) (
+                $filaUsuario[
+                    'fecha_registro'
+                ] ?? ''
+            );
+
+        $fechaTexto =
+            $fechaRegistro !== ''
+                ? date(
+                    'd/m/Y H:i',
+                    strtotime($fechaRegistro)
+                )
+                : 'Sin fecha';
+
+        $resumenAdmin[
+            'usuariosRecientes'
+        ][] =
+            $nombreUsuario .
+            ' | Rol: ' .
+            (string) (
+                $filaUsuario['rol'] ?? ''
+            ) .
+            ' | Registro: ' .
+            $fechaTexto;
+    }
+
+    $consultaUsuariosRecientes->close();
+
+    $usuariosRecientesTexto =
+        count(
+            $resumenAdmin[
+                'usuariosRecientes'
+            ]
+        ) > 0
+            ? implode(
+                "\n- ",
+                $resumenAdmin[
+                    'usuariosRecientes'
+                ]
+            )
+            : 'No hay usuarios recientes.';
+
+    $contextoAdmin = implode(
+        "\n",
+        [
+            'DATOS REALES DEL PANEL ADMINISTRATIVO:',
+            '- Usuarios registrados: ' .
+                $resumenAdmin[
+                    'usuariosTotal'
+                ],
+            '- Cuentas de Alumno: ' .
+                $resumenAdmin[
+                    'alumnosTotal'
+                ],
+            '- Cuentas de Docente: ' .
+                $resumenAdmin[
+                    'docentesTotal'
+                ],
+            '- Cuentas de Administrador: ' .
+                $resumenAdmin[
+                    'administradoresTotal'
+                ],
+            '- Cuentas de Investigador: ' .
+                $resumenAdmin[
+                    'investigadoresTotal'
+                ],
+            '- Ciclos escolares activos: ' .
+                $resumenAdmin[
+                    'ciclosActivos'
+                ],
+            '- Materias activas: ' .
+                $resumenAdmin[
+                    'materiasActivas'
+                ],
+            '- Estudiantes con inscripción activa: ' .
+                $resumenAdmin[
+                    'estudiantesInscritos'
+                ],
+            '- Cursos activos: ' .
+                $resumenAdmin[
+                    'cursosActivos'
+                ],
+            '- Inscripciones activas: ' .
+                $resumenAdmin[
+                    'inscripcionesActivas'
+                ],
+            '- Grupos registrados: ' .
+                $resumenAdmin[
+                    'gruposTotal'
+                ],
+            'USUARIOS REGISTRADOS RECIENTEMENTE:',
+            '- ' .
+                $usuariosRecientesTexto,
+        ]
+    );
+}
+
 $contenidos = [];
 
 $consultaHistorial = $bdChatbot->prepare(
@@ -1166,11 +1454,15 @@ if ($rol === 'docente') {
 
 if ($rol === 'admin') {
     $instruccionesRol = [
-        'El usuario actual es un administrador de AulaMos.',
+        'El usuario actual es un administrador autenticado de AulaMos.',
         'No lo trates como alumno ni como docente.',
-        'Por ahora no tienes contexto administrativo conectado en esta versión.',
-        'No inventes cantidades de usuarios, cursos, grupos, ciclos, materias o inscripciones.',
-        'Si solicita información administrativa que no esté disponible, indica claramente que ese dato todavía no está conectado a AulaBot.',
+        'Puedes responder preguntas administrativas únicamente con los datos reales proporcionados por AulaMos.',
+        'Puedes consultar cantidades de usuarios, alumnos, docentes, administradores, investigadores, ciclos escolares activos, materias activas, estudiantes con inscripción activa, cursos activos, inscripciones activas y grupos registrados.',
+        'También puedes consultar los usuarios registrados recientemente cuando esa información sea proporcionada en el contexto.',
+        'No inventes usuarios, cantidades, grupos, cursos, materias, inscripciones ni estadísticas.',
+        'No reveles contraseñas, claves API, credenciales ni configuraciones privadas.',
+        'No afirmes que creaste, eliminaste o modificaste registros si esa operación no está implementada.',
+        'Si un dato administrativo no está incluido en el contexto disponible, indica claramente que ese dato todavía no está conectado a AulaBot.',
         'Responde de manera profesional, clara y breve.',
     ];
 }
@@ -1200,6 +1492,30 @@ if (
 
     $instruccionesRol[] =
         'No contradigas, modifiques ni completes con cantidades inventadas los datos reales proporcionados.';
+}
+
+
+if (
+    $rol === 'admin' &&
+    $contextoAdmin !== ''
+) {
+    $instruccionesRol[] =
+        $contextoAdmin;
+
+    $instruccionesRol[] =
+        'Los datos anteriores provienen directamente de la base de datos de AulaMos.';
+
+    $instruccionesRol[] =
+        'Cuando el administrador pregunte por usuarios, alumnos, docentes, administradores, investigadores, ciclos, materias, estudiantes inscritos, cursos, inscripciones o grupos, responde directamente con los datos reales anteriores.';
+
+    $instruccionesRol[] =
+        'Cuando pregunte por usuarios recientes, utiliza exclusivamente la lista proporcionada.';
+
+    $instruccionesRol[] =
+        'Diferencia entre cuentas con rol Alumno y estudiantes con inscripción activa, ya que no necesariamente representan la misma cantidad.';
+
+    $instruccionesRol[] =
+        'No contradigas, modifiques ni completes con datos inventados las cifras reales proporcionadas.';
 }
 
 

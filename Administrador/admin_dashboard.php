@@ -109,7 +109,7 @@ $usuarios_recientes = $conexion->query("
                 <p>Bienvenido a tu espacio administrativo.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">
+                <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
                     <i class="fa-solid fa-comment-dots"></i> Chatbot
                 </button>
                 <div class="icon-bell">
