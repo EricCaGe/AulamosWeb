@@ -7,13 +7,11 @@
 // Configuración de la conexión
 //$host = '10.2.2.43';
 //$host = '10.2.0.234';
-<<<<<<< HEAD
-$host = 'localhost';
-$usuario = 'Aulamos';
-=======
-$host = '10.2.1.226';
+
+
+$host = '10.2.0.125';
 $usuario = 'aulamos';
->>>>>>> 319848ee2130fabba3b1f293087604f07431f33e
+
 $password = 'E12345678!';
 //$password = '12345678';
 //$password = 'Jaziel123';
