@@ -101,6 +101,9 @@
         if (pref === 'lector_pantalla') {
     localStorage.setItem('lector_pantalla', value == 1 ? 'true' : 'false');
 }
+if (pref === 'navegacion_teclado') {
+            localStorage.setItem('navegacion_teclado', value == 1 ? 'true' : 'false');
+        }
         fetch('../ajax/guardar_preferencia.php', {
             method: 'POST',
             headers: {
@@ -159,8 +162,13 @@
         }
 
     }
-
     break;
+                case 'navegacion_teclado':
+                // Llamar al toggle de la nueva clase
+                if (window.teclado) {
+                    window.teclado.toggle();
+                }
+                break;
             case 'subtitulos':
                 // Simulación
                 if (value == 1) {
@@ -169,14 +177,7 @@
                     console.log('📝 Subtítulos desactivados');
                 }
                 break;
-            case 'navegacion_teclado':
-                // Simulación
-                if (value == 1) {
-                    console.log('⌨️ Navegación por teclado activada');
-                } else {
-                    console.log('⌨️ Navegación por teclado desactivada');
-                }
-                break;
+                
         }
     }
     
@@ -196,6 +197,11 @@
             const value = select.value;
             aplicarPreferenciaVisual(pref, value);
         });
+          const estadoTeclado = localStorage.getItem('navegacion_teclado');
+        if (estadoTeclado === 'true') {
+            // Si estaba activado, mostramos el teclado automáticamente
+            toggleKeyboardDisplay(true);
+         }
     }
     
     cargarPreferenciasIniciales();
@@ -206,4 +212,9 @@
     // los duplicamos aquí.
     // =============================================
 
+    // Variable para guardar la instancia del teclado virtual
+let virtualKeyboardInstance = null;
+
+
+ window.toggleKeyboardDisplay = toggleKeyboardDisplay;
 })();

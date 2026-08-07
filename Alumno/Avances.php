@@ -275,6 +275,10 @@ if (empty($statsMateria)) {
 
     </main>
 </div>
+
+<?php include '../API/teclado_accesibilidad.php'; ?>
+<script src="js/navegacionTeclado.js"></script>
+<script src="js/Accesibilidad.js"></script> 
 <script src="../Administrador/js/lector.js"></script>
 <script src="js/Inicio.js"></script>
 <script src="js/Avances.js"></script>

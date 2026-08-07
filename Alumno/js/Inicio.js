@@ -116,10 +116,27 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // --- Navegación por teclado (simulación) ---
     if (btnNavegacion) {
-        btnNavegacion.addEventListener('click', function() {
-            alert('⌨️ Navegación por teclado mejorada (simulación)');
-        });
-    }
+    btnNavegacion.addEventListener('click', function() {
+        // Buscar si existe el toggle de la configuración (en la página de accesibilidad)
+        const togglePrincipal = document.querySelector('.toggle-btn[data-pref="navegacion_teclado"]');
+        
+        if (togglePrincipal) {
+            // Si estamos en la página de accesibilidad, hacemos clic en el toggle de arriba
+            togglePrincipal.click();
+        } else {
+            // Si estamos en otra página (alumno, actividades, etc.), activamos el teclado directamente
+            if (window.teclado) {
+                window.teclado.toggle();
+            } else {
+                console.warn("⌨️ Teclado aún no cargado, reintentando...");
+                // Reintentar en 300ms por si el DOM tardó en cargar
+                setTimeout(() => {
+                    if (window.teclado) window.teclado.toggle();
+                }, 300);
+            }
+        }
+    });
+}
 
     // --- Configuración ---
     if (btnConfig) {
