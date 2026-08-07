@@ -98,6 +98,9 @@
     
     // Guardar preferencia en BD mediante AJAX
     function guardarPreferencia(pref, value) {
+        if (pref === 'lector_pantalla') {
+    localStorage.setItem('lector_pantalla', value == 1 ? 'true' : 'false');
+}
         fetch('../ajax/guardar_preferencia.php', {
             method: 'POST',
             headers: {
@@ -144,13 +147,20 @@
                 }
                 break;
             case 'lector_pantalla':
-                // Simulación: mostrar alerta o activar lector
-                if (value == 1) {
-                    console.log('🔊 Lector de pantalla activado');
-                } else {
-                    console.log('🔇 Lector de pantalla desactivado');
-                }
-                break;
+
+    if (typeof lector !== 'undefined' && lector) {
+
+        if (value == 1 && !lector.activado) {
+            lector.activar();
+        }
+
+        if (value == 0 && lector.activado) {
+            lector.desactivar();
+        }
+
+    }
+
+    break;
             case 'subtitulos':
                 // Simulación
                 if (value == 1) {

@@ -3,7 +3,12 @@ session_start();
 require_once '../Conexion/conexion.php';
 
 // Verificar que el usuario esté logueado
-$id_usuario = $_SESSION['id_usuario'] ?? 1; // Cambia por el ID real de sesión
+if (!isset($_SESSION['usuario'])) {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
+$id_usuario = $_SESSION['usuario']['id_usuario'];
 
 // =============================================
 // 1. OBTENER PREFERENCIAS ACTUALES
@@ -76,7 +81,7 @@ $textSizeMap = [
         
         <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         <div class="menu-spacer"></div>
-    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -244,7 +249,7 @@ $textSizeMap = [
                 <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
                 <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
                 <button class="acc-opt-btn" id="btn-text-size"><i class="fa-solid fa-font"></i><span>Texto grande</span></button>
-                <button class="acc-opt-btn" id="btn-leer"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
+                 <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
                 <button class="acc-opt-btn" id="btn-subtitulos"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
                 <button class="acc-opt-btn" id="btn-navegacion"><i class="fa-solid fa-keyboard"></i><span>Navegación</span></button>
             </div>
@@ -256,5 +261,7 @@ $textSizeMap = [
 
 <script src="js/Inicio.js"></script>
 <script src="js/Accesibilidad.js"></script>
+<script src="./InicioSesion/js/lector.js"></script>
+<script src="../Administrador/js/lector.js"></script>
 </body>
 </html>

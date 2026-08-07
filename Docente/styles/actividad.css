@@ -214,3 +214,67 @@ input:checked + .slider:before {
   background-color: #e0ebff;
   border-color: #4a75f0;
 }
+
+/* =========================================
+   ESTILOS PARA BOTONES (MISMO TAMAÑO Y COLOR)
+========================================= */
+
+/* Contenedor de botones */
+.activity-form .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Botón "Crear Actividad" (azul) */
+.btn-outline-blue {
+    background-color: #3b71f3; /* Azul sólido */
+    color: white;
+    border: 1px solid #3b71f3;
+    padding: 12px 24px; /* Mismo padding para ambos botones */
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%; /* Ocupa todo el espacio disponible */
+    justify-content: center;
+}
+
+.btn-outline-blue:hover {
+    background-color: #2a5fc8; /* Azul más oscuro al pasar el mouse */
+    border-color: #2a5fc8;
+}
+
+/* Botón "Cancelar" (azul claro para que combine) */
+.btn-outline-gray {
+    background-color: #f0f5ff; /* Fondo azul muy claro */
+    color: #3b71f3; /* Texto azul */
+    border: 1px solid #3b71f3; /* Borde azul */
+    padding: 12px 24px; /* Mismo padding que el botón azul */
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%; /* Mismo ancho que el botón azul */
+    justify-content: center;
+}
+
+.btn-outline-gray:hover {
+    background-color: #e0ebff; /* Fondo un poco más oscuro al pasar el mouse */
+    color: #2a5fc8; /* Texto azul más oscuro */
+    border-color: #2a5fc8;
+}
+
+/* Asegurar que ambos botones tengan el mismo ancho en el contenedor */
+.activity-form .button-group .btn-outline-blue,
+.activity-form .button-group .btn-outline-gray {
+    flex: 1; /* Ambos botones ocupan el mismo espacio */
+}
