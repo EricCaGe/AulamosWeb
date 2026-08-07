@@ -344,6 +344,725 @@ if ($rol === 'docente') {
     );
 }
 
+/*
+|--------------------------------------------------------------------------
+| Recuperar datos reales del alumno
+|--------------------------------------------------------------------------
+| Todas las consultas utilizan exclusivamente el ID autenticado.
+| Gemini recibe un resumen y nunca puede elegir otro alumno.
+*/
+
+$contextoAlumno = '';
+
+if ($rol === 'alumno') {
+
+    $resumenAlumno = [
+        'materias' => [],
+        'cursos' => [],
+        'actividadesTotal' => 0,
+        'actividadesPendientes' => 0,
+        'actividadesAtrasadas' => 0,
+        'actividadesEnProceso' => 0,
+        'actividadesCompletadas' => 0,
+        'actividadesCalificadas' => 0,
+        'progresoGeneral' => 0,
+        'rachaDias' => 0,
+        'horasAprendizajeMes' => 0.0,
+        'promedioEntregasCalificadas' => null,
+        'entregasCalificadas' => 0,
+        'proximaActividad' => null,
+        'actividadesPorAtender' => [],
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Materias y cursos activos
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaMaterias = $bdChatbot->prepare(
+        '
+            SELECT DISTINCT
+                m.nombre AS materia_nombre,
+                c.nombre AS curso_nombre
+            FROM inscripciones i
+            INNER JOIN cursos c
+                ON i.id_curso = c.id_curso
+            INNER JOIN materias m
+                ON c.id_materia = m.id_materia
+            WHERE i.id_alumno = ?
+              AND i.estado = "Activo"
+              AND c.estado = "Activo"
+            ORDER BY
+                m.nombre,
+                c.nombre
+        '
+    );
+
+    $consultaMaterias->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaMaterias->execute();
+
+    $resultadoMaterias =
+        $consultaMaterias->get_result();
+
+    while (
+        $filaMateria =
+            $resultadoMaterias->fetch_assoc()
+    ) {
+
+        $materia = trim(
+            (string) (
+                $filaMateria['materia_nombre'] ?? ''
+            )
+        );
+
+        $curso = trim(
+            (string) (
+                $filaMateria['curso_nombre'] ?? ''
+            )
+        );
+
+        if (
+            $materia !== '' &&
+            !in_array(
+                $materia,
+                $resumenAlumno['materias'],
+                true
+            )
+        ) {
+            $resumenAlumno['materias'][] =
+                $materia;
+        }
+
+        if (
+            $curso !== '' &&
+            !in_array(
+                $curso,
+                $resumenAlumno['cursos'],
+                true
+            )
+        ) {
+            $resumenAlumno['cursos'][] =
+                $curso;
+        }
+    }
+
+    $consultaMaterias->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resumen de actividades
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaActividades = $bdChatbot->prepare(
+        '
+            SELECT
+                COUNT(*) AS total,
+
+                SUM(
+                    CASE
+                        WHEN ae.estado IN (
+                            "Pendiente",
+                            "En_proceso",
+                            "Atrasada"
+                        )
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS pendientes,
+
+                SUM(
+                    CASE
+                        WHEN ae.estado = "En_proceso"
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS en_proceso,
+
+                SUM(
+                    CASE
+                        WHEN
+                            ae.estado = "Atrasada"
+                            OR (
+                                ae.estado = "Pendiente"
+                                AND a.fecha_limite < NOW()
+                            )
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS atrasadas,
+
+                SUM(
+                    CASE
+                        WHEN ae.estado IN (
+                            "Completada",
+                            "Calificada"
+                        )
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS completadas,
+
+                SUM(
+                    CASE
+                        WHEN ae.estado = "Calificada"
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS calificadas
+
+            FROM actividad_estudiantes ae
+
+            INNER JOIN actividades a
+                ON ae.id_actividad = a.id_actividad
+
+            WHERE ae.id_alumno = ?
+        '
+    );
+
+    $consultaActividades->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaActividades->execute();
+
+    $resultadoActividades =
+        $consultaActividades->get_result();
+
+    $filaActividades =
+        $resultadoActividades->fetch_assoc();
+
+    $resumenAlumno['actividadesTotal'] =
+        (int) (
+            $filaActividades['total'] ?? 0
+        );
+
+    $resumenAlumno['actividadesPendientes'] =
+        (int) (
+            $filaActividades['pendientes'] ?? 0
+        );
+
+    $resumenAlumno['actividadesEnProceso'] =
+        (int) (
+            $filaActividades['en_proceso'] ?? 0
+        );
+
+    $resumenAlumno['actividadesAtrasadas'] =
+        (int) (
+            $filaActividades['atrasadas'] ?? 0
+        );
+
+    $resumenAlumno['actividadesCompletadas'] =
+        (int) (
+            $filaActividades['completadas'] ?? 0
+        );
+
+    $resumenAlumno['actividadesCalificadas'] =
+        (int) (
+            $filaActividades['calificadas'] ?? 0
+        );
+
+    $consultaActividades->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Progreso general
+    |--------------------------------------------------------------------------
+    */
+
+    if ($resumenAlumno['actividadesTotal'] > 0) {
+
+        $resumenAlumno['progresoGeneral'] =
+            (int) round(
+                (
+                    $resumenAlumno[
+                        'actividadesCompletadas'
+                    ] /
+                    $resumenAlumno[
+                        'actividadesTotal'
+                    ]
+                ) * 100
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Próxima actividad
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaProxima = $bdChatbot->prepare(
+        '
+            SELECT
+                a.titulo,
+                m.nombre AS materia,
+                a.fecha_limite
+            FROM actividad_estudiantes ae
+            INNER JOIN actividades a
+                ON ae.id_actividad = a.id_actividad
+            INNER JOIN cursos c
+                ON a.id_curso = c.id_curso
+            INNER JOIN materias m
+                ON c.id_materia = m.id_materia
+            WHERE ae.id_alumno = ?
+              AND ae.estado IN (
+                  "Pendiente",
+                  "En_proceso"
+              )
+              AND a.fecha_limite >= NOW()
+            ORDER BY a.fecha_limite ASC
+            LIMIT 1
+        '
+    );
+
+    $consultaProxima->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaProxima->execute();
+
+    $resultadoProxima =
+        $consultaProxima->get_result();
+
+    $filaProxima =
+        $resultadoProxima->fetch_assoc();
+
+    if ($filaProxima) {
+
+        $resumenAlumno['proximaActividad'] = [
+            'titulo' =>
+                (string) $filaProxima['titulo'],
+
+            'materia' =>
+                (string) $filaProxima['materia'],
+
+            'fechaLimite' =>
+                (string) $filaProxima['fecha_limite'],
+        ];
+    }
+
+    $consultaProxima->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Primeras actividades que debe atender
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaPendientes = $bdChatbot->prepare(
+        '
+            SELECT
+                a.titulo,
+                m.nombre AS materia,
+                a.fecha_limite,
+
+                CASE
+                    WHEN
+                        ae.estado = "Atrasada"
+                        OR (
+                            ae.estado = "Pendiente"
+                            AND a.fecha_limite < NOW()
+                        )
+                    THEN "Atrasada"
+
+                    WHEN ae.estado = "En_proceso"
+                    THEN "En proceso"
+
+                    ELSE "Pendiente"
+                END AS estado_mostrar
+
+            FROM actividad_estudiantes ae
+
+            INNER JOIN actividades a
+                ON ae.id_actividad = a.id_actividad
+
+            INNER JOIN cursos c
+                ON a.id_curso = c.id_curso
+
+            INNER JOIN materias m
+                ON c.id_materia = m.id_materia
+
+            WHERE ae.id_alumno = ?
+              AND ae.estado IN (
+                  "Pendiente",
+                  "En_proceso",
+                  "Atrasada"
+              )
+
+            ORDER BY
+                a.fecha_limite ASC
+
+            LIMIT 5
+        '
+    );
+
+    $consultaPendientes->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaPendientes->execute();
+
+    $resultadoPendientes =
+        $consultaPendientes->get_result();
+
+    while (
+        $filaPendiente =
+            $resultadoPendientes->fetch_assoc()
+    ) {
+
+        $fechaLimite =
+            (string) (
+                $filaPendiente['fecha_limite'] ?? ''
+            );
+
+        $fechaFormateada = $fechaLimite !== ''
+            ? date(
+                'd/m/Y H:i',
+                strtotime($fechaLimite)
+            )
+            : 'Sin fecha';
+
+        $resumenAlumno[
+            'actividadesPorAtender'
+        ][] = [
+            'titulo' =>
+                (string) (
+                    $filaPendiente['titulo'] ?? ''
+                ),
+
+            'materia' =>
+                (string) (
+                    $filaPendiente['materia'] ?? ''
+                ),
+
+            'fecha' =>
+                $fechaFormateada,
+
+            'estado' =>
+                (string) (
+                    $filaPendiente[
+                        'estado_mostrar'
+                    ] ?? 'Pendiente'
+                ),
+        ];
+    }
+
+    $consultaPendientes->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Entregas calificadas y promedio registrado
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaCalificaciones = $bdChatbot->prepare(
+        '
+            SELECT
+                COUNT(*) AS total_calificadas,
+                AVG(e.calificacion) AS promedio
+            FROM entregas e
+            INNER JOIN actividad_estudiantes ae
+                ON e.id_actividad_estudiante =
+                   ae.id_actividad_estudiante
+            WHERE ae.id_alumno = ?
+              AND e.estado = "Calificada"
+              AND e.calificacion IS NOT NULL
+        '
+    );
+
+    $consultaCalificaciones->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaCalificaciones->execute();
+
+    $resultadoCalificaciones =
+        $consultaCalificaciones->get_result();
+
+    $filaCalificaciones =
+        $resultadoCalificaciones->fetch_assoc();
+
+    $resumenAlumno['entregasCalificadas'] =
+        (int) (
+            $filaCalificaciones[
+                'total_calificadas'
+            ] ?? 0
+        );
+
+    if (
+        isset($filaCalificaciones['promedio']) &&
+        $filaCalificaciones['promedio'] !== null
+    ) {
+        $resumenAlumno[
+            'promedioEntregasCalificadas'
+        ] = round(
+            (float) $filaCalificaciones['promedio'],
+            2
+        );
+    }
+
+    $consultaCalificaciones->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Días activos durante los últimos 30 días
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaRacha = $bdChatbot->prepare(
+        '
+            SELECT
+                COUNT(
+                    DISTINCT DATE(fecha_hora)
+                ) AS dias_activos
+            FROM eventos_investigacion
+            WHERE id_usuario = ?
+              AND DATE(fecha_hora) >=
+                  DATE_SUB(
+                      CURRENT_DATE(),
+                      INTERVAL 30 DAY
+                  )
+        '
+    );
+
+    $consultaRacha->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaRacha->execute();
+
+    $resultadoRacha =
+        $consultaRacha->get_result();
+
+    $filaRacha =
+        $resultadoRacha->fetch_assoc();
+
+    $resumenAlumno['rachaDias'] =
+        (int) (
+            $filaRacha['dias_activos'] ?? 0
+        );
+
+    $consultaRacha->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Horas de aprendizaje del mes actual
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaHoras = $bdChatbot->prepare(
+        '
+            SELECT
+                COALESCE(
+                    SUM(duracion_segundos),
+                    0
+                ) / 3600 AS horas
+            FROM eventos_investigacion
+            WHERE id_usuario = ?
+              AND YEAR(fecha_hora) =
+                  YEAR(CURRENT_DATE())
+              AND MONTH(fecha_hora) =
+                  MONTH(CURRENT_DATE())
+        '
+    );
+
+    $consultaHoras->bind_param(
+        'i',
+        $idUsuario
+    );
+
+    $consultaHoras->execute();
+
+    $resultadoHoras =
+        $consultaHoras->get_result();
+
+    $filaHoras =
+        $resultadoHoras->fetch_assoc();
+
+    $resumenAlumno['horasAprendizajeMes'] =
+        round(
+            (float) (
+                $filaHoras['horas'] ?? 0
+            ),
+            1
+        );
+
+    $consultaHoras->close();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Construir resumen que recibirá Gemini
+    |--------------------------------------------------------------------------
+    */
+
+    $materiasTexto =
+        count($resumenAlumno['materias']) > 0
+            ? implode(
+                ', ',
+                $resumenAlumno['materias']
+            )
+            : 'Ninguna';
+
+    $cursosTexto =
+        count($resumenAlumno['cursos']) > 0
+            ? implode(
+                ', ',
+                $resumenAlumno['cursos']
+            )
+            : 'Ninguno';
+
+    $promedioTexto =
+        $resumenAlumno[
+            'promedioEntregasCalificadas'
+        ] !== null
+            ? (
+                (string) $resumenAlumno[
+                    'promedioEntregasCalificadas'
+                ] .
+                ' de 100'
+            )
+            : 'Sin entregas calificadas';
+
+    $proximaTexto = 'No hay una actividad próxima.';
+
+    if (
+        is_array(
+            $resumenAlumno['proximaActividad']
+        )
+    ) {
+
+        $fechaProxima =
+            $resumenAlumno[
+                'proximaActividad'
+            ]['fechaLimite'];
+
+        $proximaTexto =
+            $resumenAlumno[
+                'proximaActividad'
+            ]['titulo'] .
+            ' | ' .
+            $resumenAlumno[
+                'proximaActividad'
+            ]['materia'] .
+            ' | vence ' .
+            date(
+                'd/m/Y H:i',
+                strtotime($fechaProxima)
+            );
+    }
+
+    $lineasPendientes = [];
+
+    foreach (
+        $resumenAlumno[
+            'actividadesPorAtender'
+        ] as $actividadPendiente
+    ) {
+
+        $lineasPendientes[] =
+            '- ' .
+            $actividadPendiente['titulo'] .
+            ' | ' .
+            $actividadPendiente['materia'] .
+            ' | ' .
+            $actividadPendiente['estado'] .
+            ' | vence ' .
+            $actividadPendiente['fecha'];
+    }
+
+    $pendientesTexto =
+        count($lineasPendientes) > 0
+            ? implode(
+                "\n",
+                $lineasPendientes
+            )
+            : '- No hay actividades por atender.';
+
+    $contextoAlumno = implode(
+        "\n",
+        [
+            'DATOS REALES DE LA CUENTA DEL ALUMNO:',
+            '- Materias activas: ' .
+                count(
+                    $resumenAlumno['materias']
+                ),
+            '- Nombres de materias: ' .
+                $materiasTexto,
+            '- Cursos activos: ' .
+                count(
+                    $resumenAlumno['cursos']
+                ),
+            '- Nombres de cursos: ' .
+                $cursosTexto,
+            '- Actividades totales: ' .
+                $resumenAlumno[
+                    'actividadesTotal'
+                ],
+            '- Actividades pendientes o por atender: ' .
+                $resumenAlumno[
+                    'actividadesPendientes'
+                ],
+            '- Actividades atrasadas: ' .
+                $resumenAlumno[
+                    'actividadesAtrasadas'
+                ],
+            '- Actividades en proceso: ' .
+                $resumenAlumno[
+                    'actividadesEnProceso'
+                ],
+            '- Actividades completadas: ' .
+                $resumenAlumno[
+                    'actividadesCompletadas'
+                ],
+            '- Actividades calificadas: ' .
+                $resumenAlumno[
+                    'actividadesCalificadas'
+                ],
+            '- Progreso general calculado: ' .
+                $resumenAlumno[
+                    'progresoGeneral'
+                ] .
+                '%',
+            '- Días activos en los últimos 30 días: ' .
+                $resumenAlumno[
+                    'rachaDias'
+                ],
+            '- Horas de aprendizaje este mes: ' .
+                $resumenAlumno[
+                    'horasAprendizajeMes'
+                ],
+            '- Entregas calificadas: ' .
+                $resumenAlumno[
+                    'entregasCalificadas'
+                ],
+            '- Promedio de entregas calificadas registradas: ' .
+                $promedioTexto,
+            '- Próxima actividad: ' .
+                $proximaTexto,
+            'ACTIVIDADES POR ATENDER:',
+            $pendientesTexto,
+        ]
+    );
+}
+
 $contenidos = [];
 
 $consultaHistorial = $bdChatbot->prepare(
@@ -438,6 +1157,34 @@ if ($rol === 'docente') {
     ];
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Roles que todavía no tienen contexto especializado
+|--------------------------------------------------------------------------
+*/
+
+if ($rol === 'admin') {
+    $instruccionesRol = [
+        'El usuario actual es un administrador de AulaMos.',
+        'No lo trates como alumno ni como docente.',
+        'Por ahora no tienes contexto administrativo conectado en esta versión.',
+        'No inventes cantidades de usuarios, cursos, grupos, ciclos, materias o inscripciones.',
+        'Si solicita información administrativa que no esté disponible, indica claramente que ese dato todavía no está conectado a AulaBot.',
+        'Responde de manera profesional, clara y breve.',
+    ];
+}
+
+if ($rol === 'investigador') {
+    $instruccionesRol = [
+        'El usuario actual tiene rol de investigador en AulaMos.',
+        'No lo trates como alumno, docente ni administrador.',
+        'El módulo especializado de investigador todavía no está conectado a AulaBot.',
+        'No inventes funciones, estadísticas ni datos de investigación.',
+        'Responde de manera profesional, clara y breve.',
+    ];
+}
+
 if (
     $rol === 'docente' &&
     $contextoDocente !== ''
@@ -453,6 +1200,30 @@ if (
 
     $instruccionesRol[] =
         'No contradigas, modifiques ni completes con cantidades inventadas los datos reales proporcionados.';
+}
+
+
+if (
+    $rol === 'alumno' &&
+    $contextoAlumno !== ''
+) {
+    $instruccionesRol[] =
+        $contextoAlumno;
+
+    $instruccionesRol[] =
+        'Los datos anteriores provienen directamente de la base de datos de AulaMos y pertenecen únicamente al alumno autenticado.';
+
+    $instruccionesRol[] =
+        'Cuando el alumno pregunte por sus materias, cursos, actividades, pendientes, atrasos, progreso, racha, horas de aprendizaje o próxima actividad, responde directamente usando los datos reales anteriores.';
+
+    $instruccionesRol[] =
+        'Cuando pregunte cuáles actividades tiene pendientes o atrasadas, usa la lista ACTIVIDADES POR ATENDER y no inventes actividades adicionales.';
+
+    $instruccionesRol[] =
+        'El promedio indicado corresponde únicamente al promedio simple de las entregas calificadas registradas en AulaMos; no lo presentes como promedio final oficial del curso.';
+
+    $instruccionesRol[] =
+        'Si un dato aparece como cero, ninguno o sin información, dilo claramente en lugar de inventar valores.';
 }
 
 $instruccionSistema = implode(
