@@ -85,7 +85,7 @@ $conexion->close();
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-                
+                <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
 
                 <div class="menu-spacer"></div>

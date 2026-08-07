@@ -195,5 +195,6 @@
 
 <script src="js/accesibilidad.js"></script>
 <script src="js/lector.js"></script>
+<link rel="stylesheet" href="styles/accesibilidados.css">
 </body>
 </html>

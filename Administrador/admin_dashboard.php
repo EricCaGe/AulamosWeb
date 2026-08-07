@@ -8,6 +8,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../Conexion/conexion.php';
+require_once 'includes/preferencias.php';
 
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -54,7 +55,7 @@ $usuarios_recientes = $conexion->query("
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="<?php echo $clases_body; ?>">
 
 <div class="dashboard-container">
     
@@ -117,11 +118,11 @@ $usuarios_recientes = $conexion->query("
                 <button class="btn-accessibility-header">
                     <i class="fa-solid fa-universal-access"></i>
                 </button>
-                <div class="user-profile">
+                <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
                     <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </div>
+                </a>
                 <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
@@ -251,7 +252,6 @@ $usuarios_recientes = $conexion->query("
 </div>
 
 <script src="js/admin.js"></script>
-<!-- LECTOR DE PANTALLA -->
 <script src="js/lector.js"></script>
 </body>
 </html>
