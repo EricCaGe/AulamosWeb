@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+header('Content-Type: application/json; charset=utf-8');
+
 // Verificar que el usuario sea Docente
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     http_response_code(403);
@@ -8,7 +10,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     exit;
 }
 
-// Verificar que se envió un archivo
+// Verificar que se recibió un archivo
 if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
     http_response_code(400);
     echo json_encode(['error' => 'No se recibió ningún archivo']);
@@ -20,72 +22,125 @@ $nombre_original = basename($archivo['name']);
 $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
 
 // Tipos permitidos
-$tipos_permitidos = ['pdf', 'mp4', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'jpg', 'png'];
+$tipos_permitidos = [
+    'pdf',
+    'mp4',
+    'doc',
+    'docx',
+    'ppt',
+    'pptx',
+    'txt',
+    'jpg',
+    'png'
+];
 
-if (!in_array($extension, $tipos_permitidos)) {
+if (!in_array($extension, $tipos_permitidos, true)) {
     http_response_code(400);
     echo json_encode(['error' => 'Tipo de archivo no permitido']);
     exit;
 }
 
-// Limitar tamaño a 50MB
+// Limitar tamaño a 50 MB
 if ($archivo['size'] > 50 * 1024 * 1024) {
     http_response_code(400);
-    echo json_encode(['error' => 'El archivo excede el tamaño máximo (50MB)']);
+    echo json_encode([
+        'error' => 'El archivo excede el tamaño máximo (50MB)'
+    ]);
     exit;
 }
 
+/*
+ * IMPORTANTE:
+ * Los recursos Web y Móvil ahora utilizan
+ * el MISMO almacenamiento físico.
+ */
+$carpeta_fisica = 'C:/AulamosCom/aulamos-api/uploads/recursos/';
+
 // Crear carpeta si no existe
-$carpeta = '../uploads/cursos/';
-if (!is_dir($carpeta)) {
-    mkdir($carpeta, 0777, true);
-}
-
-// Generar nombre único
-$nombre_archivo = uniqid() . '.' . $extension;
-$ruta_destino = $carpeta . $nombre_archivo;
-
-// Mover archivo
-if (move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
-    // Guardar en recursos_educativos (sin id_materia por ahora)
-    require_once '../Conexion/conexion.php';
-    
-    $id_docente = $_SESSION['usuario']['id_usuario'];
-    $tipo_recurso = $_POST['tipo_curso'] ?? 'Documento';
-    $titulo = $_POST['titulo'] ?? $nombre_original;
-    $descripcion = $_POST['descripcion'] ?? '';
-    $compartido_tipo = $_POST['compartido_tipo'] ?? 'Curso';
-    
-    $stmt = $conexion->prepare("
-        INSERT INTO recursos_educativos (
-            titulo, 
-            descripcion, 
-            tipo, 
-            url_recurso, 
-            id_docente, 
-            compartido_tipo,
-            estado
-        ) VALUES (?, ?, ?, ?, ?, ?, 'Activo')
-    ");
-    $stmt->bind_param("ssssis", $titulo, $descripcion, $tipo_recurso, $ruta_destino, $id_docente, $compartido_tipo);
-    
-    if ($stmt->execute()) {
-        $id_recurso = $conexion->insert_id;
-        echo json_encode([
-            'success' => true,
-            'message' => 'Archivo subido correctamente',
-            'nombre' => $nombre_original,
-            'url' => $ruta_destino,
-            'id_recurso' => $id_recurso
-        ]);
-    } else {
+if (!is_dir($carpeta_fisica)) {
+    if (!mkdir($carpeta_fisica, 0777, true)) {
         http_response_code(500);
-        echo json_encode(['error' => 'Error al guardar en la base de datos: ' . $stmt->error]);
+        echo json_encode([
+            'error' => 'No se pudo crear la carpeta de recursos'
+        ]);
+        exit;
     }
-    $stmt->close();
-    
-} else {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error al mover el archivo']);
 }
+
+// Nombre único
+$nombre_archivo = uniqid() . '.' . $extension;
+
+// Ruta física real en GreciaHP
+$ruta_fisica = $carpeta_fisica . $nombre_archivo;
+
+// Ruta que se almacena en MySQL y utiliza la API
+$ruta_publica = '/uploads/recursos/' . $nombre_archivo;
+
+// Mover archivo al almacenamiento común
+if (!move_uploaded_file($archivo['tmp_name'], $ruta_fisica)) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Error al mover el archivo'
+    ]);
+    exit;
+}
+
+require_once '../Conexion/conexion.php';
+
+$id_docente = $_SESSION['usuario']['id_usuario'];
+$tipo_recurso = $_POST['tipo_curso'] ?? 'Documento';
+$titulo = $_POST['titulo'] ?? $nombre_original;
+$descripcion = $_POST['descripcion'] ?? '';
+$compartido_tipo = $_POST['compartido_tipo'] ?? 'Curso';
+
+$stmt = $conexion->prepare("
+    INSERT INTO recursos_educativos (
+        titulo,
+        descripcion,
+        tipo,
+        url_recurso,
+        id_docente,
+        compartido_tipo,
+        estado
+    )
+    VALUES (?, ?, ?, ?, ?, ?, 'Activo')
+");
+
+$stmt->bind_param(
+    "ssssis",
+    $titulo,
+    $descripcion,
+    $tipo_recurso,
+    $ruta_publica,
+    $id_docente,
+    $compartido_tipo
+);
+
+if ($stmt->execute()) {
+
+    $id_recurso = $conexion->insert_id;
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Archivo subido correctamente',
+        'nombre' => $nombre_original,
+        'url' => $ruta_publica,
+        'id_recurso' => $id_recurso
+    ]);
+
+} else {
+
+    // Si falla MySQL, eliminar el archivo para no dejar basura
+    if (file_exists($ruta_fisica)) {
+        unlink($ruta_fisica);
+    }
+
+    http_response_code(500);
+
+    echo json_encode([
+        'error' => 'Error al guardar en la base de datos: ' . $stmt->error
+    ]);
+}
+
+$stmt->close();
 ?>

@@ -1,28 +1,127 @@
-(function() {
+(function () {
     'use strict';
 
     // =============================================
     // ASISTENTE VIRTUAL
     // =============================================
-    const btnAsistente = document.getElementById('btnAsistente');
+    const btnAsistente =
+        document.getElementById('btnAsistente');
+
     if (btnAsistente) {
-        btnAsistente.addEventListener('click', function() {
-            alert('🧠 Asistente Virtual: ¿Qué recurso buscas? Puedo ayudarte a encontrar material educativo.');
-        });
+        btnAsistente.addEventListener(
+            'click',
+            function () {
+                alert(
+                    'Asistente Virtual: ¿Qué recurso buscas?'
+                );
+            }
+        );
     }
 
     // =============================================
-    // NOTA: La funcionalidad de accesibilidad (modo oscuro, alto contraste, texto grande)
-    // ya está en Inicio.js, así que no la repetimos aquí.
-    // Solo añadimos funcionalidades específicas de la biblioteca si las hubiera.
+    // CONSTRUIR URL DEL RECURSO
+    //
+    // Los archivos son servidos por Node
+    // en el puerto 3000.
+    //
+    // Ejemplo:
+    // /uploads/recursos/archivo.pdf
+    //
+    // se transforma en:
+    // http://IP_DEL_SERVIDOR:3000/uploads/recursos/archivo.pdf
     // =============================================
+    function construirUrlRecurso(ruta) {
 
-    // Ejemplo: si quisieras abrir el recurso al hacer clic en la tarjeta
-    // document.querySelectorAll('.recurso-card').forEach(card => {
-    //     card.addEventListener('click', function() {
-    //         const titulo = this.querySelector('.recurso-titulo').textContent;
-    //         alert('Abriendo recurso: ' + titulo);
-    //     });
-    // });
+        if (!ruta) {
+            return null;
+        }
+
+        let rutaLimpia =
+            String(ruta)
+                .trim()
+                .replace(/\\/g, '/');
+
+        // Si ya es una URL completa,
+        // se utiliza directamente.
+        if (/^https?:\/\//i.test(rutaLimpia)) {
+            return rutaLimpia;
+        }
+
+        // Compatibilidad temporal con
+        // algunas rutas antiguas.
+        rutaLimpia =
+            rutaLimpia.replace(
+                /^(\.\.\/)+/,
+                '/'
+            );
+
+        if (!rutaLimpia.startsWith('/')) {
+            rutaLimpia =
+                '/' + rutaLimpia;
+        }
+
+        const protocolo =
+            window.location.protocol === 'https:'
+                ? 'https:'
+                : 'http:';
+
+        const servidor =
+            window.location.hostname;
+
+        return (
+            protocolo +
+            '//' +
+            servidor +
+            ':3000' +
+            rutaLimpia
+        );
+    }
+
+    // =============================================
+    // ABRIR RECURSOS
+    // =============================================
+    const tarjetas =
+        document.querySelectorAll(
+            '.js-abrir-recurso'
+        );
+
+    tarjetas.forEach(function (tarjeta) {
+
+        tarjeta.addEventListener(
+            'click',
+            function () {
+
+                const ruta =
+                    tarjeta.dataset.url;
+
+                const titulo =
+                    tarjeta.dataset.titulo ||
+                    'recurso';
+
+                const url =
+                    construirUrlRecurso(ruta);
+
+                if (!url) {
+                    alert(
+                        'Este recurso no tiene un archivo disponible.'
+                    );
+
+                    return;
+                }
+
+                console.log(
+                    'Abriendo recurso:',
+                    titulo,
+                    url
+                );
+
+                window.open(
+                    url,
+                    '_blank',
+                    'noopener,noreferrer'
+                );
+            }
+        );
+    });
 
 })();
