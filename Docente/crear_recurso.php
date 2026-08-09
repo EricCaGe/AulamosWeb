@@ -9,95 +9,231 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
 
 require_once '../Conexion/conexion.php';
 
-$id_docente = $_SESSION['usuario']['id_usuario'];
-$nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
+$id_docente = (int) $_SESSION['usuario']['id_usuario'];
+
+$nombre_docente =
+    $_SESSION['usuario']['nombre'] . ' ' .
+    $_SESSION['usuario']['apellido_paterno'];
 
 $mensaje = '';
 $tipo_mensaje = '';
 
-// ========================================== */
-// OBTENER MATERIAS PARA EL SELECT           */
-// ========================================== */
-$stmt = $conexion->prepare("SELECT id_materia, nombre FROM materias WHERE estado = 'Activa' ORDER BY nombre");
+// ==========================================
+// OBTENER CURSOS EXISTENTES DEL DOCENTE
+// ==========================================
+
+$stmt = $conexion->prepare("
+    SELECT
+        c.id_curso,
+        c.nombre,
+        c.id_materia,
+        m.nombre AS materia,
+        g.nombre AS grupo,
+        ce.nombre AS ciclo,
+        COUNT(DISTINCT i.id_alumno) AS alumnos_activos
+    FROM cursos c
+    INNER JOIN materias m
+        ON m.id_materia = c.id_materia
+    INNER JOIN grupos g
+        ON g.id_grupo = c.id_grupo
+    INNER JOIN ciclos_escolares ce
+        ON ce.id_ciclo = c.id_ciclo
+    LEFT JOIN inscripciones i
+        ON i.id_curso = c.id_curso
+        AND i.estado = 'Activo'
+    WHERE c.id_docente = ?
+      AND c.estado = 'Activo'
+    GROUP BY
+        c.id_curso,
+        c.nombre,
+        c.id_materia,
+        m.nombre,
+        g.nombre,
+        ce.nombre
+    ORDER BY c.nombre ASC
+");
+
+$stmt->bind_param("i", $id_docente);
 $stmt->execute();
-$materias = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$cursos = $stmt
+    ->get_result()
+    ->fetch_all(MYSQLI_ASSOC);
+
 $stmt->close();
 
-// ========================================== */
-// OBTENER GRUPOS PARA EL SELECT             */
-// ========================================== */
-$stmt = $conexion->prepare("SELECT id_grupo, nombre FROM grupos WHERE estado = 'Activo' ORDER BY nombre");
-$stmt->execute();
-$grupos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// ==========================================
+// PROCESAR PUBLICACIÓN DEL RECURSO
+// ==========================================
 
-// ========================================== */
-// OBTENER CICLOS ESCOLARES                  */
-// ========================================== */
-$stmt = $conexion->prepare("SELECT id_ciclo, nombre FROM ciclos_escolares WHERE estado = 'Activo' ORDER BY fecha_inicio DESC");
-$stmt->execute();
-$ciclos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
-
-// ========================================== */
-// PROCESAR FORMULARIO                        */
-// ========================================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
-    $descripcion = trim($_POST['descripcion'] ?? '');
-    $id_materia = $_POST['id_materia'] ?? 0;
-    $id_grupo = $_POST['id_grupo'] ?? 0;
-    $id_ciclo = $_POST['id_ciclo'] ?? 0;
-    $estado = $_POST['estado'] ?? 'Activo';
-    $id_recurso = $_POST['id_recurso'] ?? null;
 
-    // Validar campos obligatorios
-    if (empty($nombre) || empty($id_materia) || empty($id_grupo) || empty($id_ciclo)) {
-        $mensaje = '❌ Todos los campos obligatorios deben estar llenos.';
+    $nombre =
+        trim($_POST['nombre'] ?? '');
+
+    $descripcion =
+        trim($_POST['descripcion'] ?? '');
+
+    $id_curso =
+        (int) ($_POST['id_curso'] ?? 0);
+
+    $id_recurso =
+        (int) ($_POST['id_recurso'] ?? 0);
+
+    $tipo_recurso =
+        trim($_POST['tipo_curso'] ?? 'Documento');
+
+    $estado =
+        $_POST['estado'] ?? 'Activo';
+
+    $tipos_permitidos = [
+        'Video',
+        'PDF',
+        'Documento'
+    ];
+
+    $estados_permitidos = [
+        'Activo',
+        'Inactivo'
+    ];
+
+    if (
+        empty($nombre) ||
+        $id_curso <= 0 ||
+        $id_recurso <= 0
+    ) {
+
+        $mensaje =
+            'Completa el título, selecciona un curso y sube un archivo.';
+
         $tipo_mensaje = 'error';
+
+    } elseif (
+        !in_array(
+            $tipo_recurso,
+            $tipos_permitidos,
+            true
+        )
+    ) {
+
+        $mensaje =
+            'El tipo de recurso seleccionado no es válido.';
+
+        $tipo_mensaje = 'error';
+
+    } elseif (
+        !in_array(
+            $estado,
+            $estados_permitidos,
+            true
+        )
+    ) {
+
+        $mensaje =
+            'El estado seleccionado no es válido.';
+
+        $tipo_mensaje = 'error';
+
     } else {
+
         try {
-            // Insertar curso
+
+            // ==========================================
+            // COMPROBAR QUE EL CURSO SEA DEL DOCENTE
+            // ==========================================
+
             $stmt = $conexion->prepare("
-                INSERT INTO cursos (
-                    nombre, 
-                    descripcion, 
-                    id_materia, 
-                    id_grupo, 
-                    id_docente, 
-                    id_ciclo, 
-                    estado
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                SELECT
+                    id_curso,
+                    id_materia
+                FROM cursos
+                WHERE id_curso = ?
+                  AND id_docente = ?
+                  AND estado = 'Activo'
+                LIMIT 1
             ");
-            $stmt->bind_param("ssiiiss", $nombre, $descripcion, $id_materia, $id_grupo, $id_docente, $id_ciclo, $estado);
+
+            $stmt->bind_param(
+                "ii",
+                $id_curso,
+                $id_docente
+            );
+
             $stmt->execute();
-            $id_curso = $conexion->insert_id;
+
+            $curso_seleccionado =
+                $stmt
+                    ->get_result()
+                    ->fetch_assoc();
+
             $stmt->close();
 
-            $mensaje = '✅ Curso "' . htmlspecialchars($nombre) . '" creado exitosamente.';
-            $tipo_mensaje = 'exito';
+            if (!$curso_seleccionado) {
 
-            // ========================================== */
-            // ASOCIAR RECURSO AL CURSO (si se subió uno)  */
-            // ========================================== */
-            if (!empty($id_recurso)) {
+                $mensaje =
+                    'El curso seleccionado no existe o no pertenece al docente.';
+
+                $tipo_mensaje = 'error';
+
+            } else {
+
+                $id_materia =
+                    (int) $curso_seleccionado['id_materia'];
+
+                // ==========================================
+                // ACTUALIZAR EL RECURSO YA SUBIDO
+                // ==========================================
+
                 $stmt = $conexion->prepare("
-                    UPDATE recursos_educativos 
-                    SET id_materia = ?, id_actividad = NULL 
+                    UPDATE recursos_educativos
+                    SET
+                        titulo = ?,
+                        descripcion = ?,
+                        tipo = ?,
+                        id_materia = ?,
+                        id_curso = ?,
+                        id_actividad = NULL,
+                        compartido_tipo = 'Curso',
+                        estado = ?
                     WHERE id_recurso = ?
+                      AND id_docente = ?
                 ");
-                $stmt->bind_param("ii", $id_materia, $id_recurso);
+
+                $stmt->bind_param(
+                    "sssiisii",
+                    $nombre,
+                    $descripcion,
+                    $tipo_recurso,
+                    $id_materia,
+                    $id_curso,
+                    $estado,
+                    $id_recurso,
+                    $id_docente
+                );
+
                 $stmt->execute();
                 $stmt->close();
-                
-                $mensaje .= ' 📎 Archivo asociado al curso.';
+
+                $mensaje =
+                    'Recurso "' .
+                    htmlspecialchars(
+                        $nombre,
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) .
+                    '" publicado correctamente.';
+
+                $tipo_mensaje = 'exito';
+
+                $_POST = [];
             }
-            
-            // Limpiar campos después de guardar
-            $_POST = array();
-            
+
         } catch (Exception $e) {
-            $mensaje = '❌ Error al crear el curso: ' . $e->getMessage();
+
+            $mensaje =
+                'Error al publicar el recurso: ' .
+                $e->getMessage();
+
             $tipo_mensaje = 'error';
         }
     }
@@ -200,15 +336,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <p>Sube un documento</p>
                             </button>
                         </div>
-                        <input type="hidden" id="tipo_curso" name="tipo_curso" value="Documento">
-                        <input type="hidden" id="id_recurso" name="id_recurso" value="">
-                    </section>
+</section>
 
                     <!-- 2. Información del recurso -->
                     <section class="section-container border-container">
                         <h3 class="section-title">Información del recurso</h3>
                         
                         <form class="course-form" method="POST" action="" enctype="multipart/form-data">
+
+                            <input type="hidden" id="tipo_curso" name="tipo_curso" value="Documento">
+                            <input type="hidden" id="id_recurso" name="id_recurso" value="">
                             <div class="form-group">
                                 <label>Título del recurso <span class="text-danger">*</span></label>
                                 <input type="text" name="nombre" placeholder="Ej. La fotosíntesis" value="<?php echo htmlspecialchars($_POST['nombre'] ?? ''); ?>" required>
@@ -218,41 +355,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label>Descripción <span class="text-muted">(opcional)</span></label>
                                 <input type="text" name="descripcion" placeholder="Describe brevemente el contenido" value="<?php echo htmlspecialchars($_POST['descripcion'] ?? ''); ?>">
                             </div>
-
                             <div class="form-group">
-                                <label>Seleccionar materia <span class="text-danger">*</span></label>
-                                <select name="id_materia" required>
-                                    <option value="">Elige una materia</option>
-                                    <?php foreach ($materias as $materia): ?>
-                                        <option value="<?php echo $materia['id_materia']; ?>" <?php echo (($_POST['id_materia'] ?? '') == $materia['id_materia']) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($materia['nombre']); ?>
+                                <label>
+                                    Seleccionar curso
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <select name="id_curso" required>
+                                    <option value="">
+                                        Elige un curso existente
+                                    </option>
+
+                                    <?php foreach ($cursos as $curso): ?>
+                                        <option
+                                            value="<?php echo (int) $curso['id_curso']; ?>"
+                                            <?php
+                                            echo (
+                                                ($_POST['id_curso'] ?? '') ==
+                                                $curso['id_curso']
+                                            )
+                                                ? 'selected'
+                                                : '';
+                                            ?>
+                                        >
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $curso['nombre'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            );
+                                            ?>
+
+                                            ·
+
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $curso['materia'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            );
+                                            ?>
+
+                                            · Grupo
+
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $curso['grupo'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            );
+                                            ?>
+
+                                            ·
+
+                                            <?php
+                                            echo (int) $curso['alumnos_activos'];
+                                            ?>
+
+                                            alumno(s)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                            </div>
 
-                            <div class="form-group">
-                                <label>Seleccionar grupo <span class="text-danger">*</span></label>
-                                <select name="id_grupo" required>
-                                    <option value="">Elige un grupo</option>
-                                    <?php foreach ($grupos as $grupo): ?>
-                                        <option value="<?php echo $grupo['id_grupo']; ?>" <?php echo (($_POST['id_grupo'] ?? '') == $grupo['id_grupo']) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($grupo['nombre']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Ciclo escolar <span class="text-danger">*</span></label>
-                                <select name="id_ciclo" required>
-                                    <option value="">Elige un ciclo</option>
-                                    <?php foreach ($ciclos as $ciclo): ?>
-                                        <option value="<?php echo $ciclo['id_ciclo']; ?>" <?php echo (($_POST['id_ciclo'] ?? '') == $ciclo['id_ciclo']) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($ciclo['nombre']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <?php if (count($cursos) === 0): ?>
+                                    <p style="color:#dc2626; font-size:13px; margin-top:6px;">
+                                        No tienes cursos activos disponibles.
+                                    </p>
+                                <?php endif; ?>
                             </div>
 
                             <div class="form-group">
@@ -272,7 +441,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                <div class="form-actions-row">
                                <a href="docente_dashboard.php" class="btn-cancelar">Cancelar</a>
-                               <button type="submit" class="btn-publicar">Publicar curso</button>
+                               <button type="submit" class="btn-publicar">Publicar recurso</button>
                             </div>
                         </form>
                     </section>

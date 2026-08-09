@@ -8,7 +8,7 @@
 
 <!-- 3. JS de la librería del teclado -->
  <script>
-// Inyectamos el CSS directamente para que no dependa de internet
+// Inyectamos el CSS directamente
 var style = document.createElement('style');
 style.innerHTML = `
     #virtual-keyboard-container {
@@ -31,13 +31,19 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// RESPALDO: Dibuja el teclado si la librería externa falló
+// RESPALDO: Dibuja el teclado con FLECHAS incluidas
 if (typeof SimpleKeyboard === 'undefined') {
     window.SimpleKeyboard = function(config) {
         var container = document.querySelector('.simple-keyboard');
         if (!container) return;
 
-        var layout = ['1 2 3 4 5 6 7 8 9 0', 'q w e r t y u i o p', 'a s d f g h j k l ñ', 'z x c v b n m', '{bksp} {space} {enter}'];
+        var layout = [
+            '1 2 3 4 5 6 7 8 9 0 {bksp}', 
+            'q w e r t y u i o p', 
+            'a s d f g h j k l ñ', 
+            '{shift} z x c v b n m . ,',
+            '{tab} {arrowup} {arrowdown} {arrowleft} {arrowright} {space} {enter}'
+        ];
         
         function renderKeyboard() {
             var html = '';
@@ -50,6 +56,12 @@ if (typeof SimpleKeyboard === 'undefined') {
                     if(key === '{bksp}') displayKey = '⌫';
                     if(key === '{space}') displayKey = 'Espacio';
                     if(key === '{enter}') displayKey = '↵ Enter';
+                    if(key === '{tab}') displayKey = 'Tab';
+                    if(key === '{arrowup}') displayKey = '↑';
+                    if(key === '{arrowdown}') displayKey = '↓';
+                    if(key === '{arrowleft}') displayKey = '←';
+                    if(key === '{arrowright}') displayKey = '→';
+                    if(key === '{shift}') displayKey = '⇧';
                     html += `<button class="hg-button ${special}" data-key="${key}">${displayKey}</button>`;
                 });
                 html += '</div>';
@@ -65,9 +77,19 @@ if (typeof SimpleKeyboard === 'undefined') {
                         if(input) { input.value = input.value.slice(0, -1); input.dispatchEvent(new Event('input', { bubbles: true })); }
                     } else if (key === '{space}') {
                         if(input) { input.value += ' '; input.dispatchEvent(new Event('input', { bubbles: true })); }
-                    } else if (key === '{enter}') {
-                        console.log("Tecla Enter presionada");
-                    } else {
+                    } 
+                    // TECLAS DE NAVEGACIÓN (TAB Y FLECHAS)
+                    else if (key === '{enter}' || key === '{tab}' || key === '{arrowup}' || key === '{arrowdown}' || key === '{arrowleft}' || key === '{arrowright}' || key === '{shift}') {
+                        var keyName = key.replace(/{|}/g, '');
+                        var evt = new KeyboardEvent('keydown', {
+                            key: keyName,
+                            code: keyName,
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        document.activeElement ? document.activeElement.dispatchEvent(evt) : document.dispatchEvent(evt);
+                    } 
+                    else {
                         if(input && (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA')) {
                             input.value += key;
                             input.dispatchEvent(new Event('input', { bubbles: true }));

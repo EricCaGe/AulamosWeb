@@ -3,7 +3,8 @@ session_start();
 require_once '../Conexion/conexion.php'; // Asegúrate de que la ruta sea correcta
 
 // Si no hay sesión, redirige o usa un ID por defecto (para pruebas)
-$id_usuario = $_SESSION['id_usuario'] ?? 1; // Cambia 1 por el ID real de tu usuario de prueba
+// Si no hay sesión, redirige o usa un ID por defecto (para pruebas)
+$id_usuario = $_SESSION['usuario']['id_usuario'] ?? 1; // Usamos la estructura correcta de la sesión
 
 // Consulta para obtener las actividades del alumno
 $sql = "
