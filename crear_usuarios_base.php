@@ -56,5 +56,8 @@ try {
     } else {
         echo "⚠️ El administrador ya existe.<br>";
     }
-
+} catch (Exception $e) {
+    echo "❌ Error: " . $e->getMessage() . "<br>";
+    error_log("Error en crear_usuarios_base: " . $e->getMessage());
+}
 ?>

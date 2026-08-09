@@ -4,67 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AULAMOS - Aprendemos juntos</title>
-    <!-- Vinculación del CSS de esta página -->
+    
+    <!-- CSS General -->
     <link rel="stylesheet" href="inicioSesion/styles/index.css">
-    <!-- Iconos para los botones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- ACCESIBILIDAD -->
-<link rel="stylesheet" href="./InicioSesion/styles/accesibilidad.css">
 </head>
 <body>
 
-    <!-- ========================================== -->
-    <!-- BLOQUE 1: BARRA DE NAVEGACIÓN (HEADER)     -->
-    <!-- ========================================== -->
+    <!-- BLOQUE 1: HEADER -->
     <header class="main-header">
-        <!-- Logo -->
         <div class="logo-container">
             <img src="img/logogeneral.png" alt="Logo Aulamos" class="logo-img">
         </div>
 
-        <!-- Botones de Acción -->
         <div class="nav-buttons">
             <a href="inicioSesion/login.php" class="btn btn-primary">Iniciar Sesión</a>
             <a href="inicioSesion/registro.php" class="btn btn-secondary">Crear Cuenta</a>
-            
-            <!-- BOTÓN CHATBOT (SOLO VISTA, NO HACE NADA) 
-            <button class="btn-chatbot" type="button" aria-label="Abrir chatbot">
-    <i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Chatbot
-</button>-->
-            
-            <!-- BOTÓN REDONDO MORADO (SOLO VISTA, NO HACE NADA) -->
-            <button class="btn-accessibility-round" type="button" aria-label="Opciones de accesibilidad">
-                <i class="fa-solid fa-child-accessibility" aria-hidden="true"></i>
-            </button>
         </div>
     </header>
 
-    <!-- ========================================== -->
-    <!-- BLOQUE 2: SECCIÓN DE BIENVENIDA (HERO)     -->
-    <!-- ========================================== -->
+    <!-- BLOQUE 2: HERO -->
     <main class="hero-section">
         <h2 class="hero-title">Bienvenido</h2>
         <p class="hero-subtitle">a tu espacio de crecimiento. El conocimiento es el único límite. Explora nuestros cursos hoy.</p>
         
-        <!-- Ilustración Central -->
         <div class="hero-image-container">
             <img src="img/Principal.png" alt="Estudiante flotando con laptop y libros" class="hero-img">
         </div>
     </main>
 
-    <!-- ========================================== -->
-    <!-- BLOQUE 3: PIE DE PÁGINA (FOOTER)           -->
-    <!-- ========================================== -->
+    <!-- BLOQUE 3: FOOTER -->
     <footer class="main-footer">
         <div class="footer-container">
-            
-            <!-- Recuadro Izquierdo: Centro de Información -->
             <div class="footer-card">
                 <h3>Centro de Información</h3>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab fuga repellendus suscipit amet ea aspernatur cum architecto harum possimus dicta excepturi obcaecati debitis similique eum error maxime, officiis enim consequatur.</p>
             </div>
 
-            <!-- Recuadro Derecho: Contacto -->
             <div class="footer-card">
                 <h3>¿Tienes preguntas?</h3>
                 <p class="contact-sub">Contáctanos vía</p>
@@ -74,124 +50,11 @@
                     <p><i class="fa-solid fa-envelope" aria-hidden="true"></i> cipatrimonio@itsoeh.edu.mx</p>
                 </div>
             </div>
-
         </div>
     </footer>
 
-    <!-- ========================================== -->
-    <!-- BLOQUE 4: SCRIPTS (JAVASCRIPT)             -->
-    <!-- ========================================== -->
+    <!-- BLOQUE 4: SCRIPTS -->
     <script src="inicioSesion/js/index.js"></script>
-<!-- ========================================== -->
-<!-- PANEL DE ACCESIBILIDAD FLOTANTE            -->
-<!-- ========================================== -->
-<div class="panel-accesibilidad" id="panelAccesibilidad">
-    <div class="panel-header">
-        <h3><i class="fa-solid fa-universal-access"></i> Accesibilidad</h3>
-        <button class="panel-cerrar" id="cerrarPanel">&times;</button>
-    </div>
-    <div class="panel-body">
-        <!-- Botón para abrir el modal de personalización -->
-        <button class="btn-accesibilidad-opcion" id="btnPersonalizarContraste">
-            <i class="fa-solid fa-palette"></i> Personalizar alto contraste
-            <span class="badge-nuevo">Nuevo</span>
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnModoOscuro">
-            <i class="fa-solid fa-moon"></i> Modo oscuro
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnAltoContraste">
-            <i class="fa-solid fa-eye"></i> Alto contraste
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnTextoGrande">
-            <i class="fa-solid fa-text-height"></i> Texto grande
-        </button>
-        <button class="btn-accesibilidad-opcion" id="btnLectorPantalla">
-            <i class="fa-solid fa-volume-high"></i> Lector de pantalla
-        </button>
-        <button class="btn-accesibilidad-opcion restaurar" id="btnRestablecer">
-            <i class="fa-solid fa-rotate"></i> Restablecer todas las opciones
-        </button>
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- MODAL PERSONALIZAR ALTO CONTRASTE          -->
-<!-- ========================================== -->
-<div class="modal-overlay" id="modalContraste">
-    <div class="modal-content modal-contraste">
-        <div class="modal-header">
-            <h3><i class="fa-solid fa-palette"></i> Personalizar alto contraste</h3>
-            <button class="modal-cerrar" id="cerrarModalContraste">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p class="modal-desc">Elige el fondo y el color de acento para el modo alto contraste.</p>
-            
-            <!-- Fondo -->
-            <div class="opcion-grupo">
-                <label class="opcion-label">Fondo</label>
-                <div class="opciones-botones">
-                    <button class="btn-opt fondo-blanco" data-fondo="blanco">
-                        <span class="preview" style="background:#ffffff; border:2px solid #333;"></span>
-                        Blanco
-                    </button>
-                    <button class="btn-opt fondo-negro" data-fondo="negro">
-                        <span class="preview" style="background:#000000; border:2px solid #333;"></span>
-                        Negro
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Color de acento -->
-            <div class="opcion-grupo">
-                <label class="opcion-label">Color de acento</label>
-                <div class="opciones-botones">
-                    <button class="btn-opt acento-azul" data-color="azul">
-                        <span class="preview" style="background:#3b82f6;"></span>
-                        Azul
-                    </button>
-                    <button class="btn-opt acento-amarillo" data-color="amarillo">
-                        <span class="preview" style="background:#eab308;"></span>
-                        Amarillo
-                    </button>
-                    <button class="btn-opt acento-verde" data-color="verde">
-                        <span class="preview" style="background:#22c55e;"></span>
-                        Verde
-                    </button>
-                    <button class="btn-opt acento-rojo" data-color="rojo">
-                        <span class="preview" style="background:#ef4444;"></span>
-                        Rojo
-                    </button>
-                    <button class="btn-opt acento-naranja" data-color="naranja">
-                        <span class="preview" style="background:#f97316;"></span>
-                        Naranja
-                    </button>
-                    <button class="btn-opt acento-morado" data-color="morado">
-                        <span class="preview" style="background:#8b5cf6;"></span>
-                        Morado
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Vista previa -->
-            <div class="vista-previa" id="vistaPrevia">
-                <p class="vista-titulo">Vista previa</p>
-                <div class="vista-ejemplo">
-                    <span class="vista-texto">Texto de ejemplo</span>
-                    <button class="vista-boton">Botón</button>
-                    <span class="vista-badge">Activo</span>
-                </div>
-            </div>
-            
-            <div class="modal-acciones">
-                <button class="btn-cancelar-modal" id="cancelarContraste">Cancelar</button>
-                <button class="btn-aplicar-modal" id="aplicarContraste">Aplicar cambios</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="./InicioSesion/js/accesibilidad.js"></script>
-<script src="./InicioSesion/js/lector.js"></script>
 
 </body>
 </html>
