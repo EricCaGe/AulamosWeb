@@ -375,6 +375,7 @@
     color: #94a3b8;
     margin-top: 4px;
 }
+
 /* =========================================================
    BOTONES DE ESTADO (RADIO BUTTONS ESTILIZADOS)
    ========================================================= */
@@ -432,7 +433,7 @@
 }
 
 /* =========================================================
-   BOTONES DE ACCIÓN (CANCELAR / GUARDAR) ESTILIZADOS
+   BOTONES DE ACCIÓN (CANCELAR / GUARDAR)
    ========================================================= */
 .form-actions {
     display: flex;
@@ -498,6 +499,118 @@
 /* =========================================================
    MODO OSCURO
    ========================================================= */
+body.modo-oscuro .stats-row {
+    background: #1e1e32;
+    border-color: #334155;
+}
+
+body.modo-oscuro .stat-card {
+    border-color: #334155;
+}
+
+body.modo-oscuro .stat-card .stat-number {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .busqueda-container {
+    background: #1e1e32;
+    border-color: #334155;
+}
+
+body.modo-oscuro .input-busqueda {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .filtro-btn {
+    background: #1e1e32;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.modo-oscuro .filtro-btn:hover {
+    background: #334155;
+}
+
+body.modo-oscuro .filtro-btn.active {
+    background: #3b71f3;
+    color: white;
+    border-color: #3b71f3;
+}
+
+body.modo-oscuro .catalogo-materias {
+    background: #1e1e32;
+    border-color: #334155;
+}
+
+body.modo-oscuro .materia-card {
+    border-color: #334155;
+}
+
+body.modo-oscuro .materia-nombre {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .materia-campo {
+    color: #8bb4ff;
+}
+
+body.modo-oscuro .materia-descripcion {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .btn-editar {
+    background: #334155;
+    color: #94a3b8;
+}
+
+body.modo-oscuro .btn-editar:hover {
+    background: #475569;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .btn-deshabilitar {
+    background: #3d2a1a;
+    color: #fbbf24;
+}
+
+body.modo-oscuro .btn-deshabilitar:hover {
+    background: #4d3a1a;
+}
+
+body.modo-oscuro .btn-eliminar {
+    background: #3d1a1a;
+    color: #f87171;
+}
+
+body.modo-oscuro .btn-eliminar:hover {
+    background: #4d2a2a;
+}
+
+body.modo-oscuro .modal-content {
+    background: #1e1e32;
+}
+
+body.modo-oscuro .modal-header h2 {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content .form-group label {
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content .form-group input,
+body.modo-oscuro .modal-content .form-group textarea {
+    background: #2d2d44;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.modo-oscuro .modal-content .form-group input:focus,
+body.modo-oscuro .modal-content .form-group textarea:focus {
+    background: #3d3d5c;
+    border-color: #3b71f3;
+}
+
 body.modo-oscuro .radio-group label {
     background: #2d2d44;
     border-color: #334155;
@@ -549,7 +662,53 @@ body.modo-oscuro .btn-guardar:hover {
 /* =========================================================
    RESPONSIVE
    ========================================================= */
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .stat-card {
+        border-right: none;
+        padding-right: 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .stat-card:last-of-type {
+        border-bottom: none;
+    }
+    .btn-nueva-materia {
+        margin-left: 0;
+        justify-content: center;
+    }
+    .filtros-materias {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .busqueda-container {
+        max-width: 100%;
+    }
+    .filtros-botones {
+        justify-content: center;
+    }
+    .materia-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .materia-acciones {
+        flex-wrap: wrap;
+    }
+}
+
 @media (max-width: 480px) {
+    .modal-content {
+        padding: 20px;
+        margin: 10px;
+        border-radius: 16px;
+    }
+    .modal-header h2 {
+        font-size: 18px;
+    }
     .radio-group {
         flex-direction: column;
         gap: 10px;

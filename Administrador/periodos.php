@@ -54,6 +54,9 @@ $tipo = $_GET['tipo'] ?? '';
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/periodos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body class="<?php echo $clases_body; ?>">
 
@@ -92,7 +95,8 @@ $tipo = $_GET['tipo'] ?? '';
             </a>
         </nav>
         
-        <button class="btn-accessibility-main">
+        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
+        <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
             <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
         </button>
     </aside>
@@ -107,9 +111,6 @@ $tipo = $_GET['tipo'] ?? '';
                 <p><?php echo __('administra_periodos'); ?></p>
             </div>
             <div class="header-actions">
-                <!-- <button class="btn-assistant" id="btn-asistente">
-                    <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button> -->
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
@@ -117,9 +118,6 @@ $tipo = $_GET['tipo'] ?? '';
                     <i class="fa-solid fa-language"></i>
                     <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
                 </button>
-                <!--  <button class="btn-accessibility-header">
-                    <i class="fa-solid fa-universal-access"></i>
-                </button>-->
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
@@ -297,43 +295,22 @@ $tipo = $_GET['tipo'] ?? '';
             </div>
         </div>
 
-        <!-- BARRA DE ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong><?php echo __('accesibilidad'); ?></strong>
-                    <p><?php echo __('personaliza_experiencia'); ?></p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span><?php echo __('alto_contraste'); ?></span>
-                </button>
-                <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span><?php echo __('oscuro'); ?></span>
-                </button>
-                <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span><?php echo __('grande'); ?></span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span><?php echo __('leer_pantalla'); ?></span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span><?php echo __('subtitulos'); ?></span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span><?php echo __('navegacion'); ?></span>
-                </button>
-            </div>
-            <button class="btn-open-config"><?php echo __('configuracion'); ?></button>
-        </footer>
+        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
+<!-- ✅ BOTÓN FLOTANTE -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 <script src="js/admin.js"></script>
 <script src="js/periodos.js"></script>
-<script src="js/lector.js"></script>
+
+<!-- ✅ NUEVA ACCESIBILIDAD JS -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>

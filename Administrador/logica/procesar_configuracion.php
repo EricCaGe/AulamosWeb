@@ -13,10 +13,6 @@ if (!isset($_SESSION['usuario'])) {
 $idioma = $_POST['idioma'] ?? 'es';
 $tamano_texto = $_POST['tamano_texto'] ?? 'normal';
 
-// ✅ NUEVAS: Preferencias de contraste personalizado
-$contraste_fondo = $_POST['contraste_fondo'] ?? 'negro';
-$contraste_color = $_POST['contraste_color'] ?? 'azul';
-
 // Mantener modo oscuro desde la sesión (no se modifica aquí)
 $modo_oscuro = $_SESSION['preferencias']['modo_oscuro'] ?? 0;
 
@@ -33,10 +29,6 @@ $_SESSION['preferencias'] = [
     'alto_contraste' => $alto_contraste,
     'idioma' => $idioma
 ];
-
-// ✅ NUEVAS: Guardar colores de contraste en sesión
-$_SESSION['contraste_fondo'] = $contraste_fondo;
-$_SESSION['contraste_color'] = $contraste_color;
 
 // ========================================== */
 // REDIRIGIR                                 */

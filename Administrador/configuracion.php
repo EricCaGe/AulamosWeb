@@ -32,6 +32,9 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/configuracion.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ NUEVA ACCESIBILIDAD - RUTA CORRECTA -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body class="<?php echo $clases_body; ?>">
 
@@ -67,8 +70,10 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                 <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
             </a>
         </nav>
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
+        
+        <!-- ✅ BOTÓN ACCESIBILIDAD EN SIDEBAR -->
+        <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
+            <i class="fa-solid fa-universal-access"></i> Accesibilidad
         </button>
     </aside>
 
@@ -134,12 +139,12 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                     <div class="form-group">
                         <label><?php echo __('idioma'); ?></label>
                         <div class="radio-group">
-                            <label>
-                                <input type="radio" name="idioma" value="es" <?php echo ($idioma_actual === 'es') ? 'checked' : ''; ?>>
+                            <label for="idioma_es">
+                                <input type="radio" name="idioma" id="idioma_es" value="es" <?php echo ($idioma_actual === 'es') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-language"></i> <?php echo __('español'); ?>
                             </label>
-                            <label>
-                                <input type="radio" name="idioma" value="en" <?php echo ($idioma_actual === 'en') ? 'checked' : ''; ?>>
+                            <label for="idioma_en">
+                                <input type="radio" name="idioma" id="idioma_en" value="en" <?php echo ($idioma_actual === 'en') ? 'checked' : ''; ?>>
                                 <i class="fa-solid fa-language"></i> <?php echo __('ingles'); ?>
                             </label>
                         </div>
@@ -149,72 +154,24 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                     <div class="form-group">
                         <label><?php echo __('tamano_texto'); ?></label>
                         <div class="radio-group">
-                            <label>
-                                <input type="radio" name="tamano_texto" value="pequeño" <?php echo ($tamano_actual === 'pequeño') ? 'checked' : ''; ?>>
+                            <label for="tamano_pequeno">
+                                <input type="radio" name="tamano_texto" id="tamano_pequeno" value="pequeño" <?php echo ($tamano_actual === 'pequeño') ? 'checked' : ''; ?>>
                                 <span style="font-size: 12px;">A</span> <?php echo __('pequeño'); ?>
                             </label>
-                            <label>
-                                <input type="radio" name="tamano_texto" value="normal" <?php echo ($tamano_actual === 'normal') ? 'checked' : ''; ?>>
+                            <label for="tamano_normal">
+                                <input type="radio" name="tamano_texto" id="tamano_normal" value="normal" <?php echo ($tamano_actual === 'normal') ? 'checked' : ''; ?>>
                                 <span style="font-size: 16px;">A</span> <?php echo __('normal'); ?>
                             </label>
-                            <label>
-                                <input type="radio" name="tamano_texto" value="grande" <?php echo ($tamano_actual === 'grande') ? 'checked' : ''; ?>>
+                            <label for="tamano_grande">
+                                <input type="radio" name="tamano_texto" id="tamano_grande" value="grande" <?php echo ($tamano_actual === 'grande') ? 'checked' : ''; ?>>
                                 <span style="font-size: 20px;">A</span> <?php echo __('grande'); ?>
                             </label>
+                            <label for="tamano_muy_grande">
+            <input type="radio" name="tamano_texto" id="tamano_muy_grande" value="muy_grande" <?php echo ($tamano_actual === 'muy_grande') ? 'checked' : ''; ?>>
+            <span style="font-size: 24px;">A</span> <?php echo __('muy_grande'); ?>
+        </label>
                         </div>
                     </div>
-
-                    <!-- PERSONALIZAR ALTO CONTRASTE 
-                    <div class="form-group">
-                        <label>🎨 <?php echo __('personalizar_contraste'); ?></label>
-                        <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">Elige el fondo y el color de acento para el modo alto contraste.</p>
-                        
-                        <!-- Fondo 
-                        <div style="margin-bottom: 12px;">
-                            <span style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 6px;">Fondo</span>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="contraste_fondo" value="blanco" <?php echo ($fondo_contraste === 'blanco') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#ffffff; border:2px solid #333;"></span> Blanco
-                                </label>
-                                <label>
-                                    <input type="radio" name="contraste_fondo" value="negro" <?php echo ($fondo_contraste === 'negro') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#000000; border:2px solid #333;"></span> Negro
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Color de acento 
-                        <div>
-                            <span style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 6px;">Color de acento</span>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="contraste_color" value="azul" <?php echo ($color_contraste === 'azul') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#1d4ed8;"></span> Azul
-                                </label>
-                                <label>
-                                    <input type="radio" name="contraste_color" value="amarillo" <?php echo ($color_contraste === 'amarillo') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#ca8a04;"></span> Amarillo
-                                </label>
-                                <label>
-                                    <input type="radio" name="contraste_color" value="verde" <?php echo ($color_contraste === 'verde') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#15803d;"></span> Verde
-                                </label>
-                                <label>
-                                    <input type="radio" name="contraste_color" value="rojo" <?php echo ($color_contraste === 'rojo') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#b91c1c;"></span> Rojo
-                                </label>
-                                <label>
-                                    <input type="radio" name="contraste_color" value="naranja" <?php echo ($color_contraste === 'naranja') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#ea580c;"></span> Naranja
-                                </label>
-                                <label>
-                                    <input type="radio" name="contraste_color" value="morado" <?php echo ($color_contraste === 'morado') ? 'checked' : ''; ?>>
-                                    <span class="color-preview" style="background:#7c3aed;"></span> Morado
-                                </label>
-                            </div>
-                        </div>
-                    </div> -->
 
                     <div class="form-actions">
                         <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
@@ -224,36 +181,8 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
 
         </div>
 
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong><?php echo __('accesibilidad'); ?></strong>
-                    <p>Personaliza tu experiencia en cualquier momento</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span><?php echo __('alto_contraste'); ?></span>
-                </button>
-                <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span><?php echo __('oscuro'); ?></span>
-                </button>
-                <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span><?php echo __('grande'); ?></span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span>Navegación</span>
-                </button>
-            </div>
-            <button class="btn-open-config"><?php echo __('configuracion'); ?></button>
-        </footer>
+        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
@@ -272,8 +201,16 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
     console.log('✅ Preferencias del servidor cargadas:', window.preferenciasServidor);
 </script>
 
+<!-- ✅ BOTÓN FLOTANTE -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 <script src="js/admin.js"></script>
 <script src="js/configuracion.js"></script>
-<script src="js/lector.js"></script>
+
+<!-- ✅ NUEVA ACCESIBILIDAD JS - RUTA CORRECTA -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>

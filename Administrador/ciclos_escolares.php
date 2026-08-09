@@ -39,15 +39,18 @@ $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ciclos Escolares - Administrador</title>
+    <title><?php echo __('ciclos'); ?> - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/ciclos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body class="<?php echo $clases_body; ?>">
 
@@ -61,34 +64,34 @@ $tipo = $_GET['tipo'] ?? '';
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> Dashboard
+                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> Ciclos escolares
+                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> Periodos
+                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> Materias
+                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> Grupos
+                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> Cursos
+                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
+                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
             </a>
-            
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> Configuración
+                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
             </a>
         </nav>
         
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> Accesibilidad
+        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
+        <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
+            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
         </button>
     </aside>
 
@@ -96,32 +99,29 @@ $tipo = $_GET['tipo'] ?? '';
     <main class="main-content">
         
         <!-- ENCABEZADO -->
-        <!-- ENCABEZADO -->
-<header class="content-header">
-    <div class="welcome-text">
-        <h1>Ciclos escolares</h1>
-        <p>Administración académica</p>
-    </div>
-    <div class="header-actions">
-        <!-- <button class="btn-assistant" id="btn-asistente">
-                    <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button> -->
-        <div class="icon-bell">
-            <i class="fa-regular fa-bell"></i>
-        </div>
-        <!--  <button class="btn-accessibility-header">
-                    <i class="fa-solid fa-universal-access"></i>
-                </button>-->
-        <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-            <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-            <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-            <i class="fa-solid fa-chevron-down drop-icon"></i>
-        </a>
-        <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        </a>
-    </div>
-</header>
+        <header class="content-header">
+            <div class="welcome-text">
+                <h1><?php echo __('ciclos'); ?></h1>
+                <p><?php echo __('administra_ciclos'); ?></p>
+            </div>
+            <div class="header-actions">
+                <div class="icon-bell">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
+                    <i class="fa-solid fa-language"></i>
+                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
+                </button>
+                <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
+                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
+                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+                    <i class="fa-solid fa-chevron-down drop-icon"></i>
+                </a>
+                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </header>
 
         <!-- MENSAJES -->
         <?php if ($mensaje): ?>
@@ -139,14 +139,14 @@ $tipo = $_GET['tipo'] ?? '';
                     <i class="fa-solid fa-calendar-check"></i>
                 </div>
                 <div class="resumen-info">
-                    <p class="resumen-label">Ciclo actual</p>
+                    <p class="resumen-label"><?php echo __('ciclo_actual'); ?></p>
                     <h3 class="resumen-titulo"><?php echo $ciclo_actual['nombre'] ?? 'Sin ciclo activo'; ?></h3>
                     <p class="resumen-sub">
-                        <?php echo $total_ciclos; ?> ciclo<?php echo ($total_ciclos != 1) ? 's' : ''; ?> registrado<?php echo ($total_ciclos != 1) ? 's' : ''; ?>
+                        <?php echo $total_ciclos; ?> <?php echo __('ciclos_registrados'); ?>
                     </p>
                 </div>
                 <button class="btn-agregar" id="btnNuevoCiclo">
-                    <i class="fa-solid fa-plus"></i> Nuevo ciclo
+                    <i class="fa-solid fa-plus"></i> <?php echo __('nuevo_ciclo'); ?>
                 </button>
             </div>
         </section>
@@ -156,18 +156,18 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ========================================== -->
         <section class="lista-ciclos">
             <div class="section-header">
-                <h3 class="section-title">Ciclos registrados</h3>
-                <p class="section-sub"><?php echo count($ciclos); ?> ciclo<?php echo (count($ciclos) != 1) ? 's' : ''; ?> encontrado<?php echo (count($ciclos) != 1) ? 's' : ''; ?></p>
+                <h3 class="section-title"><?php echo __('ciclos_registrados'); ?></h3>
+                <p class="section-sub"><?php echo count($ciclos); ?> <?php echo __('ciclos_encontrados'); ?></p>
             </div>
 
             <div class="ciclos-grid">
                 <?php if (empty($ciclos)): ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-calendar-circle-plus"></i>
-                        <h4>No hay ciclos registrados</h4>
-                        <p>Comienza creando un nuevo ciclo escolar.</p>
+                        <h4><?php echo __('sin_ciclos'); ?></h4>
+                        <p><?php echo __('crear_primer_ciclo'); ?></p>
                         <button class="btn-agregar-empty" id="btnNuevoCicloEmpty">
-                            <i class="fa-solid fa-plus"></i> Crear primer ciclo
+                            <i class="fa-solid fa-plus"></i> <?php echo __('crear_ciclo'); ?>
                         </button>
                     </div>
                 <?php else: ?>
@@ -176,7 +176,7 @@ $tipo = $_GET['tipo'] ?? '';
                         <div class="ciclo-header">
                             <div>
                                 <h4 class="ciclo-nombre"><?php echo htmlspecialchars($ciclo['nombre']); ?></h4>
-                                <p class="ciclo-id">Identificador: <?php echo $ciclo['id_ciclo']; ?></p>
+                                <p class="ciclo-id"><?php echo __('identificador'); ?>: <?php echo $ciclo['id_ciclo']; ?></p>
                             </div>
                             <span class="badge <?php 
                                 echo ($ciclo['estado'] === 'Activo') ? 'badge-activo' : 
@@ -189,36 +189,36 @@ $tipo = $_GET['tipo'] ?? '';
                         <div class="ciclo-fechas">
                             <div class="fecha-item">
                                 <i class="fa-regular fa-calendar"></i>
-                                <span>Inicio: <strong><?php echo date('d M Y', strtotime($ciclo['fecha_inicio'])); ?></strong></span>
+                                <span><?php echo __('inicio'); ?>: <strong><?php echo date('d M Y', strtotime($ciclo['fecha_inicio'])); ?></strong></span>
                             </div>
                             <div class="fecha-item">
                                 <i class="fa-regular fa-calendar"></i>
-                                <span>Finalización: <strong><?php echo date('d M Y', strtotime($ciclo['fecha_fin'])); ?></strong></span>
+                                <span><?php echo __('finalizacion'); ?>: <strong><?php echo date('d M Y', strtotime($ciclo['fecha_fin'])); ?></strong></span>
                             </div>
                         </div>
 
                         <div class="ciclo-estadisticas">
                             <div class="stat-item">
                                 <span class="stat-numero"><?php echo $ciclo['total_periodos'] ?? 0; ?></span>
-                                <span class="stat-etiqueta">Periodos</span>
+                                <span class="stat-etiqueta"><?php echo __('periodos'); ?></span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-numero"><?php echo $ciclo['total_grupos'] ?? 0; ?></span>
-                                <span class="stat-etiqueta">Grupos</span>
+                                <span class="stat-etiqueta"><?php echo __('grupos'); ?></span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-numero"><?php echo $ciclo['total_cursos'] ?? 0; ?></span>
-                                <span class="stat-etiqueta">Cursos</span>
+                                <span class="stat-etiqueta"><?php echo __('cursos'); ?></span>
                             </div>
                         </div>
 
                         <div class="ciclo-acciones">
                             <button class="btn-editar" data-id="<?php echo $ciclo['id_ciclo']; ?>">
-                                <i class="fa-regular fa-pen-to-square"></i> Editar
+                                <i class="fa-regular fa-pen-to-square"></i> <?php echo __('editar'); ?>
                             </button>
                             <?php if ($ciclo['estado'] !== 'Cerrado'): ?>
                             <button class="btn-cerrar" data-id="<?php echo $ciclo['id_ciclo']; ?>">
-                                <i class="fa-solid fa-lock"></i> Cerrar ciclo
+                                <i class="fa-solid fa-lock"></i> <?php echo __('cerrar_ciclo'); ?>
                             </button>
                             <?php endif; ?>
                         </div>
@@ -234,7 +234,7 @@ $tipo = $_GET['tipo'] ?? '';
         <div class="modal-overlay" id="modalCiclo">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="modalTitulo">Nuevo ciclo</h2>
+                    <h2 id="modalTitulo"><?php echo __('nuevo_ciclo'); ?></h2>
                     <button class="modal-cerrar" id="modalCerrar">&times;</button>
                 </div>
                 <form id="formCiclo" method="POST" action="logica/procesar_ciclos.php">
@@ -242,86 +242,62 @@ $tipo = $_GET['tipo'] ?? '';
                     <input type="hidden" name="id" id="modalId" value="">
 
                     <div class="form-group">
-                        <label for="modalNombre">Nombre del ciclo <span class="text-danger">*</span></label>
-                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej. Ciclo escolar 2026-2027" required>
+                        <label for="modalNombre"><?php echo __('nombre_ciclo'); ?> <span class="text-danger">*</span></label>
+                        <input type="text" id="modalNombre" name="nombre" placeholder="<?php echo __('ej_ciclo'); ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalInicio">Fecha de inicio <span class="text-danger">*</span></label>
+                        <label for="modalInicio"><?php echo __('fecha_inicio'); ?> <span class="text-danger">*</span></label>
                         <input type="date" id="modalInicio" name="fecha_inicio" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalFin">Fecha de finalización <span class="text-danger">*</span></label>
+                        <label for="modalFin"><?php echo __('fecha_fin'); ?> <span class="text-danger">*</span></label>
                         <input type="date" id="modalFin" name="fecha_fin" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Estado</label>
+                        <label><?php echo __('estado'); ?></label>
                         <div class="radio-group">
                             <label>
                                 <input type="radio" name="estado" value="Activo" checked>
-                                <i class="fa-solid fa-circle-check"></i> Activo
+                                <i class="fa-solid fa-circle-check"></i> <?php echo __('activo'); ?>
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Inactivo">
-                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
+                                <i class="fa-solid fa-circle-xmark"></i> <?php echo __('inactivo'); ?>
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Cerrado">
-                                <i class="fa-solid fa-lock"></i> Cerrado
+                                <i class="fa-solid fa-lock"></i> <?php echo __('cerrado'); ?>
                             </label>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
-                        <button type="submit" class="btn-guardar">Guardar</button>
+                        <button type="button" class="btn-cancelar" id="modalCancelar"><?php echo __('cancelar'); ?></button>
+                        <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- BARRA DE ACCESIBILIDAD                     -->
-        <!-- ========================================== -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span>Alto contraste</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span>Modo oscuro</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span>Texto grande</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span>Navegación</span>
-                </button>
-            </div>
-            <button class="btn-open-config">Abrir configuración</button>
-        </footer>
+        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
+<!-- ✅ BOTÓN FLOTANTE -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 <script src="js/admin.js"></script>
 <script src="js/ciclos.js"></script>
-<!-- LECTOR DE PANTALLA -->
-<script src="js/lector.js"></script>
+
+<!-- ✅ NUEVA ACCESIBILIDAD JS -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>

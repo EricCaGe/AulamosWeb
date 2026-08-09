@@ -38,15 +38,18 @@ $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Materias - Administrador</title>
+    <title><?php echo __('materias'); ?> - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/materias.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body class="<?php echo $clases_body; ?>">
 
@@ -60,34 +63,34 @@ $tipo = $_GET['tipo'] ?? '';
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> Dashboard
+                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> Ciclos escolares
+                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> Periodos
+                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> Materias
+                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> Grupos
+                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> Cursos
+                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
+                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
             </a>
-            
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> Configuración
+                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
             </a>
         </nav>
         
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> Accesibilidad
+        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
+        <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
+            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
         </button>
     </aside>
 
@@ -97,24 +100,22 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ENCABEZADO -->
         <header class="content-header">
             <div class="welcome-text">
-                <h1>Materias</h1>
-                <p>Administra el catálogo y sus campos formativos.</p>
+                <h1><?php echo __('materias'); ?></h1>
+                <p><?php echo __('administra_materias'); ?></p>
             </div>
             <div class="header-actions">
-                <!-- <button class="btn-assistant" id="btn-asistente">
-                    <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button> -->
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-                <!--  <button class="btn-accessibility-header">
-                    <i class="fa-solid fa-universal-access"></i>
-                </button>-->
+                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
+                    <i class="fa-solid fa-language"></i>
+                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
+                </button>
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-    <i class="fa-solid fa-chevron-down drop-icon"></i>
-</a>
+                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
+                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+                    <i class="fa-solid fa-chevron-down drop-icon"></i>
+                </a>
                 <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
@@ -135,18 +136,18 @@ $tipo = $_GET['tipo'] ?? '';
             <div class="stats-row">
                 <div class="stat-card">
                     <span class="stat-number"><?php echo $total_materias; ?></span>
-                    <span class="stat-label">Total</span>
+                    <span class="stat-label"><?php echo __('total'); ?></span>
                 </div>
                 <div class="stat-card stat-activa">
                     <span class="stat-number"><?php echo $materias_activas; ?></span>
-                    <span class="stat-label">Activas</span>
+                    <span class="stat-label"><?php echo __('activas'); ?></span>
                 </div>
                 <div class="stat-card stat-inactiva">
                     <span class="stat-number"><?php echo $materias_inactivas; ?></span>
-                    <span class="stat-label">Inactivas</span>
+                    <span class="stat-label"><?php echo __('inactivas'); ?></span>
                 </div>
                 <button class="btn-nueva-materia" id="btnNuevaMateria">
-                    <i class="fa-solid fa-plus"></i> Nueva materia
+                    <i class="fa-solid fa-plus"></i> <?php echo __('nueva_materia'); ?>
                 </button>
             </div>
         </section>
@@ -157,12 +158,12 @@ $tipo = $_GET['tipo'] ?? '';
         <section class="filtros-materias">
             <div class="busqueda-container">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" placeholder="Buscar materia..." class="input-busqueda" id="buscarMateria">
+                <input type="text" placeholder="<?php echo __('buscar_materia'); ?>" class="input-busqueda" id="buscarMateria">
             </div>
             <div class="filtros-botones">
-                <button class="filtro-btn active" data-filtro="todas">Todas</button>
-                <button class="filtro-btn" data-filtro="Activa">Activa</button>
-                <button class="filtro-btn" data-filtro="Inactiva">Inactiva</button>
+                <button class="filtro-btn active" data-filtro="todas"><?php echo __('todas'); ?></button>
+                <button class="filtro-btn" data-filtro="Activa"><?php echo __('activa'); ?></button>
+                <button class="filtro-btn" data-filtro="Inactiva"><?php echo __('inactiva'); ?></button>
             </div>
         </section>
 
@@ -171,8 +172,8 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ========================================== -->
         <section class="catalogo-materias">
             <div class="catalogo-header">
-                <h3>Catálogo</h3>
-                <span class="resultados" id="totalResultados"><?php echo count($materias); ?> resultados</span>
+                <h3><?php echo __('catalogo'); ?></h3>
+                <span class="resultados" id="totalResultados"><?php echo count($materias); ?> <?php echo __('resultados'); ?></span>
             </div>
 
             <div class="materias-grid" id="materiasGrid">
@@ -190,13 +191,13 @@ $tipo = $_GET['tipo'] ?? '';
                     <p class="materia-descripcion"><?php echo htmlspecialchars($materia['descripcion'] ?? 'Sin descripción'); ?></p>
                     <div class="materia-acciones">
                         <button class="btn-editar" data-id="<?php echo $materia['id_materia']; ?>">
-                            <i class="fa-regular fa-pen-to-square"></i> Editar
+                            <i class="fa-regular fa-pen-to-square"></i> <?php echo __('editar'); ?>
                         </button>
                         <button class="btn-deshabilitar" data-id="<?php echo $materia['id_materia']; ?>">
-                            <i class="fa-solid fa-eye-slash"></i> Deshabilitar
+                            <i class="fa-solid fa-eye-slash"></i> <?php echo __('deshabilitar'); ?>
                         </button>
                         <button class="btn-eliminar" data-id="<?php echo $materia['id_materia']; ?>">
-                            <i class="fa-regular fa-trash-can"></i> Eliminar
+                            <i class="fa-regular fa-trash-can"></i> <?php echo __('eliminar'); ?>
                         </button>
                     </div>
                 </div>
@@ -210,7 +211,7 @@ $tipo = $_GET['tipo'] ?? '';
         <div class="modal-overlay" id="modalMateria">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="modalTitulo">Nueva materia</h2>
+                    <h2 id="modalTitulo"><?php echo __('nueva_materia'); ?></h2>
                     <button class="modal-cerrar" id="modalCerrar">&times;</button>
                 </div>
                 <form id="formMateria" method="POST" action="logica/procesar_materias.php">
@@ -218,81 +219,59 @@ $tipo = $_GET['tipo'] ?? '';
                     <input type="hidden" name="id" id="modalId" value="">
 
                     <div class="form-group">
-                        <label for="modalNombre">Nombre de la materia <span class="text-danger">*</span></label>
-                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej. Matemáticas" required>
+                        <label for="modalNombre"><?php echo __('nombre_materia'); ?> <span class="text-danger">*</span></label>
+                        <input type="text" id="modalNombre" name="nombre" placeholder="<?php echo __('ej_materia'); ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalCampo">Campo formativo <span class="text-danger">*</span></label>
-                        <input type="text" id="modalCampo" name="campo_formativo" placeholder="Ej. Saberes y Pensamiento Científico" required>
+                        <label for="modalCampo"><?php echo __('campo_formativo'); ?> <span class="text-danger">*</span></label>
+                        <input type="text" id="modalCampo" name="campo_formativo" placeholder="<?php echo __('ej_campo'); ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalDescripcion">Descripción</label>
-                        <textarea id="modalDescripcion" name="descripcion" rows="3" placeholder="Descripción de la materia" maxlength="1000"></textarea>
+                        <label for="modalDescripcion"><?php echo __('descripcion'); ?></label>
+                        <textarea id="modalDescripcion" name="descripcion" rows="3" placeholder="<?php echo __('descripcion_materia'); ?>" maxlength="1000"></textarea>
                         <p class="contador-caracteres"><span id="modalContador">0</span>/1000</p>
                     </div>
 
                     <div class="form-group">
-    <label>Estado</label>
-    <div class="radio-group">
-        <label>
-            <input type="radio" name="estado" value="Activa" checked>
-            <i class="fa-solid fa-circle-check"></i> Activa
-        </label>
-        <label>
-            <input type="radio" name="estado" value="Inactiva">
-            <i class="fa-solid fa-circle-xmark"></i> Inactiva
-        </label>
-    </div>
-</div>
+                        <label><?php echo __('estado'); ?></label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="estado" value="Activa" checked>
+                                <i class="fa-solid fa-circle-check"></i> <?php echo __('activa'); ?>
+                            </label>
+                            <label>
+                                <input type="radio" name="estado" value="Inactiva">
+                                <i class="fa-solid fa-circle-xmark"></i> <?php echo __('inactiva'); ?>
+                            </label>
+                        </div>
+                    </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
-                        <button type="submit" class="btn-guardar">Guardar</button>
+                        <button type="button" class="btn-cancelar" id="modalCancelar"><?php echo __('cancelar'); ?></button>
+                        <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- BARRA DE ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span>Alto contraste</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span>Modo oscuro</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span>Texto grande</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span>Navegación</span>
-                </button>
-            </div>
-            <button class="btn-open-config">Abrir configuración</button>
-        </footer>
+        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
+<!-- ✅ BOTÓN FLOTANTE -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 <script src="js/admin.js"></script>
 <script src="js/materias.js"></script>
-<!-- LECTOR DE PANTALLA -->
-<script src="js/lector.js"></script>
+
+<!-- ✅ NUEVA ACCESIBILIDAD JS -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>

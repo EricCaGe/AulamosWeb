@@ -1,0 +1,579 @@
+/* =========================================================
+   BOTÓN FLOTANTE DE ACCESIBILIDAD - REDONDO
+   ========================================================= */
+.btn-accesibilidad-flotante {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #5a189a;
+    border: 3px solid #5a189a;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(90, 24, 154, 0.3);
+    z-index: 10000;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-accesibilidad-flotante:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(90, 24, 154, 0.5);
+    background: #f3e8ff;
+}
+
+.btn-accesibilidad-flotante.active,
+.btn-accesibilidad-header.active {
+    background: #5a189a;
+    color: #ffffff;
+    border-color: #5a189a;
+}
+
+/* =========================================================
+   BARRA FLOTANTE HORIZONTAL
+   ========================================================= */
+.accesibilidad-bar {
+    position: fixed;
+    bottom: 105px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 20px;
+    padding: 12px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 9999;
+    max-width: 95%;
+    transition: all 0.3s ease-in-out;
+}
+
+.accesibilidad-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 30px);
+    pointer-events: none;
+}
+
+.acc-info { display: flex; align-items: center; gap: 12px; }
+.acc-icon-main { width: 45px; height: 45px; border: 1px solid #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #5a189a; font-size: 20px; }
+.acc-text { display: flex; flex-direction: column; }
+.acc-text strong { color: #5a189a; font-size: 15px; }
+.acc-text span { color: #6b7280; font-size: 12px; }
+
+.acc-buttons { display: flex; gap: 8px; }
+.acc-btn { background: #fdfdfd; border: 1px solid #d1d5db; border-radius: 6px; width: 75px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: background 0.2s, border-color 0.2s; padding: 4px; }
+.acc-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
+.acc-btn i, .acc-text-icon { font-size: 18px; color: #0f172a; font-weight: bold; }
+.acc-btn span { font-size: 10px; color: #1e293b; text-align: center; line-height: 1.1; font-weight: 500; }
+
+.acc-btn-primary { background-color: #2563eb; color: white; border: none; border-radius: 8px; padding: 14px 20px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); transition: background-color 0.2s; white-space: nowrap; }
+.acc-btn-primary:hover { background-color: #1d4ed8; }
+
+/* =========================================================
+   MODAL DE CONTRASTE
+   ========================================================= */
+.modal-contraste-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    transition: opacity 0.3s ease;
+}
+
+.modal-contraste-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-contraste-container {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-family: sans-serif;
+}
+
+.modal-contraste-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 16px; }
+.modal-contraste-header h3 { margin: 0; color: #5a189a; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.btn-cerrar-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+
+.opcion-grupo { margin-bottom: 20px; }
+.opcion-grupo label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #374151; }
+.opciones-botones { display: flex; gap: 10px; }
+
+.btn-opcion { flex: 1; padding: 10px; border: 2px solid #d1d5db; background: #f9fafb; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+.btn-opcion:hover { border-color: #5a189a; }
+
+.btn-opcion.seleccionado {
+    background: #5a189a !important;
+    color: #ffffff !important;
+    border-color: #5a189a !important;
+}
+
+.btn-borde-amarillo { border-color: #facc15; }
+.btn-borde-azul { border-color: #2563eb; }
+.btn-borde-verde { border-color: #22c55e; }
+
+.modal-contraste-footer { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #e5e7eb; padding-top: 16px; }
+.btn-restablecer { background: #ef4444; color: white; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: bold; }
+
+/* =========================================================
+   ALTO CONTRASTE - VARIABLES Y BASE
+   ========================================================= */
+
+/* --- VARIABLES DE COLORES --- */
+body.alto-contraste.color-azul { --color-acento: #1d4ed8; }
+body.alto-contraste.color-amarillo { --color-acento: #ca8a04; }
+body.alto-contraste.color-verde { --color-acento: #15803d; }
+body.alto-contraste.color-rojo { --color-acento: #b91c1c; }
+
+body.alto-contraste.fondo-negro {
+    --contraste-fondo: #000000;
+    --contraste-texto: #ffffff;
+}
+
+body.alto-contraste.fondo-blanco {
+    --contraste-fondo: #ffffff;
+    --contraste-texto: #000000;
+}
+
+/* --- FONDOS Y TEXTOS BASE --- */
+body.alto-contraste.fondo-negro,
+body.alto-contraste.fondo-negro * {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.alto-contraste.fondo-blanco,
+body.alto-contraste.fondo-blanco * {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* =========================================================
+   BORDES GLOBALES - TODOS LOS ELEMENTOS
+   ========================================================= */
+
+body.alto-contraste * {
+    border-color: var(--color-acento) !important;
+}
+
+/* =========================================================
+   EXCEPCIONES: ELEMENTOS CON FONDOS Y COLORES ESPECIALES
+   ========================================================= */
+
+/* --- INPUTS --- */
+body.alto-contraste input,
+body.alto-contraste select,
+body.alto-contraste textarea,
+body.alto-contraste .input-wrapper {
+    background: var(--contraste-fondo) !important;
+    color: var(--contraste-texto) !important;
+    border: 2px solid var(--color-acento) !important;
+}
+
+body.alto-contraste input:focus,
+body.alto-contraste select:focus,
+body.alto-contraste textarea:focus {
+    outline: 2px solid var(--color-acento) !important;
+    outline-offset: 2px !important;
+}
+
+/* --- BOTONES --- */
+body.alto-contraste .btn,
+body.alto-contraste .btn-primary,
+body.alto-contraste .btn-guardar,
+body.alto-contraste .btn-agregar,
+body.alto-contraste .btn-success,
+body.alto-contraste .btn-editar,
+body.alto-contraste .btn-cerrar,
+body.alto-contraste .btn-eliminar,
+body.alto-contraste .btn-submit-login,
+body.alto-contraste .btn-publicar,
+body.alto-contraste .btn-configuracion,
+body.alto-contraste .acc-btn-primary,
+body.alto-contraste .btn-open-config {
+    background: var(--color-acento) !important;
+    border: 2px solid var(--color-acento) !important;
+    color: var(--contraste-fondo) !important;
+}
+
+body.alto-contraste .btn:hover {
+    opacity: 0.85 !important;
+}
+
+/* --- RADIO BUTTONS --- */
+body.alto-contraste .radio-group label {
+    border: 2px solid var(--color-acento) !important;
+    background: var(--contraste-fondo) !important;
+    color: var(--contraste-texto) !important;
+}
+
+body.alto-contraste .radio-group label:has(input:checked) {
+    background: var(--color-acento) !important;
+    color: var(--contraste-fondo) !important;
+    border-color: var(--color-acento) !important;
+}
+
+/* --- MENU ITEMS --- */
+body.alto-contraste .menu-item {
+    color: var(--contraste-texto) !important;
+    background: var(--contraste-fondo) !important;
+    border-bottom: 1px solid var(--color-acento) !important;
+}
+
+body.alto-contraste .menu-item.active,
+body.alto-contraste .menu-item:hover {
+    background: var(--color-acento) !important;
+    color: var(--contraste-fondo) !important;
+}
+
+/* --- BADGES --- */
+body.alto-contraste .badge,
+body.alto-contraste .badge-activo,
+body.alto-contraste .badge-inactivo,
+body.alto-contraste .badge-cerrado {
+    background: var(--color-acento) !important;
+    color: var(--contraste-fondo) !important;
+    border: 2px solid var(--color-acento) !important;
+}
+
+/* --- SIDEBAR --- */
+body.alto-contraste .sidebar {
+    background: var(--contraste-fondo) !important;
+    border-right: 2px solid var(--color-acento) !important;
+    border-bottom: 2px solid var(--color-acento) !important;
+}
+
+/* --- PANELES Y TARJETAS --- */
+body.alto-contraste .config-card,
+body.alto-contraste .panel-academico,
+body.alto-contraste .accesos-rapidos,
+body.alto-contraste .gestion-academica,
+body.alto-contraste .accessibility-bar,
+body.alto-contraste .resumen-card,
+body.alto-contraste .ciclo-card,
+body.alto-contraste .periodo-card,
+body.alto-contraste .curso-card,
+body.alto-contraste .grupo-card,
+body.alto-contraste .inscripcion-card,
+body.alto-contraste .materia-card,
+body.alto-contraste .stat-box,
+body.alto-contraste .quick-btn,
+body.alto-contraste .card,
+body.alto-contraste .modal-content {
+    background: var(--contraste-fondo) !important;
+    border: 2px solid var(--color-acento) !important;
+}
+
+/* --- TABLAS --- */
+body.alto-contraste table td,
+body.alto-contraste table th {
+    border-color: var(--color-acento) !important;
+}
+
+/* --- LINEAS HR --- */
+body.alto-contraste hr,
+body.alto-contraste .separator,
+body.alto-contraste .divider {
+    border-color: var(--color-acento) !important;
+}
+
+/* --- TEXTOS EN TARJETAS --- */
+body.alto-contraste .card h1,
+body.alto-contraste .card h2,
+body.alto-contraste .card h3,
+body.alto-contraste .card h4,
+body.alto-contraste .card p,
+body.alto-contraste .card label,
+body.alto-contraste .card span {
+    color: var(--contraste-texto) !important;
+}
+
+/* --- HELP TEXT --- */
+body.alto-contraste .help-text,
+body.alto-contraste .text-muted,
+body.alto-contraste .small-text {
+    color: var(--contraste-texto) !important;
+    opacity: 0.7 !important;
+}
+
+/* --- ESTADÍSTICAS --- */
+body.alto-contraste .stat-number,
+body.alto-contraste .stat-label,
+body.alto-contraste .stat-sub {
+    color: var(--contraste-texto) !important;
+}
+
+/* --- ACCESOS RÁPIDOS --- */
+body.alto-contraste .quick-btn i {
+    color: var(--color-acento) !important;
+}
+
+/* =========================================================
+   ENCABEZADOS Y DIVISORES
+   ========================================================= */
+
+body.alto-contraste .config-header,
+body.alto-contraste .ciclo-header,
+body.alto-contraste .periodo-header,
+body.alto-contraste .curso-header,
+body.alto-contraste .grupo-header,
+body.alto-contraste .inscripcion-header,
+body.alto-contraste .materia-header,
+body.alto-contraste .catalogo-header,
+body.alto-contraste .periodos-header,
+body.alto-contraste .cursos-header,
+body.alto-contraste .grupos-header,
+body.alto-contraste .inscripciones-header,
+body.alto-contraste .section-header,
+body.alto-contraste .modal-header,
+body.alto-contraste .modal-footer,
+body.alto-contraste .card-header,
+body.alto-contraste .card-footer,
+body.alto-contraste .form-actions {
+    border-bottom: 2px solid var(--color-acento) !important;
+    border-top: 2px solid var(--color-acento) !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 480px) {
+    .btn-accesibilidad-flotante {
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+        bottom: 20px;
+        right: 20px;
+    }
+    .btn-accesibilidad-header {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+    .accesibilidad-bar {
+        flex-direction: column;
+        bottom: 85px;
+        padding: 12px 16px;
+    }
+    .acc-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .acc-btn {
+        width: 65px;
+        height: 55px;
+    }
+    .modal-contraste-container {
+        width: 95%;
+        padding: 16px;
+    }
+    .opciones-botones {
+        flex-wrap: wrap;
+    }
+    .btn-opcion {
+        flex: 1 1 40%;
+        padding: 8px;
+        font-size: 12px;
+    }
+}
+/* =========================================================
+   TAMAÑOS DE TEXTO - ADMINISTRADOR
+   ========================================================= */
+
+/* --- TAMAÑO MUY GRANDE --- */
+body.texto-muy-grande {
+    font-size: 1.4rem !important;
+}
+
+body.texto-muy-grande h1 {
+    font-size: 2.8rem !important;
+}
+
+body.texto-muy-grande h2 {
+    font-size: 2.2rem !important;
+}
+
+body.texto-muy-grande .welcome-text h1 {
+    font-size: 2.8rem !important;
+}
+
+body.texto-muy-grande .welcome-text h2 {
+    font-size: 2.2rem !important;
+}
+
+body.texto-muy-grande .stat-number {
+    font-size: 2.5rem !important;
+}
+
+body.texto-muy-grande .menu-item {
+    font-size: 1.1rem !important;
+    padding: 16px 20px !important;
+}
+
+body.texto-muy-grande .quick-btn {
+    font-size: 1rem !important;
+    padding: 24px 16px !important;
+}
+
+body.texto-muy-grande .acc-btn {
+    font-size: 1rem !important;
+    width: 85px !important;
+    height: 75px !important;
+}
+
+body.texto-muy-grande .acc-btn span {
+    font-size: 11px !important;
+}
+
+body.texto-muy-grande .section-title {
+    font-size: 1.4rem !important;
+}
+
+body.texto-muy-grande .config-header h3 {
+    font-size: 1.4rem !important;
+}
+
+body.texto-muy-grande .form-group label {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .form-group input,
+body.texto-muy-grande .form-group select,
+body.texto-muy-grande .form-group textarea {
+    font-size: 1rem !important;
+    padding: 12px 16px !important;
+}
+
+body.texto-muy-grande .btn,
+body.texto-muy-grande .btn-primary,
+body.texto-muy-grande .btn-guardar,
+body.texto-muy-grande .btn-agregar {
+    font-size: 1rem !important;
+    padding: 14px 28px !important;
+}
+
+body.texto-muy-grande .badge {
+    font-size: 0.85rem !important;
+    padding: 6px 16px !important;
+}
+
+body.texto-muy-grande .radio-group label {
+    font-size: 1rem !important;
+    padding: 12px 20px !important;
+}
+
+body.texto-muy-grande .modal-header h2 {
+    font-size: 1.6rem !important;
+}
+
+body.texto-muy-grande .modal-content .form-group label {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .modal-content .form-group input {
+    font-size: 1rem !important;
+    padding: 12px 16px !important;
+}
+
+body.texto-muy-grande .ciclo-nombre,
+body.texto-muy-grande .periodo-nombre,
+body.texto-muy-grande .curso-nombre,
+body.texto-muy-grande .grupo-nombre,
+body.texto-muy-grande .materia-nombre,
+body.texto-muy-grande .inscripcion-estudiante {
+    font-size: 1.2rem !important;
+}
+
+body.texto-muy-grande .stat-label {
+    font-size: 0.95rem !important;
+}
+
+body.texto-muy-grande .stat-sub {
+    font-size: 0.85rem !important;
+}
+
+body.texto-muy-grande .fecha-item {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .fecha-valor {
+    font-size: 1.1rem !important;
+}
+
+body.texto-muy-grande .detalle-item {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .detalle-valor {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .help-text {
+    font-size: 0.9rem !important;
+}
+
+body.texto-muy-grande .resultados {
+    font-size: 0.95rem !important;
+}
+
+body.texto-muy-grande .empty-state h4 {
+    font-size: 1.4rem !important;
+}
+
+body.texto-muy-grande .empty-state p {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .resumen-titulo {
+    font-size: 1.6rem !important;
+}
+
+body.texto-muy-grande .resumen-sub {
+    font-size: 1rem !important;
+}
+
+body.texto-muy-grande .resumen-label {
+    font-size: 0.95rem !important;
+}
+
+/* --- TAMAÑO GRANDE (también lo reforzamos) --- */
+body.texto-grande {
+    font-size: 1.15rem !important;
+}
+
+body.texto-grande h1 {
+    font-size: 2.2rem !important;
+}
+
+body.texto-grande h2 {
+    font-size: 1.8rem !important;
+}
+
+body.texto-grande .stat-number {
+    font-size: 2rem !important;
+}
+
+body.texto-grande .menu-item {
+    font-size: 1rem !important;
+}
+

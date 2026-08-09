@@ -40,7 +40,16 @@ if ($alto_contraste == 1) {
     $clases_body .= ' fondo-' . $fondo;
     $clases_body .= ' color-' . $color;
 }
-if (strtolower($tamano_texto) == 'grande') $clases_body .= ' texto-grande';
+
+// ✅ CORREGIDO: Agregar "Muy Grande"
+$tamano_clean = strtolower($tamano_texto);
+if ($tamano_clean == 'pequeño') {
+    $clases_body .= ' texto-pequeno';
+} elseif ($tamano_clean == 'grande') {
+    $clases_body .= ' texto-grande';
+} elseif ($tamano_clean == 'muy_grande') {
+    $clases_body .= ' texto-muy-grande';
+}
 
 // ========================================== */
 // TRADUCCIONES COMPLETAS                    */
@@ -65,6 +74,7 @@ $traducciones = [
         'pequeño' => 'Pequeño',
         'normal' => 'Normal',
         'grande' => 'Grande',
+        'muy_grande' => 'Muy Grande',  // ✅ NUEVO
         'alto_contraste' => 'Alto contraste',
         'desactivado' => 'Desactivado',
         'activado' => 'Activado',
@@ -126,6 +136,7 @@ $traducciones = [
         'pequeño' => 'Small',
         'normal' => 'Normal',
         'grande' => 'Large',
+        'muy_grande' => 'Very Large',  // ✅ NUEVO
         'alto_contraste' => 'High contrast',
         'desactivado' => 'Disabled',
         'activado' => 'Enabled',

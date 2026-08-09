@@ -74,15 +74,18 @@ $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscripciones - Administrador</title>
+    <title><?php echo __('inscripciones'); ?> - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/inscripciones.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ✅ NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body class="<?php echo $clases_body; ?>">
 
@@ -96,34 +99,34 @@ $tipo = $_GET['tipo'] ?? '';
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> Dashboard
+                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> Ciclos escolares
+                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> Periodos
+                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> Materias
+                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> Grupos
+                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> Cursos
+                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
+                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
             </a>
-            
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> Configuración
+                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
             </a>
         </nav>
         
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> Accesibilidad
+        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
+        <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
+            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
         </button>
     </aside>
 
@@ -133,24 +136,22 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ENCABEZADO -->
         <header class="content-header">
             <div class="welcome-text">
-                <h1>Inscripciones</h1>
-                <p>Asigna estudiantes a sus cursos</p>
+                <h1><?php echo __('inscripciones'); ?></h1>
+                <p><?php echo __('administra_inscripciones'); ?></p>
             </div>
             <div class="header-actions">
-                <!-- <button class="btn-assistant" id="btn-asistente">
-                    <i class="fa-solid fa-comment-dots"></i> Chatbot
-                </button> -->
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-                <!--  <button class="btn-accessibility-header">
-                    <i class="fa-solid fa-universal-access"></i>
-                </button>-->
+                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
+                    <i class="fa-solid fa-language"></i>
+                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
+                </button>
                 <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-    <i class="fa-solid fa-chevron-down drop-icon"></i>
-</a>
+                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
+                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+                    <i class="fa-solid fa-chevron-down drop-icon"></i>
+                </a>
                 <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
@@ -171,14 +172,14 @@ $tipo = $_GET['tipo'] ?? '';
             <div class="stats-row">
                 <div class="stat-card">
                     <span class="stat-number"><?php echo $total_inscripciones; ?></span>
-                    <span class="stat-label">Total</span>
+                    <span class="stat-label"><?php echo __('total'); ?></span>
                 </div>
                 <div class="stat-card stat-activa">
                     <span class="stat-number"><?php echo $inscripciones_activas; ?></span>
-                    <span class="stat-label">Activas</span>
+                    <span class="stat-label"><?php echo __('activas'); ?></span>
                 </div>
                 <button class="btn-nueva-inscripcion" id="btnNuevaInscripcion">
-                    <i class="fa-solid fa-plus"></i> Nueva inscripción
+                    <i class="fa-solid fa-plus"></i> <?php echo __('nueva_inscripcion'); ?>
                 </button>
             </div>
         </section>
@@ -189,7 +190,7 @@ $tipo = $_GET['tipo'] ?? '';
         <section class="busqueda-inscripciones">
             <div class="busqueda-container">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" placeholder="Buscar estudiante, curso, materia o grupo..." class="input-busqueda" id="buscarInscripcion">
+                <input type="text" placeholder="<?php echo __('buscar_inscripcion'); ?>" class="input-busqueda" id="buscarInscripcion">
             </div>
         </section>
 
@@ -198,18 +199,18 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ========================================== -->
         <section class="lista-inscripciones">
             <div class="inscripciones-header">
-                <h3>Inscripciones registradas</h3>
-                <span class="resultados" id="totalResultados"><?php echo count($inscripciones); ?> resultados</span>
+                <h3><?php echo __('inscripciones_registradas'); ?></h3>
+                <span class="resultados" id="totalResultados"><?php echo count($inscripciones); ?> <?php echo __('resultados'); ?></span>
             </div>
 
             <div class="inscripciones-grid" id="inscripcionesGrid">
                 <?php if (empty($inscripciones)): ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-pen-to-square"></i>
-                        <h4>No hay inscripciones registradas</h4>
-                        <p>Comienza creando una nueva inscripción.</p>
+                        <h4><?php echo __('sin_inscripciones'); ?></h4>
+                        <p><?php echo __('crear_primer_inscripcion'); ?></p>
                         <button class="btn-agregar-empty" id="btnNuevoInscripcionEmpty">
-                            <i class="fa-solid fa-plus"></i> Crear primera inscripción
+                            <i class="fa-solid fa-plus"></i> <?php echo __('crear_inscripcion'); ?>
                         </button>
                     </div>
                 <?php else: ?>
@@ -226,40 +227,40 @@ $tipo = $_GET['tipo'] ?? '';
 
                         <div class="inscripcion-detalles">
                             <div class="detalle-item">
-                                <span class="detalle-label">Correo:</span>
+                                <span class="detalle-label"><?php echo __('correo'); ?>:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($inscripcion['correo']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label">Curso:</span>
+                                <span class="detalle-label"><?php echo __('curso'); ?>:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($inscripcion['curso']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label">Materia:</span>
+                                <span class="detalle-label"><?php echo __('materia'); ?>:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($inscripcion['materia']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label">Grupo:</span>
+                                <span class="detalle-label"><?php echo __('grupo'); ?>:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($inscripcion['grupo']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label">Ciclo:</span>
+                                <span class="detalle-label"><?php echo __('ciclo'); ?>:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($inscripcion['ciclo']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label">Inscripción:</span>
+                                <span class="detalle-label"><?php echo __('fecha_inscripcion'); ?>:</span>
                                 <span class="detalle-valor"><?php echo date('d M Y, h:i a', strtotime($inscripcion['fecha'])); ?></span>
                             </div>
                         </div>
 
                         <div class="inscripcion-acciones">
                             <button class="btn-editar" data-id="<?php echo $inscripcion['id_inscripcion']; ?>">
-                                <i class="fa-regular fa-pen-to-square"></i> Editar
+                                <i class="fa-regular fa-pen-to-square"></i> <?php echo __('editar'); ?>
                             </button>
                             <button class="btn-deshabilitar" data-id="<?php echo $inscripcion['id_inscripcion']; ?>">
-                                <i class="fa-solid fa-eye-slash"></i> Desactivar
+                                <i class="fa-solid fa-eye-slash"></i> <?php echo __('deshabilitar'); ?>
                             </button>
                             <button class="btn-eliminar" data-id="<?php echo $inscripcion['id_inscripcion']; ?>">
-                                <i class="fa-regular fa-trash-can"></i> Eliminar
+                                <i class="fa-regular fa-trash-can"></i> <?php echo __('eliminar'); ?>
                             </button>
                         </div>
                     </div>
@@ -274,7 +275,7 @@ $tipo = $_GET['tipo'] ?? '';
         <div class="modal-overlay" id="modalInscripcion">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="modalTitulo">Nueva inscripción</h2>
+                    <h2 id="modalTitulo"><?php echo __('nueva_inscripcion'); ?></h2>
                     <button class="modal-cerrar" id="modalCerrar">&times;</button>
                 </div>
                 <form id="formInscripcion" method="POST" action="logica/procesar_inscripciones.php">
@@ -283,10 +284,10 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Estudiante -->
                     <div class="form-group">
-                        <label>Estudiante <span class="text-danger">*</span></label>
+                        <label><?php echo __('estudiante'); ?> <span class="text-danger">*</span></label>
                         <div class="radio-group radio-inline" id="estudianteOptions">
                             <?php if (empty($estudiantes)): ?>
-                                <p style="color: #94a3b8; font-style: italic;">No hay estudiantes disponibles</p>
+                                <p style="color: #94a3b8; font-style: italic;"><?php echo __('sin_estudiantes'); ?></p>
                             <?php else: ?>
                                 <?php foreach ($estudiantes as $index => $estudiante): ?>
                                 <label>
@@ -300,10 +301,10 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Curso -->
                     <div class="form-group">
-                        <label>Curso <span class="text-danger">*</span></label>
+                        <label><?php echo __('curso'); ?> <span class="text-danger">*</span></label>
                         <div class="radio-group radio-inline" id="cursoOptions">
                             <?php if (empty($cursos)): ?>
-                                <p style="color: #94a3b8; font-style: italic;">No hay cursos disponibles</p>
+                                <p style="color: #94a3b8; font-style: italic;"><?php echo __('sin_cursos'); ?></p>
                             <?php else: ?>
                                 <?php foreach ($cursos as $index => $curso): ?>
                                 <label>
@@ -317,69 +318,47 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Estado -->
                     <div class="form-group">
-                        <label>Estado</label>
+                        <label><?php echo __('estado'); ?></label>
                         <div class="radio-group">
                             <label>
                                 <input type="radio" name="estado" value="Activo" checked>
-                                <i class="fa-solid fa-circle-check"></i> Activo
+                                <i class="fa-solid fa-circle-check"></i> <?php echo __('activo'); ?>
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Inactivo">
-                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
+                                <i class="fa-solid fa-circle-xmark"></i> <?php echo __('inactivo'); ?>
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Finalizado">
-                                <i class="fa-solid fa-lock"></i> Finalizado
+                                <i class="fa-solid fa-lock"></i> <?php echo __('finalizado'); ?>
                             </label>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
-                        <button type="submit" class="btn-guardar">Guardar</button>
+                        <button type="button" class="btn-cancelar" id="modalCancelar"><?php echo __('cancelar'); ?></button>
+                        <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- BARRA DE ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast">
-                    <i class="fa-solid fa-eye"></i><span>Alto contraste</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-darkmode">
-                    <i class="fa-solid fa-moon"></i><span>Modo oscuro</span>
-                </button>
-                <button class="acc-opt-btn" id="btn-text-size">
-                    <span class="font-icon">Aa</span><span>Texto grande</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span>
-                </button>
-                <button class="acc-opt-btn">
-                    <i class="fa-solid fa-keyboard"></i><span>Navegación</span>
-                </button>
-            </div>
-            <button class="btn-open-config">Abrir configuración</button>
-        </footer>
+        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
+<!-- ✅ BOTÓN FLOTANTE -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 <script src="js/admin.js"></script>
 <script src="js/inscripciones.js"></script>
-<!-- LECTOR DE PANTALLA -->
-<script src="js/lector.js"></script>
+
+<!-- ✅ NUEVA ACCESIBILIDAD JS -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>
