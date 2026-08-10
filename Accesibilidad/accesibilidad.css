@@ -577,3 +577,41 @@ body.texto-grande .menu-item {
     font-size: 1rem !important;
 }
 
+/* =========================================================
+   INDICADOR DE ENFOQUE PARA NAVEGACIÓN POR TECLADO
+   ========================================================= */
+
+body.navegacion-teclado *:focus {
+    outline: 3px solid #5a189a !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 6px rgba(90, 24, 154, 0.3) !important;
+    border-radius: 4px !important;
+}
+
+body.navegacion-teclado .menu-item:focus {
+    outline: 3px solid #ffffff !important;
+    outline-offset: -2px !important;
+    background: #5a189a !important;
+    color: #ffffff !important;
+}
+
+body.navegacion-teclado .btn:focus,
+body.navegacion-teclado button:focus,
+body.navegacion-teclado a:focus {
+    outline: 3px solid #5a189a !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 6px rgba(90, 24, 154, 0.3) !important;
+}
+
+/* Modo oscuro */
+body.modo-oscuro.navegacion-teclado *:focus {
+    outline: 3px solid #a855f7 !important;
+    box-shadow: 0 0 0 6px rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Alto contraste */
+body.alto-contraste.navegacion-teclado *:focus {
+    outline: 3px solid var(--color-acento, #ffffff) !important;
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4) !important;
+}
+

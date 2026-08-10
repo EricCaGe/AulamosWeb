@@ -84,17 +84,6 @@ function cargarTodasPreferencias() {
         console.log('✅ Texto grande aplicado');
     }
 
-    // Lector de pantalla - EL CONSTRUCTOR YA LO ACTIVA
-    const claveLector = obtenerClave('lector_pantalla');
-    if (localStorage.getItem(claveLector) === 'true') {
-        if (window.lector) {
-            window.lector.activado = true;
-            window.lector.aplicarEventos();
-            window.lector.actualizarBotonLector();
-            console.log('✅ Lector de pantalla aplicado');
-        }
-    }
-    
     // Subtítulos
     const claveSubtitulos = obtenerClave('subtitulos');
     if (localStorage.getItem(claveSubtitulos) === 'true' || localStorage.getItem(claveSubtitulos) === '1') {
@@ -116,11 +105,9 @@ function cargarTodasPreferencias() {
 function guardarPreferencia(campo, valor) {
     const idUsuario = window.idUsuario || 0;
     
-    // Guardar en localStorage con clave única por usuario
     const clave = obtenerClave(campo);
     localStorage.setItem(clave, valor);
 
-    // Guardar en la BD
     const formData = new FormData();
     formData.append('id_usuario', idUsuario);
     formData.append('campo', campo);
@@ -181,6 +168,14 @@ function toggleTextoGrande() {
 function toggleSubtitulos() {
     const activo = document.body.classList.toggle('subtitulos');
     guardarPreferencia('subtitulos', activo ? 'true' : 'false');
+    
+    // ✅ Si se desactivan, ocultar la caja de subtítulos
+    if (!activo) {
+        const caja = document.getElementById('subtitulosLectura');
+        if (caja) {
+            caja.style.display = 'none';
+        }
+    }
 }
 
 function toggleNavegacionTeclado() {
@@ -189,7 +184,7 @@ function toggleNavegacionTeclado() {
 }
 
 function abrirConfiguracion() {
-    alert('⚙️ Abriendo configuración...');
+    window.location.href = 'accesibilidad.php';
 }
 
 // ========================================== */
@@ -203,7 +198,7 @@ class LectorPantalla {
         this.ultimoElemento = null;
         this.ultimoTexto = '';
         this.manejandoClick = false;
-        this.inicializar();
+        this.tiempoEspera = null;
     }
 
     inicializar() {
@@ -228,6 +223,7 @@ class LectorPantalla {
         guardarPreferencia('lector_pantalla', 'false');
         this.removerEventos();
         this.sintesis.cancel();
+        this.ocultarSubtitulos();  // ✅ OCULTAR SUBTÍTULOS AL DESACTIVAR
         this.anunciar('🔇 Lector de pantalla desactivado');
         this.actualizarBotonLector();
     }
@@ -247,50 +243,37 @@ class LectorPantalla {
         }
     }
 
-    aplicarEventos() {
-        const elementos = this.obtenerElementos();
-        elementos.forEach(el => {
-            el.removeEventListener('mouseenter', this.handleMouseEnter);
-            el.removeEventListener('focus', this.handleFocus);
-            el.removeEventListener('click', this.handleClick);
-            
-            el.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
-            el.addEventListener('focus', this.handleFocus.bind(this));
-            el.addEventListener('click', this.handleClick.bind(this));
-        });
-
-        if (this.observer) {
-            this.observer.disconnect();
-        }
-        this.observer = new MutationObserver(() => {
-            this.removerEventos();
-            this.aplicarEventos();
-        });
-        this.observer.observe(document.body, { childList: true, subtree: true });
-    }
-
-    removerEventos() {
-        const elementos = this.obtenerElementos();
-        elementos.forEach(el => {
-            el.removeEventListener('mouseenter', this.handleMouseEnter);
-            el.removeEventListener('focus', this.handleFocus);
-            el.removeEventListener('click', this.handleClick);
-        });
-        if (this.observer) {
-            this.observer.disconnect();
-        }
-    }
-
     obtenerElementos() {
         return document.querySelectorAll(
             'button, a[href], input, select, textarea, ' +
             '[tabindex]:not([tabindex="-1"]), ' +
-            '.menu-item, .quick-btn, .btn, .card'
+            '.menu-item, .quick-btn, .btn, .card, ' +
+            'h1, h2, h3, h4, h5, h6, ' +
+            'p, span, li, ' +
+            '.stat-number, .stat-label, .welcome-text, ' +
+            '.modulo-nombre, .actividad-usuario, ' +
+            '.periodo-valor, .periodo-etiqueta, ' +
+            '.reporte-titulo, .reporte-valor, .reporte-descripcion, ' +
+            '.destacado-valor, .destacado-etiqueta'
         );
     }
 
     obtenerTextoElemento(el) {
         let texto = '';
+
+        if (['H1','H2','H3','H4','H5','H6','P','SPAN','LI'].includes(el.tagName)) {
+            texto = el.textContent.trim();
+            if (el.classList.contains('stat-number')) {
+                const parent = el.closest('.stat-card, .stat-info');
+                if (parent) {
+                    const label = parent.querySelector('.stat-label');
+                    if (label) {
+                        return texto + ' ' + label.textContent.trim();
+                    }
+                }
+            }
+            if (texto) return texto;
+        }
 
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
             const label = document.querySelector(`label[for="${el.id}"]`);
@@ -370,7 +353,12 @@ class LectorPantalla {
         if (!this.activado) return;
         if (!texto || texto.trim() === '') return;
 
+        if (this.ultimoTexto === texto) {
+            if (this.tiempoEspera) return;
+        }
+
         this.sintesis.cancel();
+        this.ultimoTexto = texto;
 
         const utterance = new SpeechSynthesisUtterance(texto);
         utterance.lang = 'es-MX';
@@ -384,8 +372,60 @@ class LectorPantalla {
             utterance.voice = vozEsp;
         }
 
+        this.mostrarSubtitulos(texto);
+
+        utterance.onend = () => {
+            this.ocultarSubtitulos();
+        };
+
         this.sintesis.speak(utterance);
-        this.ultimoTexto = texto;
+
+        clearTimeout(this.tiempoEspera);
+        this.tiempoEspera = setTimeout(() => {
+            this.ultimoTexto = '';
+            this.tiempoEspera = null;
+        }, 2000);
+    }
+
+    // ✅ MOSTRAR SUBTÍTULOS SOLO SI ESTÁN ACTIVADOS
+    mostrarSubtitulos(texto) {
+        const subtitulosActivos = document.body.classList.contains('subtitulos');
+        if (!subtitulosActivos) return;
+
+        let caja = document.getElementById('subtitulosLectura');
+        if (!caja) {
+            caja = document.createElement('div');
+            caja.id = 'subtitulosLectura';
+            caja.style.cssText = `
+                position: fixed;
+                bottom: 120px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.85);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-size: 20px;
+                max-width: 80%;
+                z-index: 99999;
+                text-align: center;
+                font-family: sans-serif;
+                border: 2px solid #5a189a;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                display: none;
+                pointer-events: none;
+            `;
+            document.body.appendChild(caja);
+        }
+        caja.textContent = texto;
+        caja.style.display = 'block';
+    }
+
+    ocultarSubtitulos() {
+        const caja = document.getElementById('subtitulosLectura');
+        if (caja) {
+            caja.style.display = 'none';
+        }
     }
 
     handleMouseEnter(e) {
@@ -404,24 +444,6 @@ class LectorPantalla {
         if (el === this.ultimoElemento) return;
         this.ultimoElemento = el;
 
-        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-            const label = document.querySelector(`label[for="${el.id}"]`);
-            let texto = '';
-            if (label) {
-                texto = label.textContent.trim() + ', ';
-            }
-            if (el.value) {
-                texto += 'valor: ' + el.value + ', ';
-            }
-            if (el.placeholder) {
-                texto += el.placeholder;
-            }
-            if (texto) {
-                this.leer(texto);
-            }
-            return;
-        }
-
         const texto = this.obtenerTextoElemento(el);
         if (texto) {
             this.leer(texto);
@@ -436,16 +458,40 @@ class LectorPantalla {
 
         if (texto) {
             this.leer(texto);
+        }
+    }
+
+    aplicarEventos() {
+        const elementos = this.obtenerElementos();
+        elementos.forEach(el => {
+            el.removeEventListener('mouseenter', this.handleMouseEnter);
+            el.removeEventListener('focus', this.handleFocus);
+            el.removeEventListener('click', this.handleClick);
             
-            this.manejandoClick = true;
-            setTimeout(() => {
-                this.manejandoClick = false;
-                if (el.tagName === 'A' || el.tagName === 'BUTTON') {
-                    if (e.defaultPrevented) {
-                        el.click();
-                    }
-                }
-            }, 800);
+            el.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
+            el.addEventListener('focus', this.handleFocus.bind(this));
+            el.addEventListener('click', this.handleClick.bind(this));
+        });
+
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+        this.observer = new MutationObserver(() => {
+            this.removerEventos();
+            this.aplicarEventos();
+        });
+        this.observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    removerEventos() {
+        const elementos = this.obtenerElementos();
+        elementos.forEach(el => {
+            el.removeEventListener('mouseenter', this.handleMouseEnter);
+            el.removeEventListener('focus', this.handleFocus);
+            el.removeEventListener('click', this.handleClick);
+        });
+        if (this.observer) {
+            this.observer.disconnect();
         }
     }
 
@@ -547,15 +593,15 @@ function aplicarPersonalizacion() {
 // INICIALIZAR - CON CARGA DE PREFERENCIAS   */
 // ========================================== */
 
-// ✅ CREAR EL LECTOR Y EXPONERLO GLOBALMENTE
-let lector = new LectorPantalla();
-window.lector = lector;
+let lector = null;
 
-// ✅ EJECUTAR CUANDO LA PÁGINA ESTÉ LISTA
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando accesibilidad...');
     
-    // ✅ CONFIGURAR EL BOTÓN LECTOR
+    lector = new LectorPantalla();
+    window.lector = lector;
+    lector.inicializar();
+    
     const btnLeer = document.getElementById('btnLectorPantalla');
     if (btnLeer) {
         const nuevoBtn = btnLeer.cloneNode(true);
@@ -577,7 +623,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ✅ CARGAR PREFERENCIAS
     cargarTodasPreferencias();
     
     console.log('✅ Accesibilidad inicializada correctamente');
