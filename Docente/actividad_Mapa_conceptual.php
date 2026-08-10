@@ -66,7 +66,7 @@ $rol = "Docente";
                             <span class="user-name"><?php echo $usuario; ?>!</span>
                             <span class="user-role"><?php echo $rol; ?></span>
                         </div>
-                        <i class="fa-solid fa-chevron-down drop-icon"></i>
+                        
                     </div>
                 </div>
             </header>

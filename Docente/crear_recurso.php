@@ -296,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                             <span class="user-role">Docente</span>
                         </div>
-                        <i class="fa-solid fa-chevron-down drop-icon"></i>
+                        
                     </div>
                 </div>
             </header>

@@ -257,7 +257,7 @@ $path_area = "M0,30 L" . implode(" L", array_map(fn($p) => $p['x'] . "," . $p['y
                             <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                             <span class="user-role">Docente</span>
                         </div>
-                        <i class="fa-solid fa-chevron-down drop-icon"></i>
+                        
                     </div>
                 </div>
             </header>
