@@ -1,5 +1,7 @@
 <?php
 session_start();
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
 
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Investigador') {
     header('Location: ../InicioSesion/login.php');

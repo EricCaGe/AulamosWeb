@@ -1,467 +1,118 @@
 <?php
+// ========================================== */
+// PROCESAR LOGIN                            */
+// ========================================== */
 
-// ==========================================
-// PROCESAR LOGIN
-// ==========================================
+require_once '../Conexion/conexion.php';
 
-session_start();
-
-/*
-|--------------------------------------------------------------------------
-| BACKEND NODE DE AULAMOS
-|--------------------------------------------------------------------------
-|
-| Esta debe ser la IP de la computadora donde ejecutas:
-|
-| node server.js
-|
-*/
-const AULAMOS_API =
-    'http://10.2.0.125:3000/api';
-
-// ==========================================
-// VALIDAR MÉTODO
-// ==========================================
-
+// Verificar que se envió el formulario
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header(
-        'Location: login.php?error=sesion'
-    );
+    header('Location: login.php?error=sesion');
     exit;
 }
 
-// ==========================================
-// OBTENER DATOS
-// ==========================================
+// Obtener datos del formulario
+$rol = $_POST['rol'] ?? 'Alumno';
+$correo = trim($_POST['correo'] ?? '');
+$password = $_POST['password'] ?? '';
 
-$rolSeleccionado =
-    trim(
-        $_POST['rol'] ??
-        'Alumno'
-    );
-
-$correo =
-    strtolower(
-        trim(
-            $_POST['correo'] ??
-            ''
-        )
-    );
-
-$password =
-    $_POST['password'] ??
-    '';
-
-// ==========================================
-// VALIDAR CAMPOS
-// ==========================================
-
-if (
-    $correo === '' ||
-    $password === ''
-) {
-    header(
-        'Location: login.php?error=sesion'
-    );
+if (empty($correo) || empty($password)) {
+    header('Location: login.php?error=sesion');
     exit;
 }
 
-// ==========================================
-// VALIDAR ROL
-// ==========================================
-
-$rolesPermitidos = [
-    'Alumno',
-    'Docente',
-    'Investigador',
-    'Admin',
-];
-
-if (
-    !in_array(
-        $rolSeleccionado,
-        $rolesPermitidos,
-        true
-    )
-) {
-    header(
-        'Location: login.php?error=rol_invalido'
-    );
-    exit;
-}
-
-// ==========================================
-// COMPROBAR CURL
-// ==========================================
-
-if (
-    !function_exists(
-        'curl_init'
-    )
-) {
-    error_log(
-        'PHP cURL no está habilitado.'
-    );
-
-    header(
-        'Location: login.php?error=servidor'
-    );
-    exit;
+// Validar que el rol sea válido
+if (!in_array($rol, ['Alumno', 'Docente', 'Investigador', 'Admin'])) {
+    $rol = 'Alumno';
 }
 
 try {
+    // Buscar usuario por correo y rol
+    $stmt = $conexion->prepare("
+        SELECT 
+            u.id_usuario,
+            u.nombre,
+            u.apellido_paterno,
+            u.apellido_materno,
+            u.correo,
+            u.password_hash,
+            u.estado,
+            r.nombre AS rol
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        INNER JOIN roles r ON ur.id_rol = r.id_rol
+        WHERE u.correo = ? AND r.nombre = ?
+    ");
 
-    // ======================================
-    // DATOS PARA EL BACKEND NODE
-    // ======================================
+    $stmt->bind_param("ss", $correo, $rol);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $usuario = $resultado->fetch_assoc();
+    $stmt->close();
 
-    $datosLogin = [
-        'correo' =>
-            $correo,
-
-        'password' =>
-            $password,
-    ];
-
-    // ======================================
-    // PETICIÓN A NODE
-    // ======================================
-
-    $curl =
-        curl_init();
-
-    curl_setopt_array(
-        $curl,
-        [
-            CURLOPT_URL =>
-                AULAMOS_API .
-                '/auth/login',
-
-            CURLOPT_POST =>
-                true,
-
-            CURLOPT_POSTFIELDS =>
-                json_encode(
-                    $datosLogin
-                ),
-
-            CURLOPT_RETURNTRANSFER =>
-                true,
-
-            CURLOPT_CONNECTTIMEOUT =>
-                10,
-
-            CURLOPT_TIMEOUT =>
-                30,
-
-            CURLOPT_HTTPHEADER =>
-                [
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                ],
-        ]
-    );
-
-    $respuesta =
-        curl_exec(
-            $curl
-        );
-
-    $errorCurl =
-        curl_error(
-            $curl
-        );
-
-    $codigoHttp =
-        curl_getinfo(
-            $curl,
-            CURLINFO_HTTP_CODE
-        );
-
-    curl_close(
-        $curl
-    );
-
-    // ======================================
-    // ERROR DE CONEXIÓN
-    // ======================================
-
-    if (
-        $respuesta === false ||
-        $errorCurl
-    ) {
-
-        error_log(
-            'Error al conectar con Node: ' .
-            $errorCurl
-        );
-
-        header(
-            'Location: login.php?error=servidor'
-        );
-
+    // Verificar si el usuario existe
+    if (!$usuario) {
+        header('Location: login.php?error=credenciales');
         exit;
     }
 
-    // ======================================
-    // CONVERTIR RESPUESTA
-    // ======================================
-
-    $datos =
-        json_decode(
-            $respuesta,
-            true
-        );
-
-    if (
-        !is_array(
-            $datos
-        )
-    ) {
-
-        error_log(
-            'Respuesta inválida del backend Node.'
-        );
-
-        header(
-            'Location: login.php?error=sesion'
-        );
-
+    // Verificar estado del usuario
+    if ($usuario['estado'] === 'Inactivo') {
+        header('Location: login.php?error=inactivo');
         exit;
     }
 
-    // ======================================
-    // CREDENCIALES INCORRECTAS
-    // ======================================
-
-    if (
-        $codigoHttp === 401
-    ) {
-
-        header(
-            'Location: login.php?error=credenciales'
-        );
-
+    if ($usuario['estado'] === 'Bloqueado') {
+        header('Location: login.php?error=bloqueado');
         exit;
     }
 
-    // ======================================
-    // CUENTA BLOQUEADA / INACTIVA
-    // ======================================
-
-    if (
-        $codigoHttp === 403
-    ) {
-
-        $mensajeBackend =
-            strtolower(
-                $datos['mensaje'] ??
-                ''
-            );
-
-        if (
-            str_contains(
-                $mensajeBackend,
-                'bloqueada'
-            )
-        ) {
-
-            header(
-                'Location: login.php?error=bloqueado'
-            );
-
-        } else {
-
-            header(
-                'Location: login.php?error=inactivo'
-            );
-        }
-
+    // Verificar contraseña
+    if (!password_verify($password, $usuario['password_hash'])) {
+        header('Location: login.php?error=credenciales');
         exit;
     }
 
-    // ======================================
-    // CUALQUIER OTRO ERROR
-    // ======================================
+    // ========================================== */
+    // INICIAR SESIÓN                            */
+    // ========================================== */
 
-    if (
-        $codigoHttp < 200 ||
-        $codigoHttp >= 300
-    ) {
-
-        error_log(
-            'Error login API: ' .
-            (
-                $datos['mensaje'] ??
-                'Error desconocido'
-            )
-        );
-
-        header(
-            'Location: login.php?error=sesion'
-        );
-
-        exit;
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
-
-    // ======================================
-    // COMPROBAR RESPUESTA COMPLETA
-    // ======================================
-
-    if (
-        empty(
-            $datos['token']
-        ) ||
-        empty(
-            $datos['usuario']
-        )
-    ) {
-
-        error_log(
-            'El backend no devolvió token o usuario.'
-        );
-
-        header(
-            'Location: login.php?error=sesion'
-        );
-
-        exit;
-    }
-
-    $usuario =
-        $datos['usuario'];
-
-    // ======================================
-    // VALIDAR ROL SELECCIONADO
-    // ======================================
-
-    if (
-        !isset(
-            $usuario['rol']
-        ) ||
-        $usuario['rol'] !==
-            $rolSeleccionado
-    ) {
-
-        header(
-            'Location: login.php?error=rol_incorrecto'
-        );
-
-        exit;
-    }
-
-    // ======================================
-    // REGENERAR ID DE SESIÓN
-    // ======================================
-
-    session_regenerate_id(
-        true
-    );
-
-    // ======================================
-    // GUARDAR JWT
-    // ======================================
-
-    $_SESSION['token'] =
-        $datos['token'];
-
-    // También lo dejamos con este nombre
-    // por compatibilidad futura.
-    $_SESSION['jwt'] =
-        $datos['token'];
-
-    // ======================================
-    // GUARDAR USUARIO
-    // ======================================
 
     $_SESSION['usuario'] = [
-        'id_usuario' =>
-            $usuario['id_usuario'],
-
-        'nombre' =>
-            $usuario['nombre'],
-
-        'apellido_paterno' =>
-            $usuario['apellido_paterno'] ??
-            '',
-
-        'apellido_materno' =>
-            $usuario['apellido_materno'] ??
-            '',
-
-        'correo' =>
-            $usuario['correo'],
-
-        'rol' =>
-            $usuario['rol'],
-
-        'token' =>
-            $datos['token'],
+        'id_usuario' => $usuario['id_usuario'],
+        'nombre' => $usuario['nombre'],
+        'apellido_paterno' => $usuario['apellido_paterno'],
+        'apellido_materno' => $usuario['apellido_materno'],
+        'correo' => $usuario['correo'],
+        'rol' => $usuario['rol']
     ];
 
-    // ======================================
-    // REDIRECCIONAR SEGÚN ROL
-    // ======================================
+    // Actualizar último acceso
+    $stmt = $conexion->prepare("UPDATE usuarios SET ultimo_acceso = NOW() WHERE id_usuario = ?");
+    $stmt->bind_param("i", $usuario['id_usuario']);
+    $stmt->execute();
+    $stmt->close();
 
-    switch (
-        $usuario['rol']
-    ) {
-
-        case 'Alumno':
-
-            header(
-                'Location: ../Alumno/alumno.php'
-            );
-
-            break;
-
-        case 'Docente':
-
-            header(
-                'Location: ../Docente/docente_dashboard.php'
-            );
-
-            break;
-
-        case 'Investigador':
-
-            header(
-                'Location: ../Investigador/investigador_dashboard.php'
-            );
-
-            break;
-
-        case 'Admin':
-
-            header(
-                'Location: ../Administrador/admin_dashboard.php'
-            );
-
-            break;
-
-        default:
-
-            header(
-                'Location: login.php?error=rol_invalido'
-            );
-
-            break;
+    // Redirigir según el rol
+    if ($usuario['rol'] === 'Alumno') {
+        header('Location: ../Alumno/alumno.php');
+    } elseif ($usuario['rol'] === 'Docente') {
+        header('Location: ../Docente/docente_dashboard.php');
+    } elseif ($usuario['rol'] === 'Investigador') {
+        header('Location: ../Investigador/dashboard.php');
+    } elseif ($usuario['rol'] === 'Admin') {
+        header('Location: ../Administrador/admin_dashboard.php');
+    } else {
+        header('Location: ../InicioSesion/login.php?error=rol_invalido');
     }
-
     exit;
 
-} catch (
-    Throwable $e
-) {
-
-    error_log(
-        'Error en login web: ' .
-        $e->getMessage()
-    );
-
-    header(
-        'Location: login.php?error=sesion'
-    );
-
+} catch (Exception $e) {
+    error_log("Error en login: " . $e->getMessage());
+    header('Location: login.php?error=sesion');
     exit;
 }
+?>
