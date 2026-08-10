@@ -62,7 +62,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    transition: box-shadow 0.2s, background 0.3s, border-color 0.3s;
+    transition: box-shadow 0.2s;
 }
 .card-actividad:hover {
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
@@ -139,115 +139,6 @@
 .asistente-wrapper {
     margin: 12px 0 24px 0;
     text-align: right;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA MODO OSCURO
-   ========================================================= */
-body.modo-oscuro .card-actividad {
-    background-color: #1e1e32;
-    border-color: #2d2d44;
-}
-body.modo-oscuro .card-titulo {
-    color: #f1f5f9;
-}
-body.modo-oscuro .filtros button {
-    background-color: #2d2d44;
-    color: #cbd5e1;
-    border-color: #4a4a6a;
-}
-body.modo-oscuro .filtros button.activo {
-    background-color: #4f46e5;
-    border-color: #4f46e5;
-}
-body.modo-oscuro .btn-ext {
-    background-color: #3d3d5c;
-    color: #fde68a;
-}
-body.modo-oscuro .btn-ext:hover {
-    background-color: #4a4a6a;
-}
-body.modo-oscuro .estado-badge.pendiente {
-    background-color: #3d3d2a;
-    color: #fde68a;
-}
-body.modo-oscuro .estado-badge.proceso {
-    background-color: #1e3a5a;
-    color: #93c5fd;
-}
-body.modo-oscuro .estado-badge.completada,
-body.modo-oscuro .estado-badge.calificada {
-    background-color: #1a3a2a;
-    color: #6ee7b7;
-}
-body.modo-oscuro .estado-badge.atrasada {
-    background-color: #3d1a1a;
-    color: #fca5a5;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA ALTO CONTRASTE
-   ========================================================= */
-body.alto-contraste .card-actividad {
-    background-color: #1a1a1a !important;
-    border: 2px solid #ffff00 !important;
-}
-body.alto-contraste .card-titulo,
-body.alto-contraste .card-asignatura,
-body.alto-contraste .card-fecha {
-    color: #ffffff !important;
-}
-body.alto-contraste .filtros button {
-    background-color: #222 !important;
-    color: #ffff00 !important;
-    border-color: #ffff00 !important;
-}
-body.alto-contraste .filtros button.activo {
-    background-color: #ffff00 !important;
-    color: #000000 !important;
-}
-body.alto-contraste .btn-ext {
-    background-color: #ffff00 !important;
-    color: #000000 !important;
-    border: 2px solid #ffffff !important;
-}
-body.alto-contraste .estado-badge {
-    background-color: #333 !important;
-    color: #ffff00 !important;
-    border: 1px solid #ffff00;
-}
-body.alto-contraste .estado-badge.pendiente,
-body.alto-contraste .estado-badge.proceso,
-body.alto-contraste .estado-badge.completada,
-body.alto-contraste .estado-badge.calificada,
-body.alto-contraste .estado-badge.atrasada {
-    background-color: #333 !important;
-    color: #ffff00 !important;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA TEXTO GRANDE
-   ========================================================= */
-body.texto-grande .filtros button {
-    font-size: 1.2rem !important;
-    padding: 10px 28px !important;
-}
-body.texto-grande .card-titulo {
-    font-size: 1.4rem !important;
-}
-body.texto-grande .card-asignatura {
-    font-size: 1.1rem !important;
-}
-body.texto-grande .card-fecha {
-    font-size: 1rem !important;
-}
-body.texto-grande .btn-ext {
-    font-size: 1rem !important;
-    padding: 8px 22px !important;
-}
-body.texto-grande .estado-badge {
-    font-size: 1rem !important;
-    padding: 6px 18px !important;
 }
 
 /* =========================================================

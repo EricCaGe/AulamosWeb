@@ -81,6 +81,9 @@ try {
         session_start();
     }
 
+    // ✅ REGENERAR ID DE SESIÓN PARA SEGURIDAD (TOKEN DE SESIÓN)
+    session_regenerate_id(true);
+
     $_SESSION['usuario'] = [
         'id_usuario' => $usuario['id_usuario'],
         'nombre' => $usuario['nombre'],

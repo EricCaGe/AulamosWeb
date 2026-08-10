@@ -1,9 +1,18 @@
 <?php
 session_start();
+
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
+
 require_once '../Conexion/conexion.php';
 
-// Si no hay sesión, usa un ID por defecto (para pruebas)
-$id_usuario = $_SESSION['id_usuario'] ?? 1;
+// Verificar que el usuario esté logueado
+if (!isset($_SESSION['usuario'])) {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
+$id_usuario = $_SESSION['usuario']['id_usuario'];
 
 // =============================================
 // 1. OBTENER MATERIAS DEL USUARIO (desde inscripciones)
@@ -38,7 +47,6 @@ $materia_actual = isset($_GET['materia']) ? $_GET['materia'] : $materias[0];
 // =============================================
 
 // 2a. Racha de estudio (días consecutivos con actividad)
-// Para simplificar, contamos días con actividad en los últimos 30 días
 $sqlRacha = "
     SELECT COUNT(DISTINCT DATE(fecha_hora)) as dias_activos
     FROM eventos_investigacion
@@ -64,8 +72,6 @@ $resultCompletadas = $stmt->get_result();
 $completadas = $resultCompletadas->fetch_assoc()['completadas'] ?? 0;
 
 // 2c. Lector activo (actividades vistas y pendientes)
-// Vistas: actividades donde el usuario ha accedido (ultimo_acceso no nulo)
-// Pendientes: total de actividades - vistas (simplificado)
 $sqlVistas = "
     SELECT COUNT(DISTINCT id_actividad) as vistas
     FROM actividad_estudiantes
@@ -98,7 +104,6 @@ $mensaje = $porcentaje >= 70 ? '¡Sigue así, cada paso cuenta!' : '¡Cada esfue
 // =============================================
 $statsMateria = [];
 if ($materia_actual !== 'Sin materias asignadas' && $materia_actual !== $materias[0]) {
-    // Obtener id_materia a partir del campo_formativo
     $sqlIdMateria = "SELECT id_materia FROM materias WHERE campo_formativo = ?";
     $stmt = $conexion->prepare($sqlIdMateria);
     $stmt->bind_param("s", $materia_actual);
@@ -107,7 +112,6 @@ if ($materia_actual !== 'Sin materias asignadas' && $materia_actual !== $materia
     $idMateria = $resultId->fetch_assoc()['id_materia'] ?? null;
 
     if ($idMateria) {
-        // Completadas en esta materia
         $sqlCompMateria = "
             SELECT COUNT(*) as comp
             FROM actividad_estudiantes ae
@@ -121,7 +125,6 @@ if ($materia_actual !== 'Sin materias asignadas' && $materia_actual !== $materia
         $resultComp = $stmt->get_result();
         $compMateria = $resultComp->fetch_assoc()['comp'] ?? 0;
 
-        // Total en esta materia
         $sqlTotalMateria = "
             SELECT COUNT(*) as total
             FROM actividad_estudiantes ae
@@ -165,6 +168,9 @@ if (empty($statsMateria)) {
     <link rel="stylesheet" href="Style/Inicio.css">
     <link rel="stylesheet" href="Style/Avances.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body>
 
@@ -187,7 +193,7 @@ if (empty($statsMateria)) {
         
         <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         <div class="menu-spacer"></div>
-    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -253,34 +259,30 @@ if (empty($statsMateria)) {
             </div>
         </div>
 
-        <!-- ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                <button class="acc-opt-btn" id="btn-text-size"><i class="fa-solid fa-font"></i><span>Texto grande</span></button>
-               <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                <button class="acc-opt-btn" id="btn-subtitulos"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-                <button class="acc-opt-btn" id="btn-navegacion"><i class="fa-solid fa-keyboard"></i><span>Navegación</span></button>
-            </div>
-            <button class="btn-open-config" id="btn-config">Abrir configuración</button>
-        </footer>
+        <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+        <!-- ========================================== -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<?php include '../API/teclado_accesibilidad.php'; ?>
-<script src="js/navegacionTeclado.js"></script>
-<script src="js/Accesibilidad.js"></script> 
-<script src="../Administrador/js/lector.js"></script>
+<!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+<!-- ========================================== -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
+<!-- ========================================== -->
+<!-- SCRIPTS                                    -->
+<!-- ========================================== -->
 <script src="js/Inicio.js"></script>
 <script src="js/Avances.js"></script>
+
+<!-- NUEVA ACCESIBILIDAD -->
+<script src="../Accesibilidad/lector.js"></script>
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>

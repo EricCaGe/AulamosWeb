@@ -39,7 +39,7 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border: 1px solid #e9edf2;
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 .help-card:hover {
     transform: translateY(-4px);
@@ -211,121 +211,11 @@
     background-color: #2563eb;
 }
 
-/* =========================================================
-   ADAPTACIONES PARA MODO OSCURO
-   ========================================================= */
-body.modo-oscuro .help-card,
-body.modo-oscuro .help-article-item {
-    background-color: #1e1e32;
-    border-color: #2d2d44;
-}
-body.modo-oscuro .help-card h3,
-body.modo-oscuro .article-content h3 {
-    color: #f1f5f9;
-}
-body.modo-oscuro .help-card p,
-body.modo-oscuro .article-content p {
-    color: #94a3b8;
-}
-body.modo-oscuro .section-title {
-    color: #f1f5f9;
-}
-body.modo-oscuro .btn-secondary {
-    background-color: #2d2d44;
-    color: #cbd5e1;
-}
-body.modo-oscuro .btn-secondary:hover {
-    background-color: #3d3d5c;
-}
-body.modo-oscuro .support-section {
-    background: linear-gradient(135deg, #1a2a4a, #1e3a5a);
-}
-body.modo-oscuro .support-text h2 {
-    color: #f1f5f9;
-}
-body.modo-oscuro .support-text p {
-    color: #94a3b8;
-}
-body.modo-oscuro .article-tag {
-    background-color: #2d2d44;
-    color: #94a3b8;
-}
-body.modo-oscuro .article-btn {
-    color: #cbd5e1;
-    border-color: #4a4a6a;
-}
-body.modo-oscuro .article-btn:hover {
-    background-color: #2d2d44;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA ALTO CONTRASTE
-   ========================================================= */
-body.alto-contraste .help-card,
-body.alto-contraste .help-article-item {
-    background-color: #1a1a1a !important;
-    border: 2px solid #ffff00 !important;
-}
-body.alto-contraste .help-card h3,
-body.alto-contraste .article-content h3,
-body.alto-contraste .section-title,
-body.alto-contraste .support-text h2 {
-    color: #ffffff !important;
-}
-body.alto-contraste .help-card p,
-body.alto-contraste .article-content p,
-body.alto-contraste .support-text p {
-    color: #ffff00 !important;
-}
-body.alto-contraste .btn-primary,
-body.alto-contraste .support-btn {
-    background-color: #ffff00 !important;
-    color: #000000 !important;
-}
-body.alto-contraste .btn-secondary {
-    background-color: #222 !important;
-    color: #ffff00 !important;
-    border: 2px solid #ffff00 !important;
-}
-body.alto-contraste .support-section {
-    background: #111111 !important;
-    border: 2px solid #ffff00 !important;
-}
-body.alto-contraste .article-btn {
-    background-color: #222 !important;
-    color: #ffff00 !important;
-    border-color: #ffff00 !important;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA TEXTO GRANDE
-   ========================================================= */
-body.texto-grande .section-title {
-    font-size: 1.8rem !important;
-}
-body.texto-grande .help-card h3 {
-    font-size: 1.4rem !important;
-}
-body.texto-grande .help-card p {
-    font-size: 1.1rem !important;
-}
-body.texto-grande .article-content h3 {
-    font-size: 1.3rem !important;
-}
-body.texto-grande .article-content p {
-    font-size: 1rem !important;
-}
-body.texto-grande .support-text h2 {
-    font-size: 1.6rem !important;
-}
-body.texto-grande .support-text p {
-    font-size: 1.1rem !important;
-}
-body.texto-grande .help-btn,
-body.texto-grande .support-btn,
-body.texto-grande .article-btn {
-    font-size: 1.1rem !important;
-    padding: 10px 28px !important;
+.btn-assistant {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
 }
 
 /* =========================================================
@@ -354,10 +244,4 @@ body.texto-grande .article-btn {
     .support-content {
         padding: 8px;
     }
-}
-.btn-assistant {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
 }

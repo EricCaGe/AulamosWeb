@@ -18,7 +18,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.3s, border-color 0.3s;
+    transition: border-color 0.3s;
 }
 .accesibilidad-option:hover {
     border-color: #3b82f6;
@@ -152,97 +152,6 @@
 }
 .btn-reset i {
     font-size: 1.1rem;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA MODO OSCURO
-   ========================================================= */
-body.modo-oscuro .accesibilidad-option {
-    background-color: #1e1e32;
-    border-color: #2d2d44;
-}
-body.modo-oscuro .option-info h3 {
-    color: #f1f5f9;
-}
-body.modo-oscuro .option-info p {
-    color: #94a3b8;
-}
-body.modo-oscuro .toggle-label {
-    color: #cbd5e1;
-}
-body.modo-oscuro .toggle-track {
-    background-color: #4a4a6a;
-}
-body.modo-oscuro .toggle-btn.active .toggle-track {
-    background-color: #4f46e5;
-}
-body.modo-oscuro .select-pref {
-    background-color: #2d2d44;
-    color: #cbd5e1;
-    border-color: #4a4a6a;
-}
-body.modo-oscuro .btn-reset {
-    background-color: #2d2d44;
-    color: #cbd5e1;
-    border-color: #4a4a6a;
-}
-body.modo-oscuro .btn-reset:hover {
-    background-color: #3d1a1a;
-    border-color: #ef4444;
-    color: #fca5a5;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA ALTO CONTRASTE
-   ========================================================= */
-body.alto-contraste .accesibilidad-option {
-    background-color: #1a1a1a !important;
-    border: 2px solid #ffff00 !important;
-}
-body.alto-contraste .option-info h3,
-body.alto-contraste .option-info p {
-    color: #ffffff !important;
-}
-body.alto-contraste .toggle-btn.active .toggle-track {
-    background-color: #ffff00 !important;
-}
-body.alto-contraste .toggle-thumb {
-    background-color: #000000 !important;
-}
-body.alto-contraste .select-pref {
-    background-color: #222 !important;
-    color: #ffff00 !important;
-    border-color: #ffff00 !important;
-}
-body.alto-contraste .btn-reset {
-    background-color: #222 !important;
-    color: #ffff00 !important;
-    border-color: #ffff00 !important;
-}
-body.alto-contraste .btn-reset:hover {
-    background-color: #ffff00 !important;
-    color: #000000 !important;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA TEXTO GRANDE
-   ========================================================= */
-body.texto-grande .option-info h3 {
-    font-size: 1.4rem !important;
-}
-body.texto-grande .option-info p {
-    font-size: 1.1rem !important;
-}
-body.texto-grande .toggle-label {
-    font-size: 1.1rem !important;
-}
-body.texto-grande .select-pref {
-    font-size: 1.1rem !important;
-    padding: 10px 20px !important;
-}
-body.texto-grande .btn-reset {
-    font-size: 1.1rem !important;
-    padding: 14px 36px !important;
 }
 
 /* =========================================================

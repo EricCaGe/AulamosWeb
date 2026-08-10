@@ -1,10 +1,18 @@
 <?php
 session_start();
-require_once '../Conexion/conexion.php'; // Asegúrate de que la ruta sea correcta
 
-// Si no hay sesión, redirige o usa un ID por defecto (para pruebas)
-// Si no hay sesión, redirige o usa un ID por defecto (para pruebas)
-$id_usuario = $_SESSION['usuario']['id_usuario'] ?? 1; // Usamos la estructura correcta de la sesión
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
+
+require_once '../Conexion/conexion.php';
+
+// Verificar que el usuario esté logueado
+if (!isset($_SESSION['usuario'])) {
+    header('Location: ../InicioSesion/login.php');
+    exit;
+}
+
+$id_usuario = $_SESSION['usuario']['id_usuario'];
 
 // Consulta para obtener las actividades del alumno
 $sql = "
@@ -14,7 +22,6 @@ $sql = "
         m.nombre AS asignatura,
         a.fecha_limite AS vencimiento,
         ae.estado,
-        -- Calcular estado real (Atrasada si está Pendiente y fecha límite pasó)
         CASE 
             WHEN ae.estado = 'Pendiente' AND a.fecha_limite < NOW() THEN 'atrasada'
             ELSE LOWER(ae.estado)
@@ -63,6 +70,9 @@ $estados_texto = [
     <link rel="stylesheet" href="Style/Inicio.css">
     <link rel="stylesheet" href="Style/actividades.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body>
 
@@ -134,35 +144,30 @@ $estados_texto = [
             <?php endif; ?>
         </div>
 
-        <!-- ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                <button class="acc-opt-btn" id="btn-text-size"><i class="fa-solid fa-font"></i><span>Texto grande</span></button>
-                <button class="acc-opt-btn" id="btn-leer"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                <button class="acc-opt-btn" id="btn-subtitulos"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-                <button class="acc-opt-btn" id="btn-navegacion"><i class="fa-solid fa-keyboard"></i><span>Navegación</span></button>
-            </div>
-            <button class="btn-open-config" id="btn-config">Abrir configuración</button>
-        </footer>
+        <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+        <!-- ========================================== -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<?php include '../API/teclado_accesibilidad.php'; ?>
-<script src="js/navegacionTeclado.js"></script>
-<script src="js/Accesibilidad.js"></script>
-<script src="../Administrador/js/lector.js"></script>
+<!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+<!-- ========================================== -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
+<!-- ========================================== -->
+<!-- SCRIPTS                                    -->
+<!-- ========================================== -->
 <script src="js/actividades.js"></script>
 <script src="js/Inicio.js"></script>
+
+<!-- NUEVA ACCESIBILIDAD -->
+<script src="../Accesibilidad/lector.js"></script>
+<script src="../Accesibilidad/accesibilidad.js"></script>
 
 </body>
 </html>

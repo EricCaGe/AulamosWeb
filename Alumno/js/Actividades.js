@@ -1,7 +1,9 @@
 (function() {
     'use strict';
 
-    // ----- FILTROS (tabs) -----
+    // =============================================
+    // FILTROS (tabs)
+    // =============================================
     const filtros = document.querySelectorAll('#filtros button');
     const tarjetas = document.querySelectorAll('.card-actividad');
 
@@ -45,7 +47,9 @@
     const filtroInicial = params.get('filtro') || 'todas';
     aplicarFiltro(filtroInicial);
 
-    // ----- SOLICITAR EXTENSIÓN -----
+    // =============================================
+    // SOLICITAR EXTENSIÓN
+    // =============================================
     document.querySelectorAll('.btn-ext').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -57,87 +61,13 @@
         });
     });
 
-    // ----- ASISTENTE VIRTUAL (solo el de la cabecera) -----
+    // =============================================
+    // ASISTENTE VIRTUAL (solo el de la cabecera)
+    // =============================================
     const btnAsistente = document.getElementById('btnAsistente');
     if (btnAsistente) {
         btnAsistente.addEventListener('click', function() {
             alert('🧠 Asistente Virtual: Estoy aquí para ayudarte con tus dudas sobre las actividades.');
-        });
-    }
-
-    // ----- ACCESIBILIDAD (si Inicio.js ya la maneja, esto es redundante, pero lo dejamos por compatibilidad) -----
-    const body = document.body;
-
-    function toggleClase(elemento, clase) {
-        elemento.classList.toggle(clase);
-        const activo = elemento.classList.contains(clase);
-        localStorage.setItem(clase, activo ? 'true' : 'false');
-    }
-
-    function cargarPreferencias() {
-        const preferencias = ['modo-oscuro', 'alto-contraste', 'texto-grande'];
-        preferencias.forEach(clase => {
-            if (localStorage.getItem(clase) === 'true') {
-                body.classList.add(clase);
-                const map = {
-                    'modo-oscuro': 'btn-darkmode',
-                    'alto-contraste': 'btn-contrast',
-                    'texto-grande': 'btn-text-size'
-                };
-                const btn = document.getElementById(map[clase]);
-                if (btn) btn.classList.add('active');
-            }
-        });
-    }
-    cargarPreferencias();
-
-    const btnDark = document.getElementById('btn-darkmode');
-    const btnContrast = document.getElementById('btn-contrast');
-    const btnText = document.getElementById('btn-text-size');
-
-    if (btnDark) {
-        btnDark.addEventListener('click', function() {
-            toggleClase(body, 'modo-oscuro');
-            this.classList.toggle('active');
-        });
-    }
-    if (btnContrast) {
-        btnContrast.addEventListener('click', function() {
-            toggleClase(body, 'alto-contraste');
-            this.classList.toggle('active');
-        });
-    }
-    if (btnText) {
-        btnText.addEventListener('click', function() {
-            toggleClase(body, 'texto-grande');
-            this.classList.toggle('active');
-        });
-    }
-
-    // Botones informativos (simulación)
-    const btnLeer = document.getElementById('btn-leer');
-    const btnSubtitulos = document.getElementById('btn-subtitulos');
-    const btnNavegacion = document.getElementById('btn-navegacion');
-    const btnConfig = document.getElementById('btn-config');
-
-    if (btnLeer) {
-        btnLeer.addEventListener('click', function() {
-            alert('🔊 Lectura de pantalla activada (simulación)');
-        });
-    }
-    if (btnSubtitulos) {
-        btnSubtitulos.addEventListener('click', function() {
-            alert('📝 Subtítulos disponibles (simulación)');
-        });
-    }
-    if (btnNavegacion) {
-        btnNavegacion.addEventListener('click', function() {
-            alert('⌨️ Navegación por teclado mejorada (simulación)');
-        });
-    }
-    if (btnConfig) {
-        btnConfig.addEventListener('click', function() {
-            alert('⚙️ Abrir configuración completa de accesibilidad (simulación)');
         });
     }
 

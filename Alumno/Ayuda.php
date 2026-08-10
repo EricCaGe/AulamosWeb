@@ -1,11 +1,11 @@
 <?php
 session_start();
 
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
+
 // Verificar que exista una sesión válida
-if (
-    !isset($_SESSION['usuario']) ||
-    !isset($_SESSION['usuario']['id_usuario'])
-) {
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['usuario']['id_usuario'])) {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
@@ -17,43 +17,20 @@ $id_usuario = (int) $_SESSION['usuario']['id_usuario'];
 // =============================================
 // OBTENER DATOS DEL USUARIO
 // =============================================
-$stmt = $conexion->prepare(
-    "SELECT nombre, apellido_paterno
-     FROM usuarios
-     WHERE id_usuario = ?"
-);
-
-if (!$stmt) {
-    die("Error al preparar la consulta del usuario.");
-}
-
+$stmt = $conexion->prepare("SELECT nombre, apellido_paterno FROM usuarios WHERE id_usuario = ?");
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
-
 $resultado = $stmt->get_result();
 $usuario = $resultado->fetch_assoc();
-
-$nombre_completo = $usuario
-    ? trim($usuario['nombre'] . ' ' . ($usuario['apellido_paterno'] ?? ''))
-    : 'Estudiante';
-
+$nombre_completo = $usuario ? trim($usuario['nombre'] . ' ' . ($usuario['apellido_paterno'] ?? '')) : 'Estudiante';
 $stmt->close();
 
 // =============================================
 // OBTENER ARTÍCULOS DEL CENTRO DE AYUDA
 // =============================================
 $articulosAyuda = [];
-
-$sqlAyuda = "
-    SELECT *
-    FROM centro_ayuda
-    WHERE activo = 1
-    ORDER BY fecha_publicacion DESC
-    LIMIT 5
-";
-
+$sqlAyuda = "SELECT * FROM centro_ayuda WHERE activo = 1 ORDER BY fecha_publicacion DESC LIMIT 5";
 $resultAyuda = $conexion->query($sqlAyuda);
-
 if ($resultAyuda) {
     $articulosAyuda = $resultAyuda->fetch_all(MYSQLI_ASSOC);
 }
@@ -68,6 +45,9 @@ if ($resultAyuda) {
     <link rel="stylesheet" href="Style/Inicio.css">
     <link rel="stylesheet" href="Style/Ayuda.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body>
 
@@ -90,7 +70,7 @@ if ($resultAyuda) {
         
         <button class="btn-accessibility-main"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         <div class="menu-spacer"></div>
-    <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -102,15 +82,9 @@ if ($resultAyuda) {
                 <p>Encuentra respuestas y recursos para ti</p>
             </div>
             <div class="header-actions">
-                <a
-    href="Chatbot.php"
-    class="btn-assistant"
-    id="btnAsistente"
-    aria-label="Abrir el asistente virtual AulaBot"
->
-    Asistente Virtual
-    <span class="robot-icon" aria-hidden="true">🤖</span>
-</a>
+                <a href="Chatbot.php" class="btn-assistant" id="btnAsistente" aria-label="Abrir el asistente virtual AulaBot">
+                    Asistente Virtual <span class="robot-icon" aria-hidden="true">🤖</span>
+                </a>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
                 <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar" class="avatar">
             </div>
@@ -157,11 +131,7 @@ if ($resultAyuda) {
                         </div>
                         <div class="article-content">
                             <h3><?= htmlspecialchars($articulo['titulo']) ?></h3>
-                            <p><?= htmlspecialchars(
-    mb_substr($articulo['contenido'], 0, 120),
-    ENT_QUOTES,
-    'UTF-8'
-) ?>...</p>
+                            <p><?= htmlspecialchars(mb_substr($articulo['contenido'], 0, 120)) ?>...</p>
                             <span class="article-tag"><?= htmlspecialchars($articulo['tipo']) ?></span>
                         </div>
                         <button class="article-btn">Leer más</button>
@@ -185,34 +155,30 @@ if ($resultAyuda) {
             </div>
         </section>
 
-        <!-- ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                <button class="acc-opt-btn" id="btn-text-size"><i class="fa-solid fa-font"></i><span>Texto grande</span></button>
-                <button class="acc-opt-btn" id="btn-leer"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                <button class="acc-opt-btn" id="btn-subtitulos"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-           <button class="acc-opt-btn" id="btn-navegacion"><i class="fa-solid fa-keyboard"></i><span>Navegación</span></button>
-            </div>
-            <button class="btn-open-config" id="btn-config">Abrir configuración</button>
-        </footer>
+        <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+        <!-- ========================================== -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<?php include '../API/teclado_accesibilidad.php'; ?>
-<script src="js/navegacionTeclado.js"></script>
-<script src="js/Accesibilidad.js"></script> 
+<!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+<!-- ========================================== -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
+<!-- ========================================== -->
+<!-- SCRIPTS                                    -->
+<!-- ========================================== -->
 <script src="js/Inicio.js"></script>
 <script src="js/Ayuda.js"></script>
-<script src="../Administrador/js/lector.js"></script>
+
+<!-- NUEVA ACCESIBILIDAD -->
+<script src="../Accesibilidad/lector.js"></script>
+<script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>

@@ -43,7 +43,7 @@
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border: 1px solid #e9edf2;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
+    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -78,75 +78,6 @@
     font-weight: 500;
     color: #475569;
     margin-top: 8px;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA MODO OSCURO
-   ========================================================= */
-body.modo-oscuro .recurso-card {
-    background-color: #1e1e32;
-    border-color: #2d2d44;
-}
-body.modo-oscuro .filtros-materia a {
-    background-color: #2d2d44;
-    color: #cbd5e1;
-    border-color: #4a4a6a;
-}
-body.modo-oscuro .filtros-materia a.activo {
-    background-color: #4f46e5;
-    border-color: #4f46e5;
-    color: white;
-}
-body.modo-oscuro .recurso-tipo {
-    background-color: #2d2d44;
-    color: #cbd5e1;
-}
-body.modo-oscuro .recurso-titulo {
-    color: #f1f5f9;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA ALTO CONTRASTE
-   ========================================================= */
-body.alto-contraste .recurso-card {
-    background-color: #1a1a1a !important;
-    border: 2px solid #ffff00 !important;
-}
-body.alto-contraste .filtros-materia a {
-    background-color: #222 !important;
-    color: #ffff00 !important;
-    border-color: #ffff00 !important;
-}
-body.alto-contraste .filtros-materia a.activo {
-    background-color: #ffff00 !important;
-    color: #000000 !important;
-}
-body.alto-contraste .recurso-titulo {
-    color: #ffffff !important;
-}
-body.alto-contraste .recurso-materia {
-    color: #ffff00 !important;
-}
-
-/* =========================================================
-   ADAPTACIONES PARA TEXTO GRANDE
-   ========================================================= */
-body.texto-grande .filtros-materia a {
-    font-size: 1.2rem !important;
-    padding: 10px 24px !important;
-}
-body.texto-grande .recurso-titulo {
-    font-size: 1.4rem !important;
-}
-body.texto-grande .recurso-materia {
-    font-size: 1.1rem !important;
-}
-body.texto-grande .recurso-tipo {
-    font-size: 1rem !important;
-    padding: 6px 16px !important;
-}
-body.texto-grande .recurso-icono {
-    font-size: 3.5rem !important;
 }
 
 /* =========================================================
