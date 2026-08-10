@@ -288,9 +288,9 @@ function formatearFecha($fecha) {
                     <section class="section-container">
                         <h3 class="section-title">Accesos rápidos</h3>
                         <div class="quick-access-grid">
-                            <a href="crear_curso.php" class="quick-btn bg-purple-solid">
+                            <a href="crear_recurso.php" class="quick-btn bg-purple-solid">
                                 <i class="fa-solid fa-arrow-up-from-bracket"></i>
-                                <span>Crear curso</span>
+                                <span>Crear recurso</span>
                             </a>
                             <a href="crear_actividad.php" class="quick-btn bg-green-solid">
                                 <i class="fa-solid fa-clipboard-check"></i>
