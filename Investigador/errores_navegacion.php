@@ -67,7 +67,6 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Errores de navegación - Investigador</title>
-    <link rel="stylesheet" href="../styles/admin.css">
     <link rel="stylesheet" href="styles/errores_navegacion.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
@@ -198,7 +197,6 @@ $stmt->close();
 </div>
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i></button>
 <script src="js/errores_navegacion.js"></script>
-<script src="../Accesibilidad/lector.js"></script>
 <script src="../Accesibilidad/accesibilidad.js"></script>
 </body>
 </html>

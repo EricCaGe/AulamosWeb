@@ -1,6 +1,6 @@
 /* =========================================
    ESTILOS ESPECÍFICOS: CREAR EVALUACIÓN
-========================================= */
+   ========================================= */
 
 .eval-layout {
     margin-top: 20px;
@@ -36,7 +36,7 @@
 }
 
 .clean-input:focus {
-    border-color: var(--primary-blue);
+    border-color: #3b71f3;
 }
 
 /* Contenedor de Fecha con Ícono */
@@ -55,7 +55,7 @@
 
 /* =========================================
    DISEÑO DE OPCIONES (RADIO BUTTONS)
-========================================= */
+   ========================================= */
 .eval-type-container {
     display: flex;
     flex-direction: column;
@@ -106,8 +106,8 @@
 }
 
 /* =========================================
-   BOTONES DE ACCIÓN (MISMO TAMAÑO Y COLOR AZUL)
-========================================= */
+   BOTONES DE ACCIÓN
+   ========================================= */
 .eval-buttons {
     display: flex;
     gap: 15px;
@@ -118,9 +118,9 @@
 .btn-outline-gray {
     flex: 1;
     padding: 12px 20px;
-    border: 1px solid #3b71f3; /* Borde azul */
-    background-color: #f0f5ff; /* Fondo azul claro */
-    color: #3b71f3; /* Texto azul */
+    border: 1px solid #3b71f3;
+    background-color: #f0f5ff;
+    color: #3b71f3;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
@@ -133,8 +133,8 @@
 }
 
 .btn-outline-gray:hover {
-    background-color: #e0ebff; /* Fondo un poco más oscuro */
-    color: #2a5fc8; /* Texto azul más oscuro */
+    background-color: #e0ebff;
+    color: #2a5fc8;
     border-color: #2a5fc8;
 }
 
@@ -142,9 +142,9 @@
 .btn-outline-blue {
     flex: 1;
     padding: 12px 20px;
-    border: 1px solid #3b71f3; /* Borde azul */
-    background-color: #3b71f3; /* Fondo azul sólido */
-    color: white; /* Texto blanco */
+    border: 1px solid #3b71f3;
+    background-color: #3b71f3;
+    color: white;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
@@ -157,20 +157,20 @@
 }
 
 .btn-outline-blue:hover {
-    background-color: #2a5fc8; /* Azul más oscuro */
+    background-color: #2a5fc8;
     border-color: #2a5fc8;
+}
+
+.btn-outline-blue:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* =========================================
    UTILIDADES
-========================================= */
+   ========================================= */
 .mt-20 { margin-top: 20px; }
 .mt-10 { margin-top: 10px; }
-
-.small-cal .cal-day {
-    height: 30px;
-    font-size: 12px;
-}
 
 .clean-input[type="select"],
 select.clean-input {
@@ -192,19 +192,9 @@ select.clean-input {
     color: #ef4444;
 }
 
-/* Estilo para el select de materia/curso/periodo */
-.clean-input[type="select"] {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 1em;
-    padding-right: 30px;
-}
-
 /* =========================================
    SECCIONES DINÁMICAS (CUESTIONARIO Y ARCHIVOS)
-========================================= */
+   ========================================= */
 
 /* Sección dinámica */
 .dynamic-section {
@@ -379,56 +369,25 @@ select.clean-input {
     background-color: #3b71f3;
 }
 
-/* Ajustes para los botones de acción */
-.eval-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-/* Botón "Cancelar" (azul claro) */
-.btn-outline-gray {
-    flex: 1;
-    padding: 12px 20px;
-    border: 1px solid #3b71f3;
-    background-color: #f0f5ff;
-    color: #3b71f3;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-outline-gray:hover {
-    background-color: #e0ebff;
-    color: #2a5fc8;
-    border-color: #2a5fc8;
-}
-
-/* Botón "Crear evaluación" (azul sólido) */
-.btn-outline-blue {
-    flex: 1;
-    padding: 12px 20px;
-    border: 1px solid #3b71f3;
-    background-color: #3b71f3;
-    color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-outline-blue:hover {
-    background-color: #2a5fc8;
-    border-color: #2a5fc8;
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .eval-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pregunta-type-container {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .form-group-clean label {
+        font-size: 16px;
+    }
+    
+    .opcion-item {
+        flex-wrap: wrap;
+    }
 }

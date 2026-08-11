@@ -1,13 +1,17 @@
 <?php
-// Iniciar sesión y verificar que el usuario sea docente
 session_start();
+
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
+
+// Verificar que el usuario sea docente
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
 
-// Conexión a la base de datos (ajustar según tu configuración)
 require_once '../Conexion/conexion.php';
+
 $id_docente = $_SESSION['usuario']['id_usuario'];
 $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . ($_SESSION['usuario']['apellido_paterno'] ?? '');
 
@@ -26,7 +30,7 @@ $consulta_cursos = "
 $resultado_cursos = mysqli_query($conexion, $consulta_cursos);
 $cursos = mysqli_fetch_all($resultado_cursos, MYSQLI_ASSOC);
 
-// Obtener ID del curso seleccionado (o el primero si no hay selección)
+// Obtener ID del curso seleccionado
 $id_curso_seleccionado = isset($_GET['id_curso']) ? (int)$_GET['id_curso'] : ($cursos ? $cursos[0]['id_curso'] : null);
 
 // Obtener estudiantes del curso seleccionado
@@ -61,9 +65,7 @@ $asistencia_curso_actual = $asistencia_guardada[$id_curso_seleccionado] ?? [];
 // Guardar asistencia (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_asistencia'])) {
     $id_curso = (int)$_POST['id_curso'];
-    $asistencias = $_POST['asistencia'] ?? []; // Array de [id_alumno => estado]
-
-    // Guardar en la sesión (simulando AsyncStorage)
+    $asistencias = $_POST['asistencia'] ?? [];
     $_SESSION['asistencia'][$id_curso] = $asistencias;
     $mensaje_exito = "Lista de asistencia guardada correctamente.";
 }
@@ -73,37 +75,35 @@ date_default_timezone_set('America/Mexico_City');
 
 // Traductores de días y meses en español
 $dias_semana = [
-    'Sunday'    => 'Domingo',
-    'Monday'    => 'Lunes',
-    'Tuesday'   => 'Martes',
+    'Sunday' => 'Domingo',
+    'Monday' => 'Lunes',
+    'Tuesday' => 'Martes',
     'Wednesday' => 'Miércoles',
-    'Thursday'  => 'Jueves',
-    'Friday'    => 'Viernes',
-    'Saturday'  => 'Sábado'
+    'Thursday' => 'Jueves',
+    'Friday' => 'Viernes',
+    'Saturday' => 'Sábado'
 ];
 
 $meses_año = [
-    'January'   => 'Enero',
-    'February'  => 'Febrero',
-    'March'     => 'Marzo',
-    'April'     => 'Abril',
-    'May'       => 'Mayo',
-    'June'      => 'Junio',
-    'July'      => 'Julio',
-    'August'    => 'Agosto',
+    'January' => 'Enero',
+    'February' => 'Febrero',
+    'March' => 'Marzo',
+    'April' => 'Abril',
+    'May' => 'Mayo',
+    'June' => 'Junio',
+    'July' => 'Julio',
+    'August' => 'Agosto',
     'September' => 'Septiembre',
-    'October'   => 'Octubre',
-    'November'  => 'Noviembre',
-    'December'  => 'Diciembre'
+    'October' => 'Octubre',
+    'November' => 'Noviembre',
+    'December' => 'Diciembre'
 ];
 
 $timestamp = time();
 $dia_nombre = $dias_semana[date('l', $timestamp)];
-$dia_num    = date('d', $timestamp);
+$dia_num = date('d', $timestamp);
 $mes_nombre = $meses_año[date('F', $timestamp)];
-$anio       = date('Y', $timestamp);
-
-// Resultado: "Viernes, 07 de Agosto de 2026"
+$anio = date('Y', $timestamp);
 $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
 ?>
 <!DOCTYPE html>
@@ -114,14 +114,18 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
     <title>Pasar Lista - Aulamos</title>
     <link rel="stylesheet" href="styles/docente.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
+    
     <style>
-        /* Estilos adicionales para pasarlista.php */
+        /* Estilos adicionales para pasarlista.php - SOLO BASE */
         .student-list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             background: white;
             margin-bottom: 10px;
@@ -135,19 +139,19 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--blue-light);
+            background: #eff6ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary-blue);
+            color: #3b71f3;
         }
         .student-name {
             font-weight: 600;
-            color: var(--text-dark);
+            color: #1e293b;
         }
         .student-group {
             font-size: 12px;
-            color: var(--text-muted);
+            color: #64748b;
         }
         .attendance-buttons {
             display: flex;
@@ -155,7 +159,7 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
         }
         .attendance-btn {
             padding: 6px 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
             background: white;
             cursor: pointer;
@@ -167,9 +171,9 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             transition: all 0.2s;
         }
         .attendance-btn.active {
-            background: var(--green-light);
-            border-color: var(--text-green);
-            color: var(--text-green);
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
         }
         .attendance-btn.falta.active {
             background: #fee2e2;
@@ -185,22 +189,19 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             display: flex;
             justify-content: space-around;
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 15px;
             margin: 20px 0;
         }
-        .summary-item {
-            text-align: center;
-        }
         .summary-number {
             font-size: 24px;
             font-weight: 800;
-            color: var(--text-dark);
+            color: #1e293b;
         }
         .summary-label {
             font-size: 12px;
-            color: var(--text-muted);
+            color: #64748b;
             margin-top: 4px;
         }
         .course-selector {
@@ -209,25 +210,21 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             align-items: center;
             padding: 12px;
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             margin-bottom: 20px;
             cursor: pointer;
         }
-        .course-info {
-            display: flex;
-            flex-direction: column;
-        }
         .course-name {
             font-weight: 600;
-            color: var(--text-dark);
+            color: #1e293b;
         }
         .course-details {
             font-size: 12px;
-            color: var(--text-muted);
+            color: #64748b;
         }
         .save-btn {
-            background: var(--primary-blue);
+            background: #3b71f3;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -245,14 +242,14 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             background: #2563eb;
         }
         .date-display {
-            background: var(--blue-light);
+            background: #eff6ff;
             padding: 12px;
             border-radius: 8px;
             text-align: center;
             margin-bottom: 20px;
         }
         .date-display strong {
-            color: var(--primary-blue);
+            color: #3b71f3;
             font-weight: 600;
         }
         .modal {
@@ -288,55 +285,54 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
         .modal-title {
             font-size: 18px;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #1e293b;
         }
         .close-modal {
             background: none;
             border: none;
             font-size: 20px;
             cursor: pointer;
-            color: var(--text-muted);
+            color: #64748b;
         }
         .course-option {
             padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #e2e8f0;
             cursor: pointer;
         }
         .course-option:hover {
             background: #f1f5f9;
         }
         .course-option.selected {
-            background: var(--blue-light);
+            background: #eff6ff;
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="dashboard-container">
+        
         <!-- BARRA LATERAL -->
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../img/logo_g.png" alt="Búho Aulamos" class="logo-img">
             </div>
-
             <nav class="menu">
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
                 <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluacion</a>
-                <a href="ver_estudiantes.php" class="menu-item active"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
+                <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-                <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
+                <a href="pasarlista.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
-
                 <div class="menu-spacer"></div>
                 <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
+        <!-- CONTENIDO PRINCIPAL -->
         <div class="main-content">
-            <!-- Header -->
+            
+            <!-- ENCABEZADO -->
             <div class="content-header">
                 <div class="welcome-text">
                     <h1>Pasar Lista</h1>
@@ -358,9 +354,10 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                 </div>
             </div>
 
-            <!-- Contenido Principal -->
+            <!-- CONTENIDO PRINCIPAL -->
             <div class="main-grid">
                 <div class="left-column">
+                    
                     <!-- Fecha -->
                     <div class="date-display">
                         <i class="fas fa-calendar-alt"></i>
@@ -409,7 +406,7 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                         </div>
 
                         <?php if (empty($estudiantes)): ?>
-                            <p style="text-align: center; color: var(--text-muted); padding: 20px;">
+                            <p style="text-align: center; color: #64748b; padding: 20px;">
                                 No hay estudiantes en este curso.
                             </p>
                         <?php else: ?>
@@ -460,7 +457,7 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                                 <!-- Resumen -->
                                 <div class="summary-container">
                                     <div class="summary-item">
-                                        <i class="fas fa-check-circle" style="color: var(--text-green); font-size: 20px;"></i>
+                                        <i class="fas fa-check-circle" style="color: #22c55e; font-size: 20px;"></i>
                                         <div class="summary-number" id="presentes-count">0</div>
                                         <div class="summary-label">Presentes</div>
                                     </div>
@@ -489,64 +486,46 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                 <div class="right-column">
                     <div class="border-container">
                         <aside class="calendar-container">
-                    <!-- Cabecera y Navegación -->
-                    <div class="calendar-header">
-                        <div class="nav-left">
-                            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
-                            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
-                        </div>
-
-                        <h2 id="month-year-title">MES AÑO</h2>
-
-                        <div class="nav-right">
-                            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
-                            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
-                        </div>
-                    </div>
-
-                    <!-- Días de la semana -->
-                    <div class="calendar-weekdays">
-                        <div class="weekday">Do</div>
-                        <div class="weekday">Lu</div>
-                        <div class="weekday">Ma</div>
-                        <div class="weekday">Mi</div>
-                        <div class="weekday">Ju</div>
-                        <div class="weekday">Vi</div>
-                        <div class="weekday">Sá</div>
-                    </div>
-
-                    <!-- Contenedor dinámico de los días -->
-                    <div id="calendar-days" class="calendar-days-grid">
-                        <!-- JavaScript inyectará los días aquí -->
-                    </div>
-                </aside>
+                            <div class="calendar-header">
+                                <div class="nav-left">
+                                    <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
+                                    <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
+                                </div>
+                                <h2 id="month-year-title">MES AÑO</h2>
+                                <div class="nav-right">
+                                    <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+                                    <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+                                </div>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Do</div>
+                                <div class="weekday">Lu</div>
+                                <div class="weekday">Ma</div>
+                                <div class="weekday">Mi</div>
+                                <div class="weekday">Ju</div>
+                                <div class="weekday">Vi</div>
+                                <div class="weekday">Sá</div>
+                            </div>
+                            <div id="calendar-days" class="calendar-days-grid"></div>
+                        </aside>
                     </div>
                 </div>
             </div>
 
-            <!-- BARRA ACCESIBILIDAD -->
-            <footer class="accessibility-bar" style="margin-top: 30px;">
-                <div class="acc-info">
-                    <div class="acc-icon-box">
-                        <i class="fa-solid fa-universal-access acc-icon-main"></i>
-                    </div>
-                    <div>
-                        <strong>Accesibilidad siempre disponible</strong>
-                        <p>Personaliza tu experiencia en cualquier momento.</p>
-                    </div>
-                </div>
-                <div class="acc-options">
-                    <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                    <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                    <button class="acc-opt-btn" id="btn-text-size"><span class="font-icon">Aa</span><span>Texto grande</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-keyboard"></i><span>Navegación<br>por teclado</span></button>
-                </div>
-                <button class="btn-open-config">Abrir configuración</button>
-            </footer>
+            <!-- ========================================== -->
+            <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+            <!-- ========================================== -->
+            <?php include '../Accesibilidad/accesibilidad.php'; ?>
+
         </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+    <!-- ========================================== -->
+    <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+        <i class="fa-solid fa-universal-access"></i>
+    </button>
 
     <!-- Modal para seleccionar curso -->
     <div class="modal" id="course-modal">
@@ -560,20 +539,27 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                      onclick="selectCourse(<?= $curso['id_curso'] ?>)">
                     <div>
                         <div style="font-weight: 600;"><?= htmlspecialchars($curso['nombre_curso']) ?></div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
+                        <div style="font-size: 12px; color: #64748b;">
                             <?= htmlspecialchars($curso['materia'] . ' · ' . $curso['grupo']) ?>
                         </div>
                     </div>
                     <?php if ($curso['id_curso'] == $id_curso_seleccionado): ?>
-                        <i class="fas fa-check-circle" style="color: var(--primary-blue);"></i>
+                        <i class="fas fa-check-circle" style="color: #3b71f3;"></i>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="docente_dashboard.js"></script>
+    <!-- ========================================== -->
+    <!-- SCRIPTS                                    -->
+    <!-- ========================================== -->
+    <script src="jss/docente_dashboard.js"></script>
+
+    <!-- NUEVA ACCESIBILIDAD -->
+    <script src="../Accesibilidad/accesibilidad.js"></script>
+    <script src="../Accesibilidad/navegacionTeclado.js"></script>
+
     <script>
         // Funciones para el modal de cursos
         function openCourseModal() {
@@ -594,7 +580,6 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             radios.forEach(radio => {
                 radio.checked = true;
                 const label = radio.closest('label');
-                // Desmarcar otros botones del mismo estudiante
                 const studentContainer = radio.closest('.student-list-item');
                 studentContainer.querySelectorAll('.attendance-btn').forEach(btn => {
                     btn.classList.remove('active', 'falta', 'retardo');
@@ -623,12 +608,10 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
             btn.addEventListener('click', function() {
                 const radio = this.querySelector('input[type="radio"]');
                 if (radio) {
-                    // Desmarcar otros botones del mismo estudiante
                     const studentContainer = this.closest('.student-list-item');
                     studentContainer.querySelectorAll('.attendance-btn').forEach(b => {
                         b.classList.remove('active', 'falta', 'retardo');
                     });
-                    // Marcar el botón clickeado
                     this.classList.add('active');
                     if (radio.value === 'Falta') this.classList.add('falta');
                     if (radio.value === 'Retardo') this.classList.add('retardo');
@@ -640,11 +623,9 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
         // Inicializar resumen
         updateSummary();
 
-        // Mensaje de éxito (PHP)
         <?php if (isset($mensaje_exito)): ?>
             alert("<?= addslashes($mensaje_exito) ?>");
         <?php endif; ?>
     </script>
-    <script src="jss/docente_dashboard.js"></script>
 </body>
 </html>

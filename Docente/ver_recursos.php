@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
+
 // Verificar que el usuario haya iniciado sesión y sea Docente
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     header('Location: ../InicioSesion/login.php');
@@ -87,11 +90,15 @@ $stmt->close();
     <title>Ver Recursos - Aulamos</title>
     <link rel="stylesheet" href="styles/docente.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
+    
     <style>
-        /* Estilos adicionales para ver_recursos.php */
+        /* Estilos adicionales para ver_recursos.php - SOLO BASE */
         .filters-container {
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 20px;
@@ -109,11 +116,11 @@ $stmt->close();
         .filter-group label {
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-muted);
+            color: #64748b;
         }
         .filter-group select {
             padding: 8px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
             font-size: 14px;
         }
@@ -124,7 +131,7 @@ $stmt->close();
         }
         .resource-card {
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 15px;
             display: flex;
@@ -150,7 +157,7 @@ $stmt->close();
         }
         .resource-title {
             font-weight: 600;
-            color: var(--text-dark);
+            color: #1e293b;
             margin-bottom: 5px;
         }
         .resource-meta {
@@ -158,7 +165,7 @@ $stmt->close();
             flex-wrap: wrap;
             gap: 10px;
             font-size: 12px;
-            color: var(--text-muted);
+            color: #64748b;
         }
         .resource-meta span {
             display: flex;
@@ -177,25 +184,24 @@ $stmt->close();
             font-size: 14px;
         }
         .btn-ver {
-            background: var(--blue-light);
-            color: var(--primary-blue);
+            background: #eff6ff;
+            color: #3b71f3;
         }
         .btn-descargar {
-            background: var(--green-light);
-            color: var(--text-green);
+            background: #dcfce7;
+            color: #166534;
         }
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: var(--text-muted);
+            color: #64748b;
         }
         .empty-state i {
             font-size: 48px;
             margin-bottom: 15px;
         }
-        /* Estilo para el botón de aplicar filtros */
         .btn-aplicar-filtros {
-            background-color: #2563eb; /* Azul primario */
+            background-color: #2563eb;
             color: white;
             border: none;
             padding: 10px 16px;
@@ -203,174 +209,176 @@ $stmt->close();
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
         }
-
         .btn-aplicar-filtros:hover {
-            background-color: #1d4ed8; /* Azul un poco más oscuro al pasar el cursor */
+            background-color: #1d4ed8;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-section">
-                <img src="../img/logo_g.png" alt="Logo Aulamos" class="logo-img">
+
+<div class="dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-section">
+            <img src="../img/logo_g.png" alt="Logo Aulamos" class="logo-img">
+        </div>
+        <nav class="menu">
+            <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
+            <a href="ver_recursos.php" class="menu-item active"><i class="fa-solid fa-folder-open"></i> Ver Recursos</a>
+            <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
+            <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
+            <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
+            <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
+            <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
+            <div class="menu-spacer"></div>
+            <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        
+        <header class="content-header">
+            <div class="welcome-text">
+                <h1>Ver Recursos</h1>
+                <p>Administra los recursos que has creado</p>
             </div>
-            <nav class="menu">
-                <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-                <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
-                <a href="ver_recursos.php" class="menu-item active"><i class="fa-solid fa-folder-open"></i> Ver Recursos</a>
-                <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
-                <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
-                <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
-                <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-                <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-                <div class="menu-spacer"></div>
-                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-            </nav>
-        </aside>
-
-        <!-- Contenido Principal -->
-        <main class="main-content">
-            <header class="content-header">
-                <div class="welcome-text">
-                    <h1>Ver Recursos</h1>
-                    <p>Administra los recursos que has creado</p>
+            <div class="header-actions">
+                <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <div class="icon-bell-container">
+                    <i class="fa-regular fa-bell"></i>
                 </div>
-                <div class="header-actions">
-                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
-                    <div class="icon-bell-container">
-                        <i class="fa-regular fa-bell"></i>
-                    </div>
-                    <div class="user-profile">
-                        <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
-                        <div class="user-info">
-                            <span class="user-name"><?= htmlspecialchars($_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno']) ?></span>
-                            <span class="user-role">Docente</span>
-                        </div>
+                <div class="user-profile">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name"><?= htmlspecialchars($nombre_docente) ?></span>
+                        <span class="user-role">Docente</span>
                     </div>
                 </div>
-            </header>
-
-            <!-- Filtros -->
-            <div class="filters-container">
-                <h3 class="section-title">Filtros</h3>
-                <form method="get" action="ver_recursos.php" class="filters-grid">
-                    <div class="filter-group">
-                        <label>Materia</label>
-                        <select name="materia">
-                            <option value="">Todas</option>
-                            <?php foreach ($materias as $materia): ?>
-                                <option value="<?= $materia['id_materia'] ?>" <?= ($filtro_materia == $materia['id_materia']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($materia['nombre']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Tipo</label>
-                        <select name="tipo">
-                            <option value="">Todos</option>
-                            <option value="PDF" <?= ($filtro_tipo == 'PDF') ? 'selected' : '' ?>>PDF</option>
-                            <option value="Video" <?= ($filtro_tipo == 'Video') ? 'selected' : '' ?>>Video</option>
-                            <option value="Documento" <?= ($filtro_tipo == 'Documento') ? 'selected' : '' ?>>Documento</option>
-                            <option value="Imagen" <?= ($filtro_tipo == 'Imagen') ? 'selected' : '' ?>>Imagen</option>
-                            <option value="Enlace" <?= ($filtro_tipo == 'Enlace') ? 'selected' : '' ?>>Enlace</option>
-                        </select>
-                    </div>
-                    <div class="filter-group" style="align-self: flex-end;">
-                        <button type="submit" class="btn-aplicar-filtros" style="width: 100%;">Aplicar Filtros</button>
-                    </div>
-                </form>
             </div>
+        </header>
 
-            <!-- Lista de Recursos -->
-            <div class="section-container">
-                <h3 class="section-title">Tus Recursos (<?= count($recursos) ?>)</h3>
-                <?php if (empty($recursos)): ?>
-                    <div class="empty-state">
-                        <i class="fa-solid fa-folder-open"></i>
-                        <p>No hay recursos creados aún.</p>
-                        <a href="crear_recurso.php" class="btn-aplicar-filtros" style="margin-top: 15px; display: inline-block; text-decoration: none;">Crear Recurso</a>
-                    </div>
-                <?php else: ?>
-                    <div class="resources-list">
-                        <?php foreach ($recursos as $recurso): ?>
-                            <div class="resource-card">
-                                <div class="resource-icon
-                                    <?php
-                                    $tipo = strtolower($recurso['tipo']);
-                                    echo $tipo === 'pdf' ? 'pdf' :
-                                         ($tipo === 'video' ? 'video' :
-                                         ($tipo === 'documento' ? 'documento' :
-                                         ($tipo === 'imagen' ? 'imagen' : 'enlace')));
-                                    ?>">
-                                    <i class="fa-solid
-                                        <?php
-                                        if ($tipo === 'pdf') echo 'fa-file-pdf';
-                                        else if ($tipo === 'video') echo 'fa-play';
-                                        else if ($tipo === 'documento') echo 'fa-file-lines';
-                                        else if ($tipo === 'imagen') echo 'fa-image';
-                                        else echo 'fa-link';
-                                        ?>">
-                                    </i>
-                                </div>
-                                <div class="resource-info">
-                                    <div class="resource-title"><?= htmlspecialchars($recurso['titulo']) ?></div>
-                                    <div class="resource-meta">
-                                        <span><i class="fa-solid fa-book"></i> <?= htmlspecialchars($recurso['materia']) ?></span>
-                                        <span><i class="fa-solid fa-calendar"></i> <?= date('d/m/Y', strtotime($recurso['fecha_publicacion'])) ?></span>
-                                        <span><i class="fa-solid fa-circle" style="font-size: 8px; color: <?= $recurso['estado'] === 'Activo' ? '#16a34a' : '#dc2626' ?>;"></i> <?= htmlspecialchars($recurso['estado']) ?></span>
-                                    </div>
-                                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">
-                                        <?= htmlspecialchars($recurso['descripcion'] ?? 'Sin descripción') ?>
-                                    </p>
-                                </div>
-                                <div class="resource-actions">
-                                    <!-- Botón Descargar -->
-                                    <?php if (!empty($recurso['url_recurso'])): ?>
-                                        <button class="btn-icon btn-descargar" title="Descargar" onclick="descargarRecurso(<?= $recurso['id_recurso'] ?>)">
-                                            <i class="fa-solid fa-download"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+        <!-- Filtros -->
+        <div class="filters-container">
+            <h3 class="section-title">Filtros</h3>
+            <form method="get" action="ver_recursos.php" class="filters-grid">
+                <div class="filter-group">
+                    <label>Materia</label>
+                    <select name="materia">
+                        <option value="">Todas</option>
+                        <?php foreach ($materias as $materia): ?>
+                            <option value="<?= $materia['id_materia'] ?>" <?= ($filtro_materia == $materia['id_materia']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($materia['nombre']) ?>
+                            </option>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Barra de Accesibilidad -->
-            <footer class="accessibility-bar">
-                <div class="acc-info">
-                    <div class="acc-icon-box">
-                        <i class="fa-solid fa-universal-access acc-icon-main"></i>
-                    </div>
-                    <div>
-                        <strong>Accesibilidad siempre disponible</strong>
-                        <p>Personaliza tu experiencia en cualquier momento.</p>
-                    </div>
+                    </select>
                 </div>
-                <div class="acc-options">
-                    <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                    <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                    <button class="acc-opt-btn" id="btn-text-size"><span class="font-icon">Aa</span><span>Texto grande</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-keyboard"></i><span>Navegación<br>por teclado</span></button>
+                <div class="filter-group">
+                    <label>Tipo</label>
+                    <select name="tipo">
+                        <option value="">Todos</option>
+                        <option value="PDF" <?= ($filtro_tipo == 'PDF') ? 'selected' : '' ?>>PDF</option>
+                        <option value="Video" <?= ($filtro_tipo == 'Video') ? 'selected' : '' ?>>Video</option>
+                        <option value="Documento" <?= ($filtro_tipo == 'Documento') ? 'selected' : '' ?>>Documento</option>
+                        <option value="Imagen" <?= ($filtro_tipo == 'Imagen') ? 'selected' : '' ?>>Imagen</option>
+                        <option value="Enlace" <?= ($filtro_tipo == 'Enlace') ? 'selected' : '' ?>>Enlace</option>
+                    </select>
                 </div>
-                <button class="btn-open-config">Abrir configuración</button>
-            </footer>
-        </main>
-    </div>
+                <div class="filter-group" style="align-self: flex-end;">
+                    <button type="submit" class="btn-aplicar-filtros" style="width: 100%;">Aplicar Filtros</button>
+                </div>
+            </form>
+        </div>
 
-    <script src="jss/docente_dashboard.js"></script>
-    <script>
-        // Función para descargar el recurso
-        function descargarRecurso(idRecurso) {
-            window.location.href = `descargar_recurso.php?id_recurso=${idRecurso}`;
-        }
-    </script>
+        <!-- Lista de Recursos -->
+        <div class="section-container">
+            <h3 class="section-title">Tus Recursos (<?= count($recursos) ?>)</h3>
+            <?php if (empty($recursos)): ?>
+                <div class="empty-state">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <p>No hay recursos creados aún.</p>
+                    <a href="crear_recurso.php" class="btn-aplicar-filtros" style="margin-top: 15px; display: inline-block; text-decoration: none;">Crear Recurso</a>
+                </div>
+            <?php else: ?>
+                <div class="resources-list">
+                    <?php foreach ($recursos as $recurso): ?>
+                        <div class="resource-card">
+                            <div class="resource-icon
+                                <?php
+                                $tipo = strtolower($recurso['tipo']);
+                                echo $tipo === 'pdf' ? 'pdf' :
+                                     ($tipo === 'video' ? 'video' :
+                                     ($tipo === 'documento' ? 'documento' :
+                                     ($tipo === 'imagen' ? 'imagen' : 'enlace')));
+                                ?>">
+                                <i class="fa-solid
+                                    <?php
+                                    if ($tipo === 'pdf') echo 'fa-file-pdf';
+                                    else if ($tipo === 'video') echo 'fa-play';
+                                    else if ($tipo === 'documento') echo 'fa-file-lines';
+                                    else if ($tipo === 'imagen') echo 'fa-image';
+                                    else echo 'fa-link';
+                                    ?>">
+                                </i>
+                            </div>
+                            <div class="resource-info">
+                                <div class="resource-title"><?= htmlspecialchars($recurso['titulo']) ?></div>
+                                <div class="resource-meta">
+                                    <span><i class="fa-solid fa-book"></i> <?= htmlspecialchars($recurso['materia']) ?></span>
+                                    <span><i class="fa-solid fa-calendar"></i> <?= date('d/m/Y', strtotime($recurso['fecha_publicacion'])) ?></span>
+                                    <span><i class="fa-solid fa-circle" style="font-size: 8px; color: <?= $recurso['estado'] === 'Activo' ? '#16a34a' : '#dc2626' ?>;"></i> <?= htmlspecialchars($recurso['estado']) ?></span>
+                                </div>
+                                <p style="font-size: 13px; color: #64748b; margin-top: 8px;">
+                                    <?= htmlspecialchars($recurso['descripcion'] ?? 'Sin descripción') ?>
+                                </p>
+                            </div>
+                            <div class="resource-actions">
+                                <?php if (!empty($recurso['url_recurso'])): ?>
+                                    <button class="btn-icon btn-descargar" title="Descargar" onclick="descargarRecurso(<?= $recurso['id_recurso'] ?>)">
+                                        <i class="fa-solid fa-download"></i>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+        <!-- ========================================== -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
+
+    </main>
+</div>
+
+<!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+<!-- ========================================== -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
+<!-- ========================================== -->
+<!-- SCRIPTS                                    -->
+<!-- ========================================== -->
+<script src="jss/docente_dashboard.js"></script>
+
+<!-- NUEVA ACCESIBILIDAD -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+<script src="../Accesibilidad/navegacionTeclado.js"></script>
+
+<script>
+    function descargarRecurso(idRecurso) {
+        window.location.href = `descargar_recurso.php?id_recurso=${idRecurso}`;
+    }
+</script>
+
 </body>
 </html>

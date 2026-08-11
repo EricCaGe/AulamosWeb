@@ -276,7 +276,6 @@ $stmt->close();
 
 <!-- ===== SCRIPTS ===== -->
 <script src="js/dashboard.js"></script>
-<script src="../Accesibilidad/lector.js"></script>
 <script src="../Accesibilidad/accesibilidad.js"></script>
 
 </body>

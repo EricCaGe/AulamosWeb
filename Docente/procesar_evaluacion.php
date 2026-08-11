@@ -1,17 +1,24 @@
 <?php
-// Iniciar sesión
 session_start();
 
-// Verificar que el usuario haya iniciado sesión y sea Docente
+// =====================================================
+// VERIFICAR SESIÓN DOCENTE
+// =====================================================
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
 
+// Regenerar ID de sesión por seguridad
+session_regenerate_id(true);
+
 require_once '../Conexion/conexion.php';
 
-// Obtener datos del formulario
 $id_docente = $_SESSION['usuario']['id_usuario'];
+
+// =====================================================
+// OBTENER DATOS DEL FORMULARIO
+// =====================================================
 $titulo = trim($_POST['titulo'] ?? '');
 $descripcion = trim($_POST['descripcion'] ?? '');
 $id_materia = $_POST['id_materia'] ?? '';
@@ -22,27 +29,39 @@ $permite_entrega_archivo = isset($_POST['permite_entrega_archivo']) ? 1 : 0;
 $fecha_limite = !empty($_POST['fecha_limite']) ? $_POST['fecha_limite'] : null;
 $id_periodo = !empty($_POST['id_periodo']) ? $_POST['id_periodo'] : null;
 
-// Validaciones
+// =====================================================
+// VALIDACIONES
+// =====================================================
 $errores = [];
 
 if (empty($titulo)) {
     $errores[] = "El título es obligatorio.";
 }
-
 if (empty($descripcion)) {
     $errores[] = "La descripción es obligatoria.";
 }
-
 if (empty($id_materia)) {
     $errores[] = "La materia es obligatoria.";
 }
-
 if (empty($id_curso)) {
     $errores[] = "El curso es obligatorio.";
 }
-
 if (!is_numeric($puntaje_maximo) || $puntaje_maximo <= 0) {
     $errores[] = "El puntaje máximo debe ser un número mayor a 0.";
+}
+
+// Validar fecha límite
+if (!empty($fecha_limite)) {
+    $fecha_limite_date = DateTime::createFromFormat('Y-m-d\TH:i', $fecha_limite);
+    if ($fecha_limite_date) {
+        $fecha_limite = $fecha_limite_date->format('Y-m-d H:i:s');
+        $ahora = new DateTime();
+        if ($fecha_limite_date <= $ahora) {
+            $errores[] = "La fecha límite debe ser en el futuro.";
+        }
+    } else {
+        $errores[] = "Formato de fecha no válido.";
+    }
 }
 
 // Si es cuestionario, validar preguntas
@@ -69,20 +88,7 @@ if ($tipo === 'Cuestionario') {
     }
 }
 
-// Si es examen o tarea, validar configuración de archivos
-if ($tipo === 'Examen' || $tipo === 'Tarea') {
-    if (!isset($_POST['tipos_archivos']) || empty($_POST['tipos_archivos'])) {
-        $errores[] = "Debe seleccionar al menos un tipo de archivo permitido.";
-    }
-    if (empty($_POST['tamano_maximo']) || !is_numeric($_POST['tamano_maximo']) || $_POST['tamano_maximo'] <= 0) {
-        $errores[] = "El tamaño máximo por archivo debe ser un número mayor a 0.";
-    }
-    if (empty($_POST['cantidad_archivos']) || !is_numeric($_POST['cantidad_archivos']) || $_POST['cantidad_archivos'] <= 0) {
-        $errores[] = "La cantidad máxima de archivos debe ser un número mayor a 0.";
-    }
-}
-
-// Si hay errores, redirigir de vuelta al formulario con los errores
+// Si hay errores, redirigir
 if (!empty($errores)) {
     $_SESSION['errores'] = $errores;
     $_SESSION['form_data'] = $_POST;
@@ -90,20 +96,41 @@ if (!empty($errores)) {
     exit;
 }
 
-// Iniciar transacción
+// =====================================================
+// VERIFICAR QUE EL CURSO PERTENEZCA AL DOCENTE
+// =====================================================
+$stmt = $conexion->prepare("SELECT id_curso FROM cursos WHERE id_curso = ? AND id_docente = ? AND estado = 'Activo'");
+$stmt->bind_param("ii", $id_curso, $id_docente);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    $_SESSION['mensaje'] = "El curso seleccionado no existe o no te pertenece.";
+    $_SESSION['tipo_mensaje'] = "error";
+    $stmt->close();
+    header('Location: crear_evaluacion.php');
+    exit;
+}
+$stmt->close();
+
+// =====================================================
+// INICIAR TRANSACCIÓN
+// =====================================================
 $conexion->begin_transaction();
 
 try {
-    // Insertar la evaluación en la tabla actividades
+    // =====================================================
+    // INSERTAR EVALUACIÓN EN actividades
+    // =====================================================
     $query = "
         INSERT INTO actividades (
             id_curso, id_docente, titulo, descripcion, tipo,
             puntaje_maximo, permite_entrega_archivo, fecha_limite, id_periodo, estado
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Publicada')
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Publicada')
     ";
     $stmt = $conexion->prepare($query);
     $stmt->bind_param(
-        "iisssddisi",
+        "iisssddii",
         $id_curso,
         $id_docente,
         $titulo,
@@ -118,33 +145,30 @@ try {
     $id_actividad = $stmt->insert_id;
     $stmt->close();
 
-    // Si es cuestionario, guardar las preguntas
+    // =====================================================
+    // GUARDAR CONFIGURACIÓN SEGÚN TIPO
+    // =====================================================
+    $configuracion = [];
+
     if ($tipo === 'Cuestionario' && isset($_POST['preguntas'])) {
-        // Crear configuración de evaluación (JSON)
-        $configuracion_evaluacion = [
+        $configuracion = [
             'preguntas' => $_POST['preguntas'],
             'tipo' => 'Cuestionario'
         ];
 
-        // Actualizar la actividad con la configuración
-        $query_config = "
-            UPDATE actividades
-            SET configuracion_evaluacion = ?
-            WHERE id_actividad = ?
-        ";
+        $query_config = "UPDATE actividades SET configuracion_evaluacion = ? WHERE id_actividad = ?";
         $stmt_config = $conexion->prepare($query_config);
-        $stmt_config->bind_param("si", json_encode($configuracion_evaluacion), $id_actividad);
+        $stmt_config->bind_param("si", json_encode($configuracion), $id_actividad);
         $stmt_config->execute();
         $stmt_config->close();
     }
 
-    // Si es examen o tarea, guardar configuración de archivos
     if ($tipo === 'Examen' || $tipo === 'Tarea') {
         $tipos_archivos = $_POST['tipos_archivos'] ?? [];
         $tamano_maximo = $_POST['tamano_maximo'] ?? 10;
         $cantidad_archivos = $_POST['cantidad_archivos'] ?? 1;
 
-        $configuracion_evaluacion = [
+        $configuracion = [
             'tipos_archivos' => $tipos_archivos,
             'tamano_maximo' => $tamano_maximo,
             'cantidad_archivos' => $cantidad_archivos,
@@ -157,51 +181,54 @@ try {
             WHERE id_actividad = ?
         ";
         $stmt_config = $conexion->prepare($query_config);
-        $stmt_config->bind_param("si", json_encode($configuracion_evaluacion), $id_actividad);
+        $stmt_config->bind_param("si", json_encode($configuracion), $id_actividad);
         $stmt_config->execute();
         $stmt_config->close();
     }
 
-    // Crear registros en actividad_estudiantes para todos los estudiantes del curso
+    // =====================================================
+    // CREAR REGISTROS EN actividad_estudiantes
+    // =====================================================
     $query_estudiantes = "
-        SELECT i.id_alumno
-        FROM inscripciones i
-        WHERE i.id_curso = ? AND i.estado = 'Activo'
+        SELECT id_alumno
+        FROM inscripciones
+        WHERE id_curso = ? AND estado = 'Activo'
     ";
     $stmt_estudiantes = $conexion->prepare($query_estudiantes);
     $stmt_estudiantes->bind_param("i", $id_curso);
     $stmt_estudiantes->execute();
     $result_estudiantes = $stmt_estudiantes->get_result();
 
+    $query_actividad_estudiante = "
+        INSERT INTO actividad_estudiantes (id_actividad, id_alumno, estado)
+        VALUES (?, ?, 'Pendiente')
+    ";
+    $stmt_actividad_estudiante = $conexion->prepare($query_actividad_estudiante);
+
     while ($row = $result_estudiantes->fetch_assoc()) {
-        $id_alumno = $row['id_alumno'];
-        $query_actividad_estudiante = "
-            INSERT INTO actividad_estudiantes (id_actividad, id_alumno, estado)
-            VALUES (?, ?, 'Pendiente')
-        ";
-        $stmt_actividad_estudiante = $conexion->prepare($query_actividad_estudiante);
-        $stmt_actividad_estudiante->bind_param("ii", $id_actividad, $id_alumno);
+        $stmt_actividad_estudiante->bind_param("ii", $id_actividad, $row['id_alumno']);
         $stmt_actividad_estudiante->execute();
-        $stmt_actividad_estudiante->close();
     }
+
+    $stmt_actividad_estudiante->close();
     $stmt_estudiantes->close();
 
-    // Confirmar transacción
+    // =====================================================
+    // CONFIRMAR TRANSACCIÓN
+    // =====================================================
     $conexion->commit();
 
     $_SESSION['mensaje'] = "Evaluación creada correctamente.";
     $_SESSION['tipo_mensaje'] = "success";
+
 } catch (Exception $e) {
-    // Revertir transacción en caso de error
     $conexion->rollback();
     $_SESSION['mensaje'] = "Error al crear la evaluación: " . $e->getMessage();
     $_SESSION['tipo_mensaje'] = "error";
 }
 
-// Cerrar conexión
 $conexion->close();
 
-// Redirigir de vuelta al formulario
 header('Location: crear_evaluacion.php');
 exit;
 ?>

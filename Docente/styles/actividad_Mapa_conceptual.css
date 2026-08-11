@@ -1,6 +1,6 @@
 /* =========================================
    ESTILOS: ACTIVIDAD MAPA CONCEPTUAL
-========================================= */
+   ========================================= */
 
 /* Encabezado con flecha de regreso */
 .header-with-back h1 {
@@ -19,7 +19,9 @@
     transition: color 0.2s;
 }
 
-.back-arrow:hover { color: #3b71f3; }
+.back-arrow:hover { 
+    color: #3b71f3; 
+}
 
 /* Layout Principal (2 Columnas) */
 .actividad-layout {
@@ -88,7 +90,7 @@
 }
 
 .status-badge.completada {
-    background-color: #34d399; /* Verde llamativo */
+    background-color: #34d399;
     color: #064e3b;
 }
 
@@ -160,7 +162,7 @@
 
 /* Caja de Calificación */
 .calificacion-box {
-    background-color: #ecfdf5; /* Verde muy claro */
+    background-color: #ecfdf5;
     color: #065f46;
     font-size: 22px;
     font-weight: 700;
@@ -173,10 +175,10 @@
 
 /* Burbuja de Comentarios */
 .comentario-burbuja {
-    background-color: #bfdbfe; /* Azul claro */
+    background-color: #bfdbfe;
     color: #1e3a8a;
     padding: 20px;
-    border-radius: 20px 20px 20px 0; /* Forma de burbuja de chat */
+    border-radius: 20px 20px 20px 0;
     font-size: 15px;
     line-height: 1.5;
     font-weight: 500;
@@ -185,29 +187,20 @@
 }
 
 /* =========================================
-   BARRA DE ACCESIBILIDAD INFERIOR
-========================================= */
-.accessibility-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-    border: 1px solid #cbd5e1;
-    border-radius: 12px;
-    padding: 15px 25px;
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .actividad-layout {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .actividad-left,
+    .actividad-right {
+        flex: 1;
+    }
+    
+    .seccion-bloque p {
+        max-width: 100%;
+    }
 }
-
-.acc-info { display: flex; align-items: center; gap: 15px; }
-.acc-icon-box { background-color: #f3e8ff; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
-.acc-icon-main { color: #6b21a8; font-size: 22px; }
-.acc-info strong { color: #4c1d95; font-size: 14px; display: block; margin-bottom: 2px;}
-.acc-info p { color: #64748b; font-size: 12px; margin: 0; }
-
-.acc-options { display: flex; gap: 10px; }
-.acc-opt-btn { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; width: 65px; height: 60px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; color: #475569; }
-.acc-opt-btn i, .font-icon { font-size: 18px; font-weight: bold; }
-.acc-opt-btn span { font-size: 10px; text-align: center; line-height: 1.1; }
-.acc-opt-btn:hover { background: #f8fafc; color: #3b71f3; border-color: #3b71f3; }
-
-.btn-open-config { background-color: #3b71f3; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-.btn-open-config:hover { background-color: #2563eb; }

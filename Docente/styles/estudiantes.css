@@ -1,9 +1,11 @@
 /* =========================================
    ESTILOS ESPECÍFICOS: VER ESTUDIANTES
-========================================= */
+   ========================================= */
 
 /* Utilidad de margen */
-.mt-20 { margin-top: 20px; }
+.mt-20 { 
+    margin-top: 20px; 
+}
 
 /* Contenedor Superior (Buscador y Pestañas) */
 .students-header-tools {
@@ -16,11 +18,11 @@
     padding-bottom: 15px;
 }
 
-/* Buscador Morado */
+/* Buscador */
 .search-bar-container {
     display: flex;
     align-items: center;
-    background-color: #f3e8ff; /* Fondo morado clarito */
+    background-color: #f3e8ff;
     border-radius: 8px;
     padding: 10px 20px;
     width: 400px;
@@ -53,13 +55,14 @@
     display: flex;
     gap: 10px;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .tab-btn {
     padding: 10px 20px;
     background-color: transparent;
     border: 1px solid #cbd5e1;
-    border-bottom: none; /* Para que se fusione con la línea de abajo */
+    border-bottom: none;
     border-radius: 8px 8px 0 0;
     font-size: 16px;
     font-weight: 600;
@@ -79,15 +82,15 @@
 
 /* =========================================
    LISTA DE ESTUDIANTES Y SCROLL
-========================================= */
+   ========================================= */
 
 .students-list-container {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    height: 400px; /* Altura fija para activar el scroll */
+    height: 400px;
     overflow-y: auto;
-    padding-right: 15px; /* Espacio para la barra de scroll */
+    padding-right: 15px;
 }
 
 /* Tarjeta individual de estudiante */
@@ -129,13 +132,13 @@
     color: #64748b;
 }
 
-/* Botón de mensaje (Sobre morado) */
+/* Botón de mensaje */
 .btn-message {
     background: transparent;
     border: none;
     cursor: pointer;
     font-size: 24px;
-    color: #7c3aed; /* Morado */
+    color: #7c3aed;
     transition: transform 0.2s;
 }
 
@@ -145,9 +148,8 @@
 
 /* =========================================
    ESTILO PERSONALIZADO DEL SCROLLBAR
-========================================= */
+   ========================================= */
 
-/* Funciona en navegadores basados en WebKit (Chrome, Edge, Safari) */
 .students-list-container::-webkit-scrollbar {
     width: 10px;
 }
@@ -158,12 +160,12 @@
 }
 
 .students-list-container::-webkit-scrollbar-thumb {
-    background: #3b71f3; /* Azul como en tu diseño */
+    background: #3b71f3;
     border-radius: 10px;
 }
 
 .students-list-container::-webkit-scrollbar-thumb:hover {
-    background: #2563eb; /* Azul más oscuro al pasar el ratón */
+    background: #2563eb;
 }
 
 .no-students-message {
@@ -186,4 +188,51 @@
 .no-students-message p {
     font-size: 1.2rem;
     margin: 0;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .search-bar-container {
+        width: 100%;
+    }
+    
+    .group-tabs {
+        justify-content: center;
+    }
+    
+    .tab-btn {
+        font-size: 14px;
+        padding: 8px 14px;
+    }
+    
+    .students-list-container {
+        height: 300px;
+    }
+    
+    .student-card {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .btn-message {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .student-info-left {
+        flex: 1;
+        min-width: 150px;
+    }
+    
+    .student-details h4 {
+        font-size: 13px;
+    }
+    
+    .tab-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
 }

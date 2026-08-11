@@ -1,6 +1,6 @@
 /* =========================================
    ESTILOS ESPECÍFICOS: CREAR ACTIVIDAD
-========================================= */
+   ========================================= */
 
 .activity-layout {
     margin-top: 20px;
@@ -38,7 +38,7 @@
 
 .clean-input:focus, 
 .clean-textarea:focus {
-    border-color: var(--primary-blue);
+    border-color: #3b71f3;
 }
 
 /* Editor de texto simulado */
@@ -120,7 +120,7 @@
 }
 
 input:checked + .slider {
-    background-color: #7c3aed; /* Color morado de tu diseño */
+    background-color: #7c3aed;
 }
 
 input:checked + .slider:before {
@@ -153,12 +153,6 @@ input:checked + .slider:before {
 .mt-20 { margin-top: 20px; }
 .mt-10 { margin-top: 10px; }
 
-/* Pequeño ajuste visual para que el calendario de la derecha se vea un poco más compacto */
-.small-cal .cal-day {
-    height: 30px;
-    font-size: 12px;
-}
-
 .error-message {
     background-color: #ffebee;
     color: #c62828;
@@ -170,7 +164,7 @@ input:checked + .slider:before {
 }
 
 .btn-submit {
-    background-color: var(--primary-blue);
+    background-color: #3b71f3;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -185,39 +179,9 @@ input:checked + .slider:before {
     background-color: #2563eb;
 }
 
-.btn-outline-blue {
-  /* Fondo azul muy claro */
-  background-color: #f0f5ff;
-  
-  /* Borde azul y esquinas redondeadas */
-  border: 1px solid #5c85ff;
-  border-radius: 8px;
-  
-  /* Color del texto azul */
-  color: #5c85ff;
-  
-  /* Tipografía y espaciado */
-  font-family: sans-serif; /* Ajusta según tu fuente */
-  font-size: 16px;
-  padding: 10px 20px;
-  
-  /* Centrar el texto y ajustar el cursor */
-  text-align: center;
-  cursor: pointer;
-  
-  /* Transición suave para cuando se pase el ratón por encima (opcional) */
-  transition: all 0.3s ease;
-}
-
-/* Efecto opcional al pasar el ratón */
-.btn-outline-blue:hover {
-  background-color: #e0ebff;
-  border-color: #4a75f0;
-}
-
 /* =========================================
-   ESTILOS PARA BOTONES (MISMO TAMAÑO Y COLOR)
-========================================= */
+   ESTILOS PARA BOTONES
+   ========================================= */
 
 /* Contenedor de botones */
 .activity-form .button-group {
@@ -228,10 +192,10 @@ input:checked + .slider:before {
 
 /* Botón "Crear Actividad" (azul) */
 .btn-outline-blue {
-    background-color: #3b71f3; /* Azul sólido */
+    background-color: #3b71f3;
     color: white;
     border: 1px solid #3b71f3;
-    padding: 12px 24px; /* Mismo padding para ambos botones */
+    padding: 12px 24px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -240,21 +204,21 @@ input:checked + .slider:before {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    width: 100%; /* Ocupa todo el espacio disponible */
+    width: 100%;
     justify-content: center;
 }
 
 .btn-outline-blue:hover {
-    background-color: #2a5fc8; /* Azul más oscuro al pasar el mouse */
+    background-color: #2a5fc8;
     border-color: #2a5fc8;
 }
 
-/* Botón "Cancelar" (azul claro para que combine) */
+/* Botón "Cancelar" */
 .btn-outline-gray {
-    background-color: #f0f5ff; /* Fondo azul muy claro */
-    color: #3b71f3; /* Texto azul */
-    border: 1px solid #3b71f3; /* Borde azul */
-    padding: 12px 24px; /* Mismo padding que el botón azul */
+    background-color: #f0f5ff;
+    color: #3b71f3;
+    border: 1px solid #3b71f3;
+    padding: 12px 24px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -263,18 +227,33 @@ input:checked + .slider:before {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    width: 100%; /* Mismo ancho que el botón azul */
+    width: 100%;
     justify-content: center;
 }
 
 .btn-outline-gray:hover {
-    background-color: #e0ebff; /* Fondo un poco más oscuro al pasar el mouse */
-    color: #2a5fc8; /* Texto azul más oscuro */
+    background-color: #e0ebff;
+    color: #2a5fc8;
     border-color: #2a5fc8;
 }
 
-/* Asegurar que ambos botones tengan el mismo ancho en el contenedor */
+/* Mismo ancho para ambos botones */
 .activity-form .button-group .btn-outline-blue,
 .activity-form .button-group .btn-outline-gray {
-    flex: 1; /* Ambos botones ocupan el mismo espacio */
+    flex: 1;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .form-toggle-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .activity-form .button-group {
+        flex-direction: column;
+    }
 }

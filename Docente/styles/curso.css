@@ -1,6 +1,6 @@
 /* =========================================
-   ESTILOS ESPECÍFICOS: CREAR CURSO
-========================================= */
+   ESTILOS ESPECÍFICOS: CREAR CURSO / RECURSO
+   ========================================= */
 
 /* Tarjetas de Tipo de Curso */
 .course-types-grid {
@@ -12,7 +12,7 @@
 
 .type-card {
     background-color: #f8fafc;
-    border: 1px solid var(--border-color);
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 20px 10px;
     text-align: center;
@@ -28,12 +28,12 @@
 .type-card h4 {
     margin: 10px 0 5px;
     font-size: 15px;
-    color: var(--text-dark);
+    color: #1e293b;
 }
 
 .type-card p {
     font-size: 12px;
-    color: var(--text-muted);
+    color: #64748b;
 }
 
 .type-icon i {
@@ -55,24 +55,24 @@
 
 .form-group label {
     font-weight: 600;
-    color: var(--text-dark);
+    color: #1e293b;
     font-size: 14px;
 }
 
 .form-group input, 
 .form-group select {
     padding: 12px 15px;
-    border: 1px solid var(--border-color);
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 14px;
-    color: var(--text-dark);
+    color: #1e293b;
     outline: none;
     font-family: inherit;
 }
 
 .form-group input:focus, 
 .form-group select:focus {
-    border-color: var(--primary-blue);
+    border-color: #3b71f3;
 }
 
 /* Área de Subida de Archivos */
@@ -81,7 +81,7 @@
     border-radius: 12px;
     padding: 30px;
     text-align: center;
-    color: var(--text-muted);
+    color: #64748b;
     cursor: pointer;
     margin: 10px 0;
     transition: background 0.3s;
@@ -109,7 +109,7 @@
     padding: 10px 25px;
     border: 1px solid #cbd5e1;
     background-color: white;
-    color: var(--primary-blue);
+    color: #3b71f3;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
@@ -122,7 +122,7 @@
 
 .btn-publicar {
     padding: 10px 25px;
-    background-color: var(--primary-blue);
+    background-color: #3b71f3;
     color: white;
     border: none;
     font-weight: 600;
@@ -133,4 +133,30 @@
 
 .btn-publicar:hover {
     background-color: #2563eb;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .course-types-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .form-actions-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-cancelar,
+    .btn-publicar {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .course-types-grid {
+        grid-template-columns: 1fr;
+    }
 }
