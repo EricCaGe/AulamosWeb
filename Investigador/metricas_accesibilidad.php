@@ -106,6 +106,7 @@ $stmt->close();
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+        
         <div class="periodo-selector">
             <div class="periodo-info">
                 <i class="fa-solid fa-calendar"></i>
@@ -116,6 +117,7 @@ $stmt->close();
             </div>
             <button class="btn-periodo"><i class="fa-solid fa-chevron-down"></i></button>
         </div>
+
         <section class="resumen-accesibilidad">
             <div class="stats-row">
                 <div class="stat-card">
@@ -148,6 +150,7 @@ $stmt->close();
                 </div>
             </div>
         </section>
+
         <div class="destacado-accesibilidad">
             <i class="fa-solid fa-universal-access"></i>
             <div>
@@ -155,6 +158,7 @@ $stmt->close();
                 <span class="destacado-valor"><?php echo htmlspecialchars($herramienta_principal); ?></span>
             </div>
         </div>
+
         <section class="funciones-utilizadas">
             <h3><i class="fa-solid fa-chart-bar"></i> Funciones más utilizadas</h3>
             <div class="tarjeta-herramientas">
@@ -179,6 +183,7 @@ $stmt->close();
                 <?php endif; ?>
             </div>
         </section>
+
         <section class="preferencias-estudiantes">
             <h3><i class="fa-solid fa-user-gear"></i> Preferencias por estudiante</h3>
             <?php if (empty($preferencias_estudiantes)): ?>
@@ -239,14 +244,23 @@ $stmt->close();
                             <span class="preferencia-estado"><?php echo $estudiante['navegacion_teclado'] ? 'Activo' : 'Desactivado'; ?></span>
                         </div>
                     </div>
-                    <div class="estudiante-fecha">
-                        <i class="fa-regular fa-clock"></i>
-                        <span>Última actualización: <?php echo date('d M Y, h:i a', strtotime($estudiante['fecha_actualizacion'])); ?></span>
+                    <div class="estudiante-footer">
+                        <div class="estudiante-fecha">
+                            <i class="fa-regular fa-clock"></i>
+                            <span>Última actualización: <?php echo date('d M Y, h:i a', strtotime($estudiante['fecha_actualizacion'])); ?></span>
+                        </div>
+                        <button class="btn-estandares" 
+                                data-id="<?php echo $estudiante['id_usuario']; ?>" 
+                                data-nombre="<?php echo htmlspecialchars($nombre_completo); ?>" 
+                                data-fecha="<?php echo date('d M Y, h:i a', strtotime($estudiante['fecha_actualizacion'])); ?>">
+                            <i class="fa-solid fa-clipboard-list"></i> Ver estándares
+                        </button>
                     </div>
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>
         </section>
+
         <section class="info-registrada">
             <h3><i class="fa-solid fa-list-check"></i> Información registrada</h3>
             <div class="info-grid">
@@ -263,13 +277,65 @@ $stmt->close();
                 <div class="info-item"><i class="fa-solid fa-check-circle" style="color:#2e7d32;"></i><span>Fecha de actualización</span></div>
             </div>
         </section>
-        <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Los datos mostrados son las preferencias de accesibilidad almacenadas en la plataforma.</p></div>
+
+        <div class="aviso-investigador">
+            <i class="fa-solid fa-circle-info"></i>
+            <p>Los datos mostrados son las preferencias de accesibilidad almacenadas en la plataforma.</p>
+        </div>
+
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
+
     </main>
 </div>
-<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i></button>
+
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
+<!-- ========================================== -->
+<!-- MODAL DE ESTÁNDARES                       -->
+<!-- ========================================== -->
+<div id="modalEstandares" class="modal-estandares-overlay modal-estandares-hidden">
+    <div class="modal-estandares-container">
+        <div class="modal-estandares-header">
+            <h3><i class="fa-solid fa-clipboard-list"></i> <span id="modalTituloEstudiante">Estándares de accesibilidad</span></h3>
+            <button class="btn-cerrar-modal" onclick="cerrarModalEstandares()">&times;</button>
+        </div>
+        
+        <div id="modalEstudianteInfo" class="modal-estudiante-info">
+            <i class="fa-solid fa-user"></i>
+            <div>
+                <span class="nombre" id="modalNombreEstudiante">Estudiante</span>
+                <span style="font-size:12px; color:#64748b; display:block;" id="modalFechaEstudiante">Actualizado: --</span>
+            </div>
+        </div>
+
+        <div id="modalTablaContainer">
+            <table class="tabla-estandares" id="tablaEstandares">
+                <thead>
+                    <tr>
+                        <th>Estándar</th>
+                        <th>Nivel</th>
+                        <th>Funcionalidad</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEstandaresBody">
+                    <tr>
+                        <td colspan="4" class="sin-preferencias">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- SCRIPTS                                    -->
+<!-- ========================================== -->
 <script src="js/metricas_accesibilidad.js"></script>
 <script src="../Accesibilidad/lector.js"></script>
 <script src="../Accesibilidad/accesibilidad.js"></script>
+
 </body>
 </html>
