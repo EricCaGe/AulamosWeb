@@ -352,7 +352,1390 @@ body.alto-contraste .form-actions {
     border-bottom: 2px solid var(--color-acento) !important;
     border-top: 2px solid var(--color-acento) !important;
 }
+/* =========================================================
+   MODO OSCURO
+   ========================================================= */
 
+   /* =========================================================
+   MODO OSCURO - GLOBAL (TODOS LOS ELEMENTOS)
+   ========================================================= */
+
+/* Primero, todos los elementos */
+body.modo-oscuro * {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+}
+
+/* Luego, excepciones (elementos que deben conservar su color o tener otro fondo) */
+body.modo-oscuro .sidebar {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .main-content {
+    background-color: #0f172a !important;
+}
+
+body.modo-oscuro .stat-card,
+body.modo-oscuro .activity-card,
+body.modo-oscuro .progress-card,
+body.modo-oscuro .student-card,
+body.modo-oscuro .resource-card,
+body.modo-oscuro .student-row,
+body.modo-oscuro .list-item,
+body.modo-oscuro .activity-item,
+body.modo-oscuro .report-list-item,
+body.modo-oscuro .report-detail,
+body.modo-oscuro .reports-details-section,
+body.modo-oscuro .section-container,
+body.modo-oscuro .border-container,
+body.modo-oscuro .course-selector,
+body.modo-oscuro .filters-container,
+body.modo-oscuro .reports-filter-bar,
+body.modo-oscuro .calendar-container,
+body.modo-oscuro .modal-content,
+body.modo-oscuro .modal-contraste-container,
+body.modo-oscuro .tarjeta-estudiante,
+body.modo-oscuro .tarjeta-herramientas,
+body.modo-oscuro .funciones-utilizadas,
+body.modo-oscuro .preferencias-estudiantes,
+body.modo-oscuro .info-registrada,
+body.modo-oscuro .aviso-investigador,
+body.modo-oscuro .destacado-accesibilidad,
+body.modo-oscuro .periodo-selector,
+body.modo-oscuro .resumen-card,
+body.modo-oscuro .mis-recurso-card,
+body.modo-oscuro .sin-recursos,
+body.modo-oscuro .recurso-card,
+body.modo-oscuro .student-list-item,
+body.modo-oscuro .summary-container,
+body.modo-oscuro .date-display,
+body.modo-oscuro .config-section,
+body.modo-oscuro .dynamic-section,
+body.modo-oscuro .pregunta-item,
+body.modo-oscuro .upload-area,
+body.modo-oscuro .rich-text-editor,
+body.modo-oscuro .type-card,
+body.modo-oscuro .tarjeta-promedio,
+body.modo-oscuro .tarjeta-destacada,
+body.modo-oscuro .promedio-actividades,
+body.modo-oscuro .registros-estudiantes,
+body.modo-oscuro .modulos-detalle,
+body.modo-oscuro .actividad-reciente,
+body.modo-oscuro .modal-estandares-container {
+    background-color: #1e293b !important;
+}
+
+/* Textos principales */
+body.modo-oscuro h1,
+body.modo-oscuro h2,
+body.modo-oscuro h3,
+body.modo-oscuro h4,
+body.modo-oscuro h5,
+body.modo-oscuro h6,
+body.modo-oscuro .welcome-text h1,
+body.modo-oscuro .welcome-text h2,
+body.modo-oscuro .stat-number,
+body.modo-oscuro .stat-label,
+body.modo-oscuro .card-value,
+body.modo-oscuro .card-title,
+body.modo-oscuro .student-details h4,
+body.modo-oscuro .progress-title,
+body.modo-oscuro .item-title,
+body.modo-oscuro .section-title,
+body.modo-oscuro .course-name,
+body.modo-oscuro .modal-title,
+body.modo-oscuro .resource-title,
+body.modo-oscuro .report-name,
+body.modo-oscuro .filter-group label,
+body.modo-oscuro .form-group-clean label,
+body.modo-oscuro .herramienta-nombre,
+body.modo-oscuro .estudiante-nombre,
+body.modo-oscuro .opcion-titulo,
+body.modo-oscuro .periodo-valor,
+body.modo-oscuro .recurso-titulo,
+body.modo-oscuro .modulo-nombre,
+body.modo-oscuro .actividad-usuario,
+body.modo-oscuro .reporte-titulo,
+body.modo-oscuro .reporte-valor,
+body.modo-oscuro .destacado-valor,
+body.modo-oscuro .promedio-valor,
+body.modo-oscuro .progress-text,
+body.modo-oscuro .date-text,
+body.modo-oscuro .nombre-actividad {
+    color: #f1f5f9 !important;
+}
+
+/* Textos secundarios */
+body.modo-oscuro p,
+body.modo-oscuro span,
+body.modo-oscuro .stat-sub,
+body.modo-oscuro .item-desc,
+body.modo-oscuro .student-details p,
+body.modo-oscuro .card-subtext,
+body.modo-oscuro .welcome-text p,
+body.modo-oscuro .text-muted,
+body.modo-oscuro .student-group,
+body.modo-oscuro .course-details,
+body.modo-oscuro .recurso-meta,
+body.modo-oscuro .recurso-fecha,
+body.modo-oscuro .estado-badge-container,
+body.modo-oscuro .herramienta-estudiantes,
+body.modo-oscuro .estudiante-id,
+body.modo-oscuro .opcion-descripcion,
+body.modo-oscuro .periodo-etiqueta,
+body.modo-oscuro .recurso-descripcion,
+body.modo-oscuro .reporte-descripcion,
+body.modo-oscuro .destacado-etiqueta,
+body.modo-oscuro .promedio-etiqueta,
+body.modo-oscuro .resultados,
+body.modo-oscuro .fecha,
+body.modo-oscuro .hora,
+body.modo-oscuro .tiempo-etiqueta,
+body.modo-oscuro .dato-etiqueta,
+body.modo-oscuro .actividad-fecha,
+body.modo-oscuro .modulo-sub {
+    color: #94a3b8 !important;
+}
+
+/* Menu items */
+body.modo-oscuro .menu-item {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .menu-item:hover,
+body.modo-oscuro .menu-item.active {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+/* Inputs */
+body.modo-oscuro input,
+body.modo-oscuro select,
+body.modo-oscuro textarea,
+body.modo-oscuro .clean-input,
+body.modo-oscuro .clean-textarea,
+body.modo-oscuro .custom-select,
+body.modo-oscuro .search-input {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro input:focus,
+body.modo-oscuro select:focus,
+body.modo-oscuro textarea:focus {
+    border-color: #4f46e5 !important;
+}
+
+/* Botones */
+body.modo-oscuro .btn,
+body.modo-oscuro button:not(.acc-btn):not(.btn-accesibilidad-flotante):not(.btn-cerrar-modal) {
+    background-color: #2d2d44 !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-primary,
+body.modo-oscuro .btn-guardar,
+body.modo-oscuro .btn-agregar,
+body.modo-oscuro .btn-success,
+body.modo-oscuro .btn-editar,
+body.modo-oscuro .btn-publicar,
+body.modo-oscuro .btn-submit-login,
+body.modo-oscuro .btn-outline-blue,
+body.modo-oscuro .btn-apply-filters,
+body.modo-oscuro .btn-estandares {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .btn-primary:hover,
+body.modo-oscuro .btn-guardar:hover,
+body.modo-oscuro .btn-outline-blue:hover,
+body.modo-oscuro .btn-apply-filters:hover {
+    background-color: #6366f1 !important;
+}
+
+/* Excepciones especiales */
+body.modo-oscuro .btn-accesibilidad-flotante {
+    background: #1e293b !important;
+    border-color: #a855f7 !important;
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .btn-accesibilidad-flotante:hover {
+    background: #334155 !important;
+}
+
+body.modo-oscuro .acc-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-btn i,
+body.modo-oscuro .acc-btn span {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .acc-btn:hover {
+    background-color: #334155 !important;
+}
+
+body.modo-oscuro .accesibilidad-bar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-text strong {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .acc-text span {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .sidebar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .main-content {
+    background-color: #0f172a !important;
+}
+
+body.modo-oscuro .content-header {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .stat-card,
+body.modo-oscuro .activity-card,
+body.modo-oscuro .progress-card,
+body.modo-oscuro .student-card,
+body.modo-oscuro .resource-card,
+body.modo-oscuro .student-row,
+body.modo-oscuro .list-item,
+body.modo-oscuro .activity-item,
+body.modo-oscuro .report-list-item,
+body.modo-oscuro .report-detail,
+body.modo-oscuro .reports-details-section,
+body.modo-oscuro .section-container,
+body.modo-oscuro .border-container,
+body.modo-oscuro .course-selector,
+body.modo-oscuro .filters-container,
+body.modo-oscuro .reports-filter-bar,
+body.modo-oscuro .calendar-container,
+body.modo-oscuro .modal-content,
+body.modo-oscuro .modal-contraste-container {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .welcome-text h1,
+body.modo-oscuro .welcome-text h2,
+body.modo-oscuro .stat-number,
+body.modo-oscuro .stat-label,
+body.modo-oscuro .card-value,
+body.modo-oscuro .card-title,
+body.modo-oscuro .student-details h4,
+body.modo-oscuro .progress-title,
+body.modo-oscuro .item-title,
+body.modo-oscuro .section-title,
+body.modo-oscuro .course-name,
+body.modo-oscuro .modal-title,
+body.modo-oscuro .resource-title,
+body.modo-oscuro .report-name,
+body.modo-oscuro .filter-group label,
+body.modo-oscuro .form-group-clean label {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .stat-sub,
+body.modo-oscuro .item-desc,
+body.modo-oscuro .student-details p,
+body.modo-oscuro .card-subtext,
+body.modo-oscuro .welcome-text p,
+body.modo-oscuro .text-muted,
+body.modo-oscuro .student-group,
+body.modo-oscuro .course-details,
+body.modo-oscuro .recurso-meta,
+body.modo-oscuro .recurso-fecha,
+body.modo-oscuro .estado-badge-container {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .menu-item {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .menu-item:hover,
+body.modo-oscuro .menu-item.active {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-assistant {
+    background: linear-gradient(90deg, #4f46e5, #7c3aed) !important;
+}
+
+body.modo-oscuro .calendar-days-grid div:hover {
+    background: #334155 !important;
+}
+
+body.modo-oscuro .today {
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .filter-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .filter-btn.active {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .clean-input,
+body.modo-oscuro .clean-textarea,
+body.modo-oscuro .custom-select {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .clean-input:focus,
+body.modo-oscuro .clean-textarea:focus {
+    border-color: #4f46e5 !important;
+}
+
+body.modo-oscuro .rich-text-editor {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .editor-toolbar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-btn i,
+body.modo-oscuro .acc-btn span,
+body.modo-oscuro .acc-text-icon {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .acc-btn:hover {
+    background-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-text strong {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .acc-text span {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .accesibilidad-bar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .btn-accesibilidad-flotante {
+    background: #1e293b !important;
+    border-color: #a855f7 !important;
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .btn-accesibilidad-flotante:hover {
+    background: #334155 !important;
+}
+
+body.modo-oscuro .modal-contraste-container {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .modal-contraste-header h3 {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .modal-contraste-header {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .opcion-grupo label {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-opcion {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-opcion:hover {
+    border-color: #a855f7 !important;
+}
+
+body.modo-oscuro .btn-opcion.seleccionado {
+    background: #a855f7 !important;
+    color: #1e293b !important;
+    border-color: #a855f7 !important;
+}
+
+body.modo-oscuro .modal-contraste-footer {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .btn-restablecer {
+    background: #dc2626 !important;
+}
+
+body.modo-oscuro .date-display {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .date-display strong {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .student-list-item {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .attendance-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .attendance-btn.active {
+    background-color: #dcfce7 !important;
+    border-color: #22c55e !important;
+    color: #166534 !important;
+}
+
+body.modo-oscuro .attendance-btn.falta.active {
+    background-color: #fee2e2 !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body.modo-oscuro .attendance-btn.retardo.active {
+    background-color: #fef3c7 !important;
+    border-color: #d97706 !important;
+    color: #d97706 !important;
+}
+
+body.modo-oscuro .summary-container {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .student-avatar {
+    background-color: #334155 !important;
+}
+
+body.modo-oscuro .avatar-icon {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .pill {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .pill.active {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .search-bar-container {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .search-input {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .stat-box {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .quick-access-grid {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .quick-btn {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .quick-btn.bg-gray-solid {
+    background-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .item-actions .badge {
+    background-color: #334155 !important;
+}
+
+
+/* =========================================================
+   MODO OSCURO - MÉTRICAS DE ACCESIBILIDAD (INVESTIGADOR)
+   ========================================================= */
+
+body.modo-oscuro .tarjeta-estudiante,
+body.modo-oscuro .tarjeta-herramientas,
+body.modo-oscuro .funciones-utilizadas,
+body.modo-oscuro .preferencias-estudiantes,
+body.modo-oscuro .info-registrada,
+body.modo-oscuro .aviso-investigador,
+body.modo-oscuro .destacado-accesibilidad,
+body.modo-oscuro .resumen-accesibilidad .stat-card,
+body.modo-oscuro .periodo-selector {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .estudiante-encabezado,
+body.modo-oscuro .tarjeta-estudiante .preferencias-grid,
+body.modo-oscuro .tarjeta-estudiante .estudiante-footer {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .estudiante-nombre,
+body.modo-oscuro .tarjeta-estudiante .estudiante-id,
+body.modo-oscuro .tarjeta-estudiante .preferencia-item span,
+body.modo-oscuro .tarjeta-estudiante .preferencia-estado {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .preferencia-item {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .preferencia-item.activa {
+    background-color: #1a3a2a !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .preferencia-item.activa .preferencia-estado {
+    color: #4ade80 !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .preferencia-item.inactiva .preferencia-estado {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .tarjeta-herramientas .herramienta-item,
+body.modo-oscuro .tarjeta-herramientas .barra-fondo {
+    background-color: transparent !important;
+}
+
+body.modo-oscuro .tarjeta-herramientas .herramienta-nombre,
+body.modo-oscuro .tarjeta-herramientas .herramienta-porcentaje {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .tarjeta-herramientas .herramienta-estudiantes {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .info-registrada .info-item {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .info-registrada .info-item span {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .aviso-investigador {
+    background-color: #2d2d44 !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .aviso-investigador p {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .destacado-accesibilidad {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .destacado-accesibilidad .destacado-etiqueta {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .destacado-accesibilidad .destacado-valor {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .periodo-info .periodo-etiqueta {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .periodo-info .periodo-valor {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .periodo-info i {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .btn-periodo {
+    background-color: #2d2d44 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .btn-estandares {
+    background-color: #4f46e5 !important;
+}
+
+body.modo-oscuro .btn-estandares:hover {
+    background-color: #6366f1 !important;
+}
+
+/* =========================================================
+   MODO OSCURO - TARJETAS DE RESUMEN (todas las páginas)
+   ========================================================= */
+
+body.modo-oscuro .stat-card,
+body.modo-oscuro .activity-card,
+body.modo-oscuro .progress-card,
+body.modo-oscuro .student-card,
+body.modo-oscuro .resource-card,
+body.modo-oscuro .student-row,
+body.modo-oscuro .list-item,
+body.modo-oscuro .activity-item,
+body.modo-oscuro .report-list-item,
+body.modo-oscuro .report-detail,
+body.modo-oscuro .reports-details-section,
+body.modo-oscuro .section-container,
+body.modo-oscuro .border-container,
+body.modo-oscuro .course-selector,
+body.modo-oscuro .filters-container,
+body.modo-oscuro .reports-filter-bar,
+body.modo-oscuro .calendar-container,
+body.modo-oscuro .modal-content,
+body.modo-oscuro .modal-contraste-container {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .welcome-text h1,
+body.modo-oscuro .welcome-text h2,
+body.modo-oscuro .stat-number,
+body.modo-oscuro .stat-label,
+body.modo-oscuro .card-value,
+body.modo-oscuro .card-title,
+body.modo-oscuro .student-details h4,
+body.modo-oscuro .progress-title,
+body.modo-oscuro .item-title,
+body.modo-oscuro .section-title,
+body.modo-oscuro .course-name,
+body.modo-oscuro .modal-title,
+body.modo-oscuro .resource-title,
+body.modo-oscuro .report-name,
+body.modo-oscuro .filter-group label,
+body.modo-oscuro .form-group-clean label,
+body.modo-oscuro .herramienta-nombre,
+body.modo-oscuro .estudiante-nombre {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .stat-sub,
+body.modo-oscuro .item-desc,
+body.modo-oscuro .student-details p,
+body.modo-oscuro .card-subtext,
+body.modo-oscuro .welcome-text p,
+body.modo-oscuro .text-muted,
+body.modo-oscuro .student-group,
+body.modo-oscuro .course-details,
+body.modo-oscuro .recurso-meta,
+body.modo-oscuro .recurso-fecha,
+body.modo-oscuro .estado-badge-container,
+body.modo-oscuro .herramienta-estudiantes,
+body.modo-oscuro .estudiante-id {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .menu-item {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .menu-item:hover,
+body.modo-oscuro .menu-item.active {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-assistant {
+    background: linear-gradient(90deg, #4f46e5, #7c3aed) !important;
+}
+
+body.modo-oscuro .calendar-days-grid div:hover {
+    background: #334155 !important;
+}
+
+body.modo-oscuro .today {
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .filter-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .filter-btn.active {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .clean-input,
+body.modo-oscuro .clean-textarea,
+body.modo-oscuro .custom-select {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .clean-input:focus,
+body.modo-oscuro .clean-textarea:focus {
+    border-color: #4f46e5 !important;
+}
+
+body.modo-oscuro .rich-text-editor {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .editor-toolbar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* =========================================================
+   MODO OSCURO - GLOBAL (TODAS LAS TARJETAS Y PANELES)
+   ========================================================= */
+
+body.modo-oscuro {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+}
+
+/* =========================================================
+   TODOS LOS CONTENEDORES Y TARJETAS
+   ========================================================= */
+
+body.modo-oscuro .sidebar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .main-content {
+    background-color: #0f172a !important;
+}
+
+body.modo-oscuro .content-header {
+    border-color: #334155 !important;
+}
+
+/* --- TODOS LOS TIPOS DE TARJETAS --- */
+body.modo-oscuro .card,
+body.modo-oscuro .stat-card,
+body.modo-oscuro .activity-card,
+body.modo-oscuro .progress-card,
+body.modo-oscuro .student-card,
+body.modo-oscuro .resource-card,
+body.modo-oscuro .student-row,
+body.modo-oscuro .list-item,
+body.modo-oscuro .activity-item,
+body.modo-oscuro .report-list-item,
+body.modo-oscuro .report-detail,
+body.modo-oscuro .reports-details-section,
+body.modo-oscuro .section-container,
+body.modo-oscuro .border-container,
+body.modo-oscuro .course-selector,
+body.modo-oscuro .filters-container,
+body.modo-oscuro .reports-filter-bar,
+body.modo-oscuro .calendar-container,
+body.modo-oscuro .modal-content,
+body.modo-oscuro .modal-contraste-container,
+body.modo-oscuro .tarjeta-estudiante,
+body.modo-oscuro .tarjeta-herramientas,
+body.modo-oscuro .funciones-utilizadas,
+body.modo-oscuro .preferencias-estudiantes,
+body.modo-oscuro .info-registrada,
+body.modo-oscuro .aviso-investigador,
+body.modo-oscuro .destacado-accesibilidad,
+body.modo-oscuro .resumen-accesibilidad .stat-card,
+body.modo-oscuro .periodo-selector,
+body.modo-oscuro .resumen-card,
+body.modo-oscuro .mis-recurso-card,
+body.modo-oscuro .sin-recursos,
+body.modo-oscuro .recurso-card,
+body.modo-oscuro .student-list-item,
+body.modo-oscuro .summary-container,
+body.modo-oscuro .date-display,
+body.modo-oscuro .config-section,
+body.modo-oscuro .dynamic-section,
+body.modo-oscuro .pregunta-item,
+body.modo-oscuro .upload-area,
+body.modo-oscuro .rich-text-editor,
+body.modo-oscuro .course-types-grid .type-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* =========================================================
+   TODOS LOS TEXTOS
+   ========================================================= */
+
+body.modo-oscuro h1,
+body.modo-oscuro h2,
+body.modo-oscuro h3,
+body.modo-oscuro h4,
+body.modo-oscuro h5,
+body.modo-oscuro h6,
+body.modo-oscuro .welcome-text h1,
+body.modo-oscuro .welcome-text h2,
+body.modo-oscuro .stat-number,
+body.modo-oscuro .stat-label,
+body.modo-oscuro .card-value,
+body.modo-oscuro .card-title,
+body.modo-oscuro .student-details h4,
+body.modo-oscuro .progress-title,
+body.modo-oscuro .item-title,
+body.modo-oscuro .section-title,
+body.modo-oscuro .course-name,
+body.modo-oscuro .modal-title,
+body.modo-oscuro .resource-title,
+body.modo-oscuro .report-name,
+body.modo-oscuro .filter-group label,
+body.modo-oscuro .form-group-clean label,
+body.modo-oscuro .herramienta-nombre,
+body.modo-oscuro .estudiante-nombre,
+body.modo-oscuro .opcion-titulo,
+body.modo-oscuro .periodo-valor,
+body.modo-oscuro .recurso-titulo,
+body.modo-oscuro .modulo-nombre,
+body.modo-oscuro .actividad-usuario,
+body.modo-oscuro .reporte-titulo,
+body.modo-oscuro .reporte-valor,
+body.modo-oscuro .destacado-valor,
+body.modo-oscuro .promedio-valor,
+body.modo-oscuro .progress-text,
+body.modo-oscuro .date-text,
+body.modo-oscuro .estudiante-nombre,
+body.modo-oscuro .nombre-actividad {
+    color: #f1f5f9 !important;
+}
+
+/* =========================================================
+   TODOS LOS TEXTOS SECUNDARIOS
+   ========================================================= */
+
+body.modo-oscuro p,
+body.modo-oscuro span:not(.badge):not(.estado-cumple),
+body.modo-oscuro .stat-sub,
+body.modo-oscuro .item-desc,
+body.modo-oscuro .student-details p,
+body.modo-oscuro .card-subtext,
+body.modo-oscuro .welcome-text p,
+body.modo-oscuro .text-muted,
+body.modo-oscuro .student-group,
+body.modo-oscuro .course-details,
+body.modo-oscuro .recurso-meta,
+body.modo-oscuro .recurso-fecha,
+body.modo-oscuro .estado-badge-container,
+body.modo-oscuro .herramienta-estudiantes,
+body.modo-oscuro .estudiante-id,
+body.modo-oscuro .opcion-descripcion,
+body.modo-oscuro .periodo-etiqueta,
+body.modo-oscuro .recurso-descripcion,
+body.modo-oscuro .reporte-descripcion,
+body.modo-oscuro .destacado-etiqueta,
+body.modo-oscuro .promedio-etiqueta,
+body.modo-oscuro .resultados,
+body.modo-oscuro .fecha,
+body.modo-oscuro .hora,
+body.modo-oscuro .tiempo-etiqueta,
+body.modo-oscuro .dato-etiqueta,
+body.modo-oscuro .actividad-fecha,
+body.modo-oscuro .modulo-sub {
+    color: #94a3b8 !important;
+}
+
+/* =========================================================
+   MENU ITEMS
+   ========================================================= */
+
+body.modo-oscuro .menu-item {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .menu-item:hover,
+body.modo-oscuro .menu-item.active {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+/* =========================================================
+   INPUTS, SELECTS, TEXTAREAS
+   ========================================================= */
+
+body.modo-oscuro input,
+body.modo-oscuro select,
+body.modo-oscuro textarea,
+body.modo-oscuro .clean-input,
+body.modo-oscuro .clean-textarea,
+body.modo-oscuro .custom-select,
+body.modo-oscuro .search-input {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro input:focus,
+body.modo-oscuro select:focus,
+body.modo-oscuro textarea:focus,
+body.modo-oscuro .clean-input:focus,
+body.modo-oscuro .clean-textarea:focus {
+    border-color: #4f46e5 !important;
+}
+
+/* =========================================================
+   PREFERENCIAS POR ESTUDIANTE (INVESTIGADOR)
+   ========================================================= */
+
+body.modo-oscuro .preferencia-item {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .preferencia-item.activa {
+    background-color: #1a3a2a !important;
+}
+
+body.modo-oscuro .preferencia-item.activa .preferencia-estado {
+    color: #4ade80 !important;
+}
+
+body.modo-oscuro .preferencia-item.inactiva .preferencia-estado {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .tarjeta-estudiante .estudiante-encabezado,
+body.modo-oscuro .tarjeta-estudiante .preferencias-grid,
+body.modo-oscuro .tarjeta-estudiante .estudiante-footer {
+    border-color: #334155 !important;
+}
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+body.modo-oscuro .btn,
+body.modo-oscuro button:not(.acc-btn):not(.btn-accesibilidad-flotante):not(.btn-cerrar-modal) {
+    background-color: #2d2d44 !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-primary,
+body.modo-oscuro .btn-guardar,
+body.modo-oscuro .btn-agregar,
+body.modo-oscuro .btn-success,
+body.modo-oscuro .btn-editar,
+body.modo-oscuro .btn-publicar,
+body.modo-oscuro .btn-submit-login,
+body.modo-oscuro .btn-outline-blue,
+body.modo-oscuro .btn-apply-filters,
+body.modo-oscuro .btn-estandares {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .btn-primary:hover,
+body.modo-oscuro .btn-guardar:hover,
+body.modo-oscuro .btn-outline-blue:hover,
+body.modo-oscuro .btn-apply-filters:hover {
+    background-color: #6366f1 !important;
+}
+
+body.modo-oscuro .btn-outline-gray {
+    background-color: #2d2d44 !important;
+    border-color: #4f46e5 !important;
+    color: #4f46e5 !important;
+}
+
+body.modo-oscuro .btn-outline-gray:hover {
+    background-color: #334155 !important;
+}
+
+body.modo-oscuro .btn-cancelar {
+    background-color: #2d2d44 !important;
+    border-color: #4f46e5 !important;
+    color: #4f46e5 !important;
+}
+
+/* =========================================================
+   BARRA DE ACCESIBILIDAD
+   ========================================================= */
+
+body.modo-oscuro .accesibilidad-bar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-btn i,
+body.modo-oscuro .acc-btn span,
+body.modo-oscuro .acc-text-icon {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .acc-btn:hover {
+    background-color: #334155 !important;
+}
+
+body.modo-oscuro .acc-text strong {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .acc-text span {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .btn-accesibilidad-flotante {
+    background: #1e293b !important;
+    border-color: #a855f7 !important;
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .btn-accesibilidad-flotante:hover {
+    background: #334155 !important;
+}
+
+/* =========================================================
+   MODAL DE CONTRASTE
+   ========================================================= */
+
+body.modo-oscuro .modal-contraste-container {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .modal-contraste-header h3 {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .modal-contraste-header {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .opcion-grupo label {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-opcion {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .btn-opcion:hover {
+    border-color: #a855f7 !important;
+}
+
+body.modo-oscuro .btn-opcion.seleccionado {
+    background: #a855f7 !important;
+    color: #1e293b !important;
+    border-color: #a855f7 !important;
+}
+
+body.modo-oscuro .modal-contraste-footer {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .btn-restablecer {
+    background: #dc2626 !important;
+}
+
+/* =========================================================
+   CALENDARIO
+   ========================================================= */
+
+body.modo-oscuro .calendar-days-grid div:hover {
+    background: #334155 !important;
+}
+
+body.modo-oscuro .today {
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+body.modo-oscuro .calendar-weekdays .weekday {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .calendar-header #month-year-title {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .nav-btn {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .nav-btn:hover {
+    color: #a855f7 !important;
+}
+
+/* =========================================================
+   FILTROS Y PESTAÑAS
+   ========================================================= */
+
+body.modo-oscuro .filtros button,
+body.modo-oscuro .filter-btn,
+body.modo-oscuro .filtros-materia a,
+body.modo-oscuro .materias-tabs a,
+body.modo-oscuro .tab-btn,
+body.modo-oscuro .pill {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .filtros button.activo,
+body.modo-oscuro .filter-btn.active,
+body.modo-oscuro .filtros-materia a.activo,
+body.modo-oscuro .materias-tabs a.activo,
+body.modo-oscuro .tab-btn.active,
+body.modo-oscuro .pill.active {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   ESTADOS Y BADGES
+   ========================================================= */
+
+body.modo-oscuro .estado-badge,
+body.modo-oscuro .badge {
+    background-color: #2d2d44 !important;
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .estado-badge.completada,
+body.modo-oscuro .estado-badge.completado,
+body.modo-oscuro .badge-publicado {
+    background-color: #1a3a2a !important;
+    color: #4ade80 !important;
+}
+
+body.modo-oscuro .estado-badge.pendiente,
+body.modo-oscuro .badge-pendiente {
+    background-color: #3d3d2a !important;
+    color: #fde68a !important;
+}
+
+body.modo-oscuro .estado-badge.atrasada {
+    background-color: #3d1a1a !important;
+    color: #fca5a5 !important;
+}
+
+body.modo-oscuro .estado-badge.proceso {
+    background-color: #1a2a3d !important;
+    color: #93c5fd !important;
+}
+
+body.modo-oscuro .estado-badge.calificada {
+    background-color: #1a3a2a !important;
+    color: #4ade80 !important;
+}
+
+body.modo-oscuro .estado-cumple.cumple {
+    background-color: #1a3a2a !important;
+    color: #4ade80 !important;
+}
+
+body.modo-oscuro .estado-cumple.no-cumple {
+    background-color: #3d1a1a !important;
+    color: #fca5a5 !important;
+}
+
+/* =========================================================
+   ASISTENTE VIRTUAL
+   ========================================================= */
+
+body.modo-oscuro .btn-assistant {
+    background: linear-gradient(90deg, #4f46e5, #7c3aed) !important;
+}
+
+/* =========================================================
+   INFORMACIÓN REGISTRADA
+   ========================================================= */
+
+body.modo-oscuro .info-item {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .info-item span {
+    color: #f1f5f9 !important;
+}
+
+/* =========================================================
+   AVISO INVESTIGADOR
+   ========================================================= */
+
+body.modo-oscuro .aviso-investigador {
+    background-color: #2d2d44 !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .aviso-investigador p {
+    color: #94a3b8 !important;
+}
+
+/* =========================================================
+   DESTACADO ACCESIBILIDAD
+   ========================================================= */
+
+body.modo-oscuro .destacado-accesibilidad {
+    background-color: #2d2d44 !important;
+}
+
+/* =========================================================
+   REPORTES Y TABLAS
+   ========================================================= */
+
+body.modo-oscuro .report-table th {
+    background-color: #2d2d44 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .report-table td {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .report-table tr:hover td {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .table-container {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* =========================================================
+   PROGRESO CIRCULAR
+   ========================================================= */
+
+body.modo-oscuro .circulo-progreso::before {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .circulo-valor {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .circulo-etiqueta {
+    color: #94a3b8 !important;
+}
+
+/* =========================================================
+   VACIOS Y MENSAJES
+   ========================================================= */
+
+body.modo-oscuro .vacio-mensaje {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .vacio-mensaje i {
+    color: #475569 !important;
+}
+
+body.modo-oscuro .sin-recursos {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .sin-recursos h3 {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .sin-recursos p {
+    color: #94a3b8 !important;
+}
+
+/* =========================================================
+   MODAL ESTÁNDARES (INVESTIGADOR)
+   ========================================================= */
+
+body.modo-oscuro .modal-estandares-container {
+    background-color: #1e293b !important;
+}
+
+body.modo-oscuro .modal-estandares-header h3 {
+    color: #a855f7 !important;
+}
+
+body.modo-oscuro .modal-estandares-header {
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .modal-estudiante-info {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .modal-estudiante-info .nombre {
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .modal-estudiante-info .fecha {
+    color: #94a3b8 !important;
+}
+
+body.modo-oscuro .tabla-estandares th {
+    background-color: #2d2d44 !important;
+    color: #f1f5f9 !important;
+}
+
+body.modo-oscuro .tabla-estandares td {
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+
+body.modo-oscuro .tabla-estandares tr:hover td {
+    background-color: #2d2d44 !important;
+}
+
+body.modo-oscuro .sin-preferencias {
+    color: #94a3b8 !important;
+}
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -608,6 +1991,7 @@ body.modo-oscuro.navegacion-teclado *:focus {
     outline: 3px solid #a855f7 !important;
     box-shadow: 0 0 0 6px rgba(168, 85, 247, 0.3) !important;
 }
+
 
 /* Alto contraste */
 body.alto-contraste.navegacion-teclado *:focus {
