@@ -160,14 +160,48 @@ $conexion->close();
                             <i class="fa-solid fa-users-slash"></i>
                             <p>No hay estudiantes inscritos en tus cursos.</p>
                         </div>
-                    <?php else: ?>
-                        <?php foreach ($estudiantes as $estudiante): ?>
-                            <div class="student-card" data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>">
-                                <div class="student-info-left">
-                                    <i class="fa-solid fa-circle-user avatar-icon"></i>
-                                    <div class="student-details">
-                                        <h4><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno']); ?></h4>
-                                        <p><?php echo htmlspecialchars($estudiante['grupo_nombre']); ?></p>
+                        
+                    </div>
+                </div>
+            </header>
+
+            <!-- BARRA DE BÚSQUEDA Y PESTAÑAS (TABS) -->
+            <div class="students-header-tools">
+                <div class="search-bar-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" class="student-search-input" placeholder="Buscar estudiante">
+                </div>
+
+                <div class="group-tabs" id="filter-tabs">
+                    <!-- Botón "Todos" -->
+                    <button class="tab-btn active" data-filter="todos">Todos</button>
+                    <!-- Botones dinámicos para cada grupo -->
+                    <?php foreach ($grupos_unicos as $grupo): ?>
+                        <button class="tab-btn" data-filter="<?php echo htmlspecialchars($grupo); ?>">
+                            <?php echo htmlspecialchars($grupo); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- LISTA DE ESTUDIANTES -->
+            <div class="main-grid mt-20">
+                <div class="left-column">
+                    <div class="students-list-container" id="students-list">
+                        <?php if (empty($estudiantes)): ?>
+                            <div class="no-students-message">
+                                <i class="fa-solid fa-users-slash"></i>
+                                <p>No hay estudiantes inscritos en tus cursos.</p>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($estudiantes as $estudiante): ?>
+                                <div class="student-card" data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>">
+                                    <div class="student-info-left">
+                                        <i class="fa-solid fa-circle-user avatar-icon"></i>
+                                        <div class="student-details">
+                                            <h4><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno']); ?></h4>
+                                            <p><?php echo htmlspecialchars($estudiante['grupo_nombre']); ?></p>
+                                        </div>
                                     </div>
                                 </div>
                                 <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>

@@ -77,24 +77,13 @@ $rol = "Docente";
                         <span class="user-name"><?php echo $usuario; ?>!</span>
                         <span class="user-role"><?php echo $rol; ?></span>
                     </div>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </div>
-            </div>
-        </header>
-
-        <!-- CONTENIDO DE LA ACTIVIDAD -->
-        <div class="actividad-layout">
-            
-            <!-- COLUMNA IZQUIERDA: Detalles y Entrega -->
-            <div class="actividad-left">
-                
-                <div class="materia-info">
-                    <div class="icon-materia">
-                        <i class="fa-solid fa-file-lines"></i>
-                    </div>
-                    <div class="text-materia">
-                        <h4>Ciencias Naturales</h4>
-                        <span>Entrega: 12/05/2026</span>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $usuario; ?>!</span>
+                            <span class="user-role"><?php echo $rol; ?></span>
+                        </div>
+                        
                     </div>
                 </div>
 

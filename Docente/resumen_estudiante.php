@@ -181,7 +181,23 @@ $porcentaje_atrasadas = $total_actividades > 0 ? round(($atrasadas / $total_acti
                         <span class="user-name"><?php echo $usuario; ?>!</span>
                         <span class="user-role"><?php echo $rol; ?></span>
                     </div>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $usuario; ?>!</span>
+                            <span class="user-role"><?php echo $rol; ?></span>
+                        </div>
+                        
+                    </div>
+                </div>
+            </header>
+
+            <!-- PERFIL DEL ESTUDIANTE -->
+            <div class="student-profile-header">
+                <i class="fa-regular fa-circle-user large-avatar"></i>
+                <div class="student-details">
+                    <h2><?php echo $nombre_alumno; ?></h2>
+                    <span class="badge-grade"><?php echo $grupo_alumno; ?></span>
                 </div>
             </div>
         </header>

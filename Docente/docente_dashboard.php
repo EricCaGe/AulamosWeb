@@ -421,15 +421,51 @@ function formatearFecha($fecha) {
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
+                    <div class="icon-bell-container">
+                        <i class="fa-regular fa-bell"></i>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                            <span class="user-role">Docente</span>
+                        </div>
+                        
+                    </div>
+                </div>
+            </header>
 
 <!-- ========================================== -->
 <!-- SCRIPTS                                    -->
 <!-- ========================================== -->
 <script src="jss/docente_dashboard.js"></script>
 
-<!-- NUEVA ACCESIBILIDAD -->
-<script src="../Accesibilidad/accesibilidad.js"></script>
-<script src="../Accesibilidad/navegacionTeclado.js"></script>
+                    <!-- Accesos rápidos -->
+                    <section class="section-container">
+                        <h3 class="section-title">Accesos rápidos</h3>
+                        <div class="quick-access-grid">
+                            <a href="crear_recurso.php" class="quick-btn bg-purple-solid">
+                                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                <span>Crear recurso</span>
+                            </a>
+                            <a href="crear_actividad.php" class="quick-btn bg-green-solid">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                                <span>Crear actividad</span>
+                            </a>
+                            <a href="crear_evaluacion.php" class="quick-btn bg-yellow-solid text-dark-yellow">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                                <span>Crear evaluación</span>
+                            </a>
+                            <a href="ver_estudiantes.php" class="quick-btn bg-blue-solid">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Ver estudiantes</span>
+                            </a>
+                            <a href="reporte.php" class="quick-btn bg-gray-solid">
+                                <i class="fa-solid fa-chart-column"></i>
+                                <span>Reportes</span>
+                            </a>
+                        </div>
+                    </section>
 
 </body>
 </html>

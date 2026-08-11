@@ -354,30 +354,13 @@ $conexion->close();
                         <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                         <span class="user-role">Docente</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </div>
-            </div>
-        </header>
-
-        <!-- MENSAJES DE ÉXITO O ERROR -->
-        <?php if (isset($_SESSION['mensaje'])): ?>
-            <div class="alert alert-<?php echo $_SESSION['tipo_mensaje']; ?>">
-                <?php echo $_SESSION['mensaje']; ?>
-            </div>
-            <?php unset($_SESSION['mensaje']); ?>
-            <?php unset($_SESSION['tipo_mensaje']); ?>
-        <?php endif; ?>
-
-        <!-- FORMULARIO DE EVALUACIÓN -->
-        <div class="main-grid eval-layout">
-            <!-- COLUMNA IZQUIERDA -->
-            <div class="left-column">
-                <form class="eval-form" id="evalForm" method="POST" action="procesar_evaluacion.php">
-                    <!-- Título de evaluación -->
-                    <div class="form-group-clean">
-                        <label for="titulo">Título de evaluación <span class="required-star">*</span></label>
-                        <input type="text" class="clean-input" id="titulo" name="titulo" placeholder="Ej: Examen de Matemáticas" required>
-                        <div class="error-message" id="error-titulo"></div>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                            <span class="user-role">Docente</span>
+                        </div>
+                        
                     </div>
 
                     <!-- Descripción -->

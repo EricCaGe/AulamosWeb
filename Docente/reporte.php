@@ -346,10 +346,13 @@ $path_area = "M0,30 L" . implode(" L", array_map(fn($p) => $p['x'] . "," . $p['y
                         <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
                         <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
                     </div>
-                    <h2 id="month-year-title">AGOSTO 2026</h2>
-                    <div class="nav-right">
-                        <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
-                        <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                            <span class="user-role">Docente</span>
+                        </div>
+                        
                     </div>
                 </div>
                 <div class="calendar-weekdays">

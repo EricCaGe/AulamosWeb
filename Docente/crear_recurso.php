@@ -263,6 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <nav class="menu">
                 <a href="docente_dashboard.php" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a>
                 <a href="crear_recurso.php" class="menu-item active"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
+                <a href="mis_recursos.php"  class="menu-item"><i class="fa-solid fa-folder-open"></i> Mis Recursos</a>
                 <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
                 <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
@@ -295,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                             <span class="user-role">Docente</span>
                         </div>
-                        <i class="fa-solid fa-chevron-down drop-icon"></i>
+                        
                     </div>
                 </div>
             </header>

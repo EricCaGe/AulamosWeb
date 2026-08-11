@@ -349,7 +349,7 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                             <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                             <span class="user-role">Docente</span>
                         </div>
-                        <i class="fa-solid fa-chevron-down drop-icon"></i>
+                        
                     </div>
                 </div>
             </div>

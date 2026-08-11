@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+<<<<<<< HEAD
 // Pasar el ID del usuario al JavaScript para accesibilidad por usuario
 echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
 
@@ -11,17 +12,18 @@ if (
     !isset($_SESSION['usuario']) ||
     $_SESSION['usuario']['rol'] !== 'Docente'
 ) {
+=======
+// Verificar que el usuario haya iniciado sesión y sea Docente
+if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+>>>>>>> c7e83f4e9bfe2df82e88f37c86b6509e663cf053
     header('Location: ../InicioSesion/login.php');
     exit;
 }
 
 require_once '../Conexion/conexion.php';
 
-$id_docente = (int) $_SESSION['usuario']['id_usuario'];
-
-$nombre_docente =
-    $_SESSION['usuario']['nombre'] . ' ' .
-    $_SESSION['usuario']['apellido_paterno'];
+$id_docente = $_SESSION['usuario']['id_usuario'];
+$nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 
 // =====================================================
 // TOKEN CSRF

@@ -74,11 +74,26 @@ $tipo_mensaje = '';
                 <div class="icon-bell-container">
                     <i class="fa-regular fa-bell"></i>
                 </div>
+<<<<<<< HEAD
                 <div class="user-profile">
                     <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
                     <div class="user-info">
                         <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                         <span class="user-role">Docente</span>
+=======
+               <div class="header-actions">
+                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                    <div class="icon-bell-container">
+                        <i class="fa-regular fa-bell"></i>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                            <span class="user-role">Docente</span>
+                        </div>
+                        
+>>>>>>> c7e83f4e9bfe2df82e88f37c86b6509e663cf053
                     </div>
                     <i class="fa-solid fa-chevron-down drop-icon"></i>
                 </div>

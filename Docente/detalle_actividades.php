@@ -106,13 +106,26 @@ $grupo_alumno = "1° A";
         <!-- LISTA DE ACTIVIDADES -->
         <div class="activities-list">
             
-            <!-- Mapa conceptual -->
-            <a href="actividad_Mapa_conceptual.php" class="activity-row" style="text-decoration: none; color: inherit;" data-status="completada">
-                <div class="activity-left">
-                    <div class="icon-box purple"><i class="fa-solid fa-file-lines"></i></div>
-                    <div class="activity-text">
-                        <h4>Mapa conceptual</h4>
-                        <span>Ciencias Naturales</span>
+            <!-- ENCABEZADO SUPERIOR CON FLECHA DE REGRESO -->
+            <header class="content-header header-with-back">
+                <div class="welcome-text">
+                    <h1>
+                        <a href="resumen_estudiante.php" class="back-arrow"><i class="fa-solid fa-arrow-left"></i></a> 
+                        Detalle de actividades
+                    </h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                    <div class="icon-bell-container">
+                        <i class="fa-regular fa-bell"></i>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $usuario; ?>!</span>
+                            <span class="user-role"><?php echo $rol; ?></span>
+                        </div>
+                        
                     </div>
                 </div>
                 <div class="activity-center">Entrega: 12/05/2026</div>
