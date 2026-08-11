@@ -9,11 +9,11 @@
 //$host = '10.2.0.234';
 
 
-$host = '10.2.2.71';
+$host = '10.2.0.125';
 $usuario = 'aulamos';
 
 
-$password = 'E12345678!';
+$password = '';
 //$password = '12345678'; //eric
 //$password = 'Jaziel123'; 
 //$password = 'qwerty1234.'; //Obregon

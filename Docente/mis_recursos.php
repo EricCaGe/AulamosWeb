@@ -1,24 +1,16 @@
 <?php
 session_start();
 
-// =====================================================
-// VERIFICAR SESIÓN DOCENTE
-// =====================================================
-if (
-    !isset($_SESSION['usuario']) ||
-    $_SESSION['usuario']['rol'] !== 'Docente'
-) {
+// Verificar que el usuario haya iniciado sesión y sea Docente
+if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
 
 require_once '../Conexion/conexion.php';
 
-$id_docente = (int) $_SESSION['usuario']['id_usuario'];
-
-$nombre_docente =
-    $_SESSION['usuario']['nombre'] . ' ' .
-    $_SESSION['usuario']['apellido_paterno'];
+$id_docente = $_SESSION['usuario']['id_usuario'];
+$nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 
 // =====================================================
 // TOKEN CSRF
