@@ -261,14 +261,14 @@ $configuracionChatbot = json_encode(
                 </a>
 
                 <a
-                    href="../Docente/mas.php"
+                    href="../Docente/pasarlista.php"
                     class="menu-item"
                 >
                     <i
                         class="fa-solid fa-bars"
                         aria-hidden="true"
                     ></i>
-                    Más
+                    Pasar lista
                 </a>
             </nav>
 

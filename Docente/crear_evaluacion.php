@@ -94,6 +94,7 @@ $conexion->close();
             display: flex;
             gap: 10px;
             margin: 10px 0;
+            flex-wrap: wrap;
         }
         .tipo-respuesta-btn {
             display: flex;
@@ -147,6 +148,8 @@ $conexion->close();
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .pregunta-meta .meta-group {
             display: flex;
@@ -312,6 +315,222 @@ $conexion->close();
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* NUEVO: Contenedor de dos columnas */
+        .two-column-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .left-column {
+            flex: 2;
+            min-width: 0;
+        }
+        .right-column {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Estilos para el calendario */
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .calendar-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        .weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            padding: 5px 0;
+        }
+        .calendar-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day {
+            text-align: center;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .calendar-day:hover {
+            background: #f0f4ff;
+        }
+        .calendar-day.empty {
+            cursor: default;
+            color: #ccc;
+        }
+        .calendar-day.today {
+            background: #4f7cff;
+            color: white;
+            font-weight: 600;
+        }
+        .calendar-day.selected {
+            background: #e8edff;
+            border: 2px solid #4f7cff;
+        }
+        .calendar-day.has-event {
+            position: relative;
+        }
+        .calendar-day.has-event::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #4f7cff;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Estilos para los botones de acción */
+        .eval-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .eval-buttons button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-outline-gray {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        .btn-outline-gray:hover {
+            background: #eee;
+        }
+        .btn-outline-blue {
+            background: #4f7cff;
+            color: white;
+        }
+        .btn-outline-blue:hover:not(:disabled) {
+            background: #3a6beb;
+        }
+        .btn-outline-blue:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Mensajes de alerta */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeeba;
+        }
+
+        .form-group-clean {
+            margin-bottom: 20px;
+        }
+        .form-group-clean label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .required-star {
+            color: #e74c3c;
+        }
+        .clean-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .clean-input:focus {
+            outline: none;
+            border-color: #4f7cff;
+            box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.1);
+        }
+        .clean-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        .clean-textarea:focus {
+            outline: none;
+            border-color: #4f7cff;
+            box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .two-column-container {
+                flex-direction: column;
+            }
+            .right-column {
+                min-width: unset;
+            }
+        }
     </style>
 </head>
 <body>
@@ -329,8 +548,8 @@ $conexion->close();
             <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
             <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
             <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
             <div class="menu-spacer"></div>
+            <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
             <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -340,33 +559,59 @@ $conexion->close();
         <!-- ENCABEZADO -->
         <header class="content-header">
             <div class="welcome-text">
-                <h1>Crear evaluación</h1>
+                <h1>Crear evaluación 👋</h1>
                 <p>Diseña tus propias evaluaciones</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <button type="button" class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
                 <div class="icon-bell-container">
                     <i class="fa-regular fa-bell"></i>
                 </div>
                 <div class="user-profile">
-                    <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
                     <div class="user-info">
                         <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                         <span class="user-role">Docente</span>
                     </div>
-                    <div class="user-profile">
-                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
-                        <div class="user-info">
-                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                            <span class="user-role">Docente</span>
-                        </div>
-                        
+                </div>
+            </div>
+        </header>
+
+        <!-- ========================================== -->
+        <!-- MENSAJES DE ÉXITO O ERROR                  -->
+        <!-- ========================================== -->
+        <?php if (isset($_SESSION['mensaje'])): ?>
+            <div class="alert alert-<?php echo $_SESSION['tipo_mensaje'] ?? 'success'; ?>">
+                <i class="fa-solid <?php 
+                    $tipo = $_SESSION['tipo_mensaje'] ?? 'success';
+                    if ($tipo === 'success') echo 'fa-check-circle';
+                    elseif ($tipo === 'error') echo 'fa-exclamation-circle';
+                    else echo 'fa-info-circle';
+                ?>"></i>
+                <?php echo $_SESSION['mensaje']; ?>
+            </div>
+            <?php unset($_SESSION['mensaje']); ?>
+            <?php unset($_SESSION['tipo_mensaje']); ?>
+        <?php endif; ?>
+
+        <!-- CONTENEDOR DE DOS COLUMNAS -->
+        <div class="two-column-container">
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+            <div class="left-column">
+                <form id="evalForm" action="guardar_evaluacion.php" method="POST">
+                    <!-- Título -->
+                    <div class="form-group-clean">
+                        <label for="titulo">Título <span class="required-star">*</span></label>
+                        <input type="text" class="clean-input" id="titulo" name="titulo" placeholder="Escribe el título de la evaluación" required>
+                        <div class="error-message" id="error-titulo"></div>
                     </div>
 
                     <!-- Descripción -->
                     <div class="form-group-clean">
                         <label for="descripcion">Descripción <span class="required-star">*</span></label>
-                        <textarea class="clean-input" id="descripcion" name="descripcion" placeholder="Describe el objetivo de la evaluación" rows="3" required></textarea>
+                        <textarea class="clean-textarea" id="descripcion" name="descripcion" placeholder="Describe el objetivo de la evaluación" rows="3" required></textarea>
                         <div class="error-message" id="error-descripcion"></div>
                     </div>
 
@@ -398,7 +643,7 @@ $conexion->close();
                         <div class="error-message" id="error-curso"></div>
                     </div>
 
-                    <!-- Periodo de evaluación (movido aquí) -->
+                    <!-- Periodo de evaluación -->
                     <div class="form-group-clean">
                         <label for="id_periodo">Periodo de evaluación</label>
                         <select class="clean-input" id="id_periodo" name="id_periodo">
@@ -425,7 +670,7 @@ $conexion->close();
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
-                                <textarea class="clean-input" name="preguntas[0][texto]" placeholder="Escribe la pregunta" rows="2" required style="width: 100%; padding: 12px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px;"></textarea>
+                                <textarea class="clean-textarea" name="preguntas[0][texto]" placeholder="Escribe la pregunta" rows="2" required></textarea>
 
                                 <div style="margin-top: 15px;">
                                     <label style="display: block; font-weight: 500; margin-bottom: 8px;">Tipo de respuesta</label>
@@ -473,7 +718,7 @@ $conexion->close();
 
                                 <!-- Campo para respuesta abierta (oculto por defecto) -->
                                 <div class="respuesta-abierta-container" style="display: none;">
-                                    <textarea name="preguntas[0][respuesta_modelo]" placeholder="Escribe aquí la respuesta modelo o indicaciones para el estudiante (opcional)" rows="2" style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 8px; margin-top: 10px;"></textarea>
+                                    <textarea class="clean-textarea" name="preguntas[0][respuesta_modelo]" placeholder="Escribe aquí la respuesta modelo o indicaciones para el estudiante (opcional)" rows="2"></textarea>
                                 </div>
 
                                 <div class="pregunta-meta">
@@ -529,7 +774,7 @@ $conexion->close();
                 </form>
             </div>
 
-            <!-- COLUMNA DERECHA -->
+            <!-- COLUMNA DERECHA: CALENDARIO + BOTONES -->
             <div class="right-column">
                 <!-- Calendario -->
                 <aside class="calendar-container">
@@ -830,6 +1075,7 @@ $conexion->close();
         function limpiarFormulario() {
             if (confirm("¿Estás seguro de que deseas cancelar la creación de la evaluación? Todos los campos se borrarán.")) {
                 form.reset();
+                // Restablecer a una pregunta inicial
                 preguntasContainer.innerHTML = `
                     <div class="pregunta-item" style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -838,7 +1084,7 @@ $conexion->close();
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
-                        <textarea class="clean-input" name="preguntas[0][texto]" placeholder="Escribe la pregunta" rows="2" required style="width: 100%; padding: 12px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px;"></textarea>
+                        <textarea class="clean-textarea" name="preguntas[0][texto]" placeholder="Escribe la pregunta" rows="2" required></textarea>
 
                         <div style="margin-top: 15px;">
                             <label style="display: block; font-weight: 500; margin-bottom: 8px;">Tipo de respuesta</label>
@@ -884,7 +1130,7 @@ $conexion->close();
                         </button>
 
                         <div class="respuesta-abierta-container" style="display: none;">
-                            <textarea name="preguntas[0][respuesta_modelo]" placeholder="Escribe aquí la respuesta modelo o indicaciones para el estudiante (opcional)" rows="2" style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 8px; margin-top: 10px;"></textarea>
+                            <textarea class="clean-textarea" name="preguntas[0][respuesta_modelo]" placeholder="Escribe aquí la respuesta modelo o indicaciones para el estudiante (opcional)" rows="2"></textarea>
                         </div>
 
                         <div class="pregunta-meta">
@@ -957,7 +1203,7 @@ $conexion->close();
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
-                <textarea class="clean-input" name="preguntas[${preguntaCount}][texto]" placeholder="Escribe la pregunta" rows="2" required style="width: 100%; padding: 12px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px;"></textarea>
+                <textarea class="clean-textarea" name="preguntas[${preguntaCount}][texto]" placeholder="Escribe la pregunta" rows="2" required></textarea>
 
                 <div style="margin-top: 15px;">
                     <label style="display: block; font-weight: 500; margin-bottom: 8px;">Tipo de respuesta</label>
@@ -1003,7 +1249,7 @@ $conexion->close();
                 </button>
 
                 <div class="respuesta-abierta-container" style="display: none;">
-                    <textarea name="preguntas[${preguntaCount}][respuesta_modelo]" placeholder="Escribe aquí la respuesta modelo o indicaciones para el estudiante (opcional)" rows="2" style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 8px; margin-top: 10px;"></textarea>
+                    <textarea class="clean-textarea" name="preguntas[${preguntaCount}][respuesta_modelo]" placeholder="Escribe aquí la respuesta modelo o indicaciones para el estudiante (opcional)" rows="2"></textarea>
                 </div>
 
                 <div class="pregunta-meta">

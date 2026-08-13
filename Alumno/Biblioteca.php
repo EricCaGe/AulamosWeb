@@ -38,36 +38,60 @@ $materias = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
 // =============================================
-// RECURSOS DISPONIBLES PARA EL ALUMNO
+// RECURSOS DISPONIBLES PARA EL ALUMNO (CORREGIDO)
 // =============================================
 $sqlRecursos = "
     SELECT DISTINCT
-        r.id_recurso, r.id_actividad, r.id_materia, r.id_curso,
-        r.titulo, r.descripcion, r.tipo, r.url_recurso, r.url_subtitulos,
-        r.accesible, r.subtitulos_disponibles, r.fecha_publicacion,
-        m.nombre AS materia, m.campo_formativo,
+        r.id_recurso,
+        r.titulo,
+        r.descripcion,
+        r.tipo,
+        r.url_recurso,
+        r.url_subtitulos,
+        r.accesible,
+        r.subtitulos_disponibles,
+        r.fecha_publicacion,
+        m.nombre AS materia,
+        m.campo_formativo,
         c.nombre AS curso,
-        a.titulo AS actividad,
         CONCAT_WS(' ', u.nombre, u.apellido_paterno) AS docente
     FROM recursos_educativos r
     LEFT JOIN materias m ON m.id_materia = r.id_materia
-    LEFT JOIN actividades a ON a.id_actividad = r.id_actividad
     LEFT JOIN cursos c ON c.id_curso = r.id_curso
     LEFT JOIN usuarios u ON u.id_usuario = r.id_docente
     WHERE r.estado = 'Activo'
+      AND r.url_recurso IS NOT NULL
+      AND r.url_recurso != ''
       AND (
+            -- Recursos públicos: visibles para todos
             r.compartido_tipo = 'Publico'
-            OR EXISTS (
-                SELECT 1
-                FROM inscripciones i
-                INNER JOIN cursos ci ON ci.id_curso = i.id_curso
-                WHERE i.id_alumno = ?
-                  AND i.estado = 'Activo'
-                  AND ci.estado = 'Activo'
-                  AND (
-                        (r.id_actividad IS NOT NULL AND EXISTS (SELECT 1 FROM actividades ar WHERE ar.id_actividad = r.id_actividad AND ar.id_curso = ci.id_curso))
-                        OR (r.id_actividad IS NULL AND r.id_curso = ci.id_curso)
-                  )
+            
+            -- Recursos de curso: solo si el alumno está inscrito en ese curso
+            OR (
+                r.compartido_tipo = 'Curso'
+                AND r.id_curso IS NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM inscripciones i
+                    WHERE i.id_alumno = ?
+                      AND i.id_curso = r.id_curso
+                      AND i.estado = 'Activo'
+                )
+            )
+            
+            -- Recursos de grupo: solo si el alumno está en el grupo del curso
+            OR (
+                r.compartido_tipo = 'Grupo'
+                AND r.id_curso IS NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM inscripciones i
+                    INNER JOIN cursos c2 ON c2.id_curso = i.id_curso
+                    INNER JOIN grupos g ON g.id_grupo = c2.id_grupo
+                    WHERE i.id_alumno = ?
+                      AND i.id_curso = r.id_curso
+                      AND i.estado = 'Activo'
+                )
             )
       )
 ";
@@ -80,9 +104,9 @@ $sqlRecursos .= " ORDER BY r.fecha_publicacion DESC, r.id_recurso DESC ";
 
 $stmt = $conexion->prepare($sqlRecursos);
 if ($usarFiltroMateria) {
-    $stmt->bind_param("is", $id_usuario, $filtroMateria);
+    $stmt->bind_param("iis", $id_usuario, $id_usuario, $filtroMateria);
 } else {
-    $stmt->bind_param("i", $id_usuario);
+    $stmt->bind_param("ii", $id_usuario, $id_usuario);
 }
 $stmt->execute();
 $recursos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -100,6 +124,8 @@ $tiposMap = [
     'presentación' => ['icono' => 'fa-solid fa-presentation-screen', 'label' => 'Presentación'],
     'documento' => ['icono' => 'fa-solid fa-file-lines', 'label' => 'Documento']
 ];
+
+$conexion->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -114,6 +140,143 @@ $tiposMap = [
     
     <!-- NUEVA ACCESIBILIDAD -->
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
+    
+    <style>
+        .filtros-materia {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .filtros-materia a {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #475569;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .filtros-materia a:hover {
+            background: #e2e8f0;
+        }
+        .filtros-materia a.activo {
+            background: #8b5cf6;
+            color: white;
+        }
+        .grid-recursos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .recurso-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+        }
+        .recurso-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .recurso-card:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .recurso-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f3e8ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .recurso-icono i {
+            font-size: 24px;
+            color: #8b5cf6;
+        }
+        .recurso-titulo {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .recurso-materia {
+            font-size: 13px;
+            color: #8b5cf6;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .recurso-tipo {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+        .recurso-descripcion {
+            font-size: 13px;
+            color: #64748b;
+            margin: 8px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .recurso-detalle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin: 2px 0;
+        }
+        .recurso-detalle i {
+            width: 14px;
+            color: #8b5cf6;
+        }
+        .recurso-abrir {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+        .recurso-abrir i {
+            margin-right: 4px;
+        }
+        .sin-recursos {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+        .sin-recursos i {
+            font-size: 48px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+        .sin-recursos h3 {
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .sin-recursos p {
+            color: #64748b;
+        }
+    </style>
 </head>
 <body>
 
@@ -130,7 +293,6 @@ $tiposMap = [
             <a href="Biblioteca.php" class="menu-item active"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
             <a href="avances.php" class="menu-item"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
             <a href="ayuda.php" class="menu-item"><i class="fa-solid fa-circle-question"></i> Ayuda</a>
-           
         </nav>
         <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         <div class="menu-spacer"></div>
@@ -146,7 +308,9 @@ $tiposMap = [
                 <p>Explora los recursos compartidos en tus cursos.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btnAsistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <button class="btn-assistant" id="btnAsistente" onclick="window.location.href='../Alumno/ChatbotAlumno.php?rol=alumno'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
             </div>
         </header>
@@ -205,7 +369,11 @@ $tiposMap = [
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <p style="text-align:center; padding:35px 20px; color:#64748b;">No hay recursos disponibles para tus cursos.</p>
+            <div class="sin-recursos">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No hay recursos disponibles</h3>
+                <p>No se encontraron recursos para tus cursos o con el filtro seleccionado.</p>
+            </div>
         <?php endif; ?>
 
         <!-- ========================================== -->
@@ -232,6 +400,34 @@ $tiposMap = [
 <!-- NUEVA ACCESIBILIDAD -->
 <script src="../Accesibilidad/lector.js"></script>
 <script src="../Accesibilidad/accesibilidad.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    function construirUrl(ruta) {
+        if (!ruta) return null;
+        let limpia = String(ruta).trim().replace(/\\/g, '/');
+        if (/^https?:\/\//i.test(limpia)) return limpia;
+        if (limpia.startsWith('/')) {
+            return window.location.origin + limpia;
+        }
+        return window.location.origin + '/' + limpia.replace(/^\.\.\//, '');
+    }
+
+    document.querySelectorAll('.js-abrir-recurso').forEach(function (boton) {
+        boton.addEventListener('click', function () {
+            const url = construirUrl(this.dataset.url);
+            if (!url) {
+                alert('No se puede abrir el recurso: URL no disponible.');
+                return;
+            }
+            window.open(url, '_blank', 'noopener,noreferrer');
+        });
+    });
+
+})();
+</script>
 
 </body>
 </html>

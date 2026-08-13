@@ -61,7 +61,7 @@ $conexion->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Actividad - Aulamos</title>
+    <title>Crear Actividad</title>
 
     <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">
@@ -91,9 +91,9 @@ $conexion->close();
             <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
             <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
             <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
 
             <div class="menu-spacer"></div>
+            <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
             <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -108,25 +108,20 @@ $conexion->close();
                 <p>Diseña las nuevas actividades</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <button type="button" class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
                 <div class="icon-bell-container">
                     <i class="fa-regular fa-bell"></i>
                 </div>
                 <div class="user-profile">
-                    <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
                     <div class="user-info">
                         <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                         <span class="user-role">Docente</span>
                     </div>
-                    <div class="user-profile">
-                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
-                        <div class="user-info">
-                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                            <span class="user-role">Docente</span>
-                        </div>
-                        
-                    </div>
                 </div>
+            </div>
             </header>
 
             <!-- MENSAJES DE ÉXITO O ERROR -->
@@ -174,7 +169,6 @@ $conexion->close();
                                     <option value="Ejercicio">Ejercicio</option>
                                     <option value="Lectura">Lectura</option>
                                     <option value="Proyecto">Proyecto</option>
-                                    <option value="Evaluacion">Evaluación</option>
                                 </select>
                             </div>
 
@@ -282,141 +276,6 @@ $conexion->close();
             <?php unset($_SESSION['mensaje']); ?>
             <?php unset($_SESSION['tipo_mensaje']); ?>
         <?php endif; ?>
-
-        <!-- FORMULARIO DE ACTIVIDAD -->
-        <div class="main-grid activity-layout">
-            <!-- COLUMNA IZQUIERDA -->
-            <div class="left-column">
-                <form class="activity-form" action="procesar_actividad.php" method="POST">
-                    <div class="form-group-clean">
-                        <label for="titulo">Título <span class="required-field">*</span></label>
-                        <input type="text" id="titulo" name="titulo" class="clean-input" placeholder="Ej: Tarea de matemáticas" required>
-                    </div>
-
-                    <div class="form-group-clean">
-                        <label for="descripcion">Descripción <span class="required-field">*</span></label>
-                        <textarea id="descripcion" name="descripcion" class="clean-textarea" rows="3" placeholder="Describe brevemente la actividad" required></textarea>
-                    </div>
-
-                    <div class="form-group-clean">
-                        <label for="instrucciones">Instrucciones para los estudiantes <span class="required-field">*</span></label>
-                        <div class="rich-text-editor">
-                            <div class="editor-toolbar">
-                                <button type="button" onclick="formatText('bold')" title="Negrita"><i class="fa-solid fa-bold"></i></button>
-                                <button type="button" onclick="formatText('italic')" title="Cursiva"><i class="fa-solid fa-italic"></i></button>
-                                <button type="button" onclick="formatText('underline')" title="Subrayado"><i class="fa-solid fa-underline"></i></button>
-                            </div>
-                            <textarea id="instrucciones" name="instrucciones" class="clean-textarea no-top-border" rows="4" placeholder="Escribe las instrucciones aquí" required></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group-clean">
-                            <label for="tipo">Tipo de actividad <span class="required-field">*</span></label>
-                            <select id="tipo" name="tipo" class="clean-input" required>
-                                <option value="">Selecciona un tipo</option>
-                                <option value="Tarea">Tarea</option>
-                                <option value="Ejercicio">Ejercicio</option>
-                                <option value="Lectura">Lectura</option>
-                                <option value="Proyecto">Proyecto</option>
-                                <option value="Evaluacion">Evaluación</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group-clean">
-                            <label for="puntaje_maximo">Puntaje máximo <span class="required-field">*</span></label>
-                            <input type="number" id="puntaje_maximo" name="puntaje_maximo" class="clean-input" value="100.00" min="0" max="1000" step="0.01" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group-clean">
-                            <label for="id_curso">Curso <span class="required-field">*</span></label>
-                            <select id="id_curso" name="id_curso" class="clean-input" required>
-                                <option value="">Selecciona un curso</option>
-                                <?php foreach ($cursos as $curso): ?>
-                                    <option value="<?php echo $curso['id_curso']; ?>">
-                                        <?php echo htmlspecialchars($curso['nombre']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="form-group-clean">
-                            <label for="id_periodo">Periodo de evaluación</label>
-                            <select id="id_periodo" name="id_periodo" class="clean-input">
-                                <option value="">Ninguno</option>
-                                <?php foreach ($periodos as $periodo): ?>
-                                    <option value="<?php echo $periodo['id_periodo']; ?>">
-                                        <?php echo htmlspecialchars($periodo['nombre']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-toggle-row">
-                        <label for="permite_entrega_archivo">Permitir la entrega de archivos</label>
-                        <label class="switch">
-                            <input type="checkbox" id="permite_entrega_archivo" name="permite_entrega_archivo" checked value="1">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-
-                    <div class="form-group-clean mt-20">
-                        <label for="fecha_limite">Fecha límite <span class="required-field">*</span></label>
-                        <input type="datetime-local" id="fecha_limite" name="fecha_limite" class="clean-input" required>
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="button-group">
-                        <button type="button" class="btn-outline-gray" onclick="limpiarFormulario()">
-                            <i class="fa-solid fa-times"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn-outline-blue">
-                            <i class="fa-solid fa-plus"></i> Crear Actividad
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- COLUMNA DERECHA -->
-            <div class="right-column">
-                <!-- Calendario -->
-                <aside class="calendar-container">
-                    <!-- Cabecera y Navegación -->
-                    <div class="calendar-header">
-                        <div class="nav-left">
-                            <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
-                            <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
-                        </div>
-
-                        <h2 id="month-year-title">MES AÑO</h2>
-
-                        <div class="nav-right">
-                            <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
-                            <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
-                        </div>
-                    </div>
-
-                    <!-- Días de la semana -->
-                    <div class="calendar-weekdays">
-                        <div class="weekday">Do</div>
-                        <div class="weekday">Lu</div>
-                        <div class="weekday">Ma</div>
-                        <div class="weekday">Mi</div>
-                        <div class="weekday">Ju</div>
-                        <div class="weekday">Vi</div>
-                        <div class="weekday">Sá</div>
-                    </div>
-
-                    <!-- Contenedor dinámico de los días -->
-                    <div id="calendar-days" class="calendar-days-grid">
-                        <!-- JavaScript inyectará los días aquí -->
-                    </div>
-                </aside>
-            </div>
-        </div>
 
         <!-- ========================================== -->
         <!-- NUEVA BARRA DE ACCESIBILIDAD               -->

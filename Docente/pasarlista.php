@@ -62,12 +62,33 @@ if ($id_curso_seleccionado) {
 $asistencia_guardada = isset($_SESSION['asistencia']) ? $_SESSION['asistencia'] : [];
 $asistencia_curso_actual = $asistencia_guardada[$id_curso_seleccionado] ?? [];
 
+// Variables para el modal de confirmación
+$mostrar_modal = false;
+$resumen_asistencia = ['presentes' => 0, 'faltas' => 0, 'retardos' => 0];
+$nombre_curso_modal = '';
+
 // Guardar asistencia (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_asistencia'])) {
     $id_curso = (int)$_POST['id_curso'];
     $asistencias = $_POST['asistencia'] ?? [];
     $_SESSION['asistencia'][$id_curso] = $asistencias;
-    $mensaje_exito = "Lista de asistencia guardada correctamente.";
+    
+    // Calcular resumen
+    foreach ($asistencias as $estado) {
+        if ($estado === 'Presente') $resumen_asistencia['presentes']++;
+        elseif ($estado === 'Falta') $resumen_asistencia['faltas']++;
+        elseif ($estado === 'Retardo') $resumen_asistencia['retardos']++;
+    }
+    
+    // Obtener nombre del curso para el modal
+    foreach ($cursos as $curso) {
+        if ($curso['id_curso'] == $id_curso) {
+            $nombre_curso_modal = $curso['nombre_curso'] . ' - ' . $curso['materia'] . ' - ' . $curso['grupo'];
+            break;
+        }
+    }
+    
+    $mostrar_modal = true;
 }
 
 // Configurar zona horaria
@@ -305,6 +326,90 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
         .course-option.selected {
             background: #eff6ff;
         }
+
+        /* Estilos para el modal de confirmación */
+        .modal-confirmacion {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-confirmacion.active {
+            display: flex;
+        }
+        .modal-confirmacion .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-confirmacion .modal-icon {
+            font-size: 48px;
+            color: #22c55e;
+            margin-bottom: 15px;
+        }
+        .modal-confirmacion .modal-titulo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .modal-confirmacion .modal-subtitulo {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .modal-confirmacion .modal-resumen {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .modal-confirmacion .resumen-item {
+            text-align: center;
+        }
+        .modal-confirmacion .resumen-numero {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        .modal-confirmacion .resumen-etiqueta {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .modal-confirmacion .resumen-item.presente .resumen-numero {
+            color: #22c55e;
+        }
+        .modal-confirmacion .resumen-item.falta .resumen-numero {
+            color: #dc2626;
+        }
+        .modal-confirmacion .resumen-item.retardo .resumen-numero {
+            color: #d97706;
+        }
+        .modal-confirmacion .btn-aceptar {
+            background: #3b71f3;
+            color: white;
+            border: none;
+            padding: 10px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .modal-confirmacion .btn-aceptar:hover {
+            background: #2563eb;
+        }
     </style>
 </head>
 <body>
@@ -323,10 +428,10 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="pasarlista.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 <div class="menu-spacer"></div>
-                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-            </nav>
+            <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
+            <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
@@ -339,19 +444,20 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                     <p>Registra la asistencia de tus estudiantes</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
-                    <div class="icon-bell-container">
-                        <i class="fa-regular fa-bell"></i>
-                    </div>
-                    <div class="user-profile">
-                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
-                        <div class="user-info">
-                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                            <span class="user-role">Docente</span>
-                        </div>
-                        
+                <button type="button" class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
+                <div class="icon-bell-container">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+                <div class="user-profile">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                        <span class="user-role">Docente</span>
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- CONTENIDO PRINCIPAL -->
@@ -410,7 +516,7 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                                 No hay estudiantes en este curso.
                             </p>
                         <?php else: ?>
-                            <form method="post" action="pasarlista.php">
+                            <form method="post" action="pasarlista.php" id="form-asistencia">
                                 <input type="hidden" name="id_curso" value="<?= $id_curso_seleccionado ?>">
 
                                 <?php foreach ($estudiantes as $estudiante): ?>
@@ -473,7 +579,7 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                                     </div>
                                 </div>
 
-                                <button type="submit" name="guardar_asistencia" class="save-btn">
+                                <button type="submit" name="guardar_asistencia" class="save-btn" id="btn-guardar">
                                     <i class="fas fa-save"></i>
                                     <span>Guardar lista</span>
                                 </button>
@@ -551,6 +657,36 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
         </div>
     </div>
 
+    <!-- Modal de confirmación de guardado -->
+    <?php if ($mostrar_modal): ?>
+    <div class="modal-confirmacion active" id="modal-confirmacion">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="modal-titulo">¡Lista guardada!</h3>
+            <p class="modal-subtitulo">
+                La lista de <strong><?= htmlspecialchars($nombre_curso_modal) ?></strong> se guardó en este dispositivo.
+            </p>
+            <div class="modal-resumen">
+                <div class="resumen-item presente">
+                    <div class="resumen-numero"><?= $resumen_asistencia['presentes'] ?></div>
+                    <div class="resumen-etiqueta">Presentes</div>
+                </div>
+                <div class="resumen-item falta">
+                    <div class="resumen-numero"><?= $resumen_asistencia['faltas'] ?></div>
+                    <div class="resumen-etiqueta">Faltas</div>
+                </div>
+                <div class="resumen-item retardo">
+                    <div class="resumen-numero"><?= $resumen_asistencia['retardos'] ?></div>
+                    <div class="resumen-etiqueta">Retardos</div>
+                </div>
+            </div>
+            <button class="btn-aceptar" onclick="cerrarModalConfirmacion()">Aceptar</button>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- ========================================== -->
     <!-- SCRIPTS                                    -->
     <!-- ========================================== -->
@@ -572,6 +708,11 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
 
         function selectCourse(idCurso) {
             window.location.href = `pasarlista.php?id_curso=${idCurso}`;
+        }
+
+        // Función para cerrar el modal de confirmación
+        function cerrarModalConfirmacion() {
+            document.getElementById('modal-confirmacion').classList.remove('active');
         }
 
         // Marcar todos como presentes
