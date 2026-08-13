@@ -67,11 +67,40 @@ if ($archivo['size'] > 50 * 1024 * 1024) {
 // =====================================================
 // VALIDAR DATOS DEL FORMULARIO
 // =====================================================
-$tipo_recurso = $_POST['tipo_curso'] ?? 'Documento';
+// AULAMOS: detectar tipo real por extension
+switch ($extension) {
+    case 'mp4':
+        $tipo_recurso = 'Video';
+        break;
+    case 'pdf':
+        $tipo_recurso = 'PDF';
+        break;
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'gif':
+    case 'webp':
+        $tipo_recurso = 'Imagen';
+        break;
+    case 'ppt':
+    case 'pptx':
+        $tipo_recurso = 'Presentación';
+        break;
+    default:
+        $tipo_recurso = 'Documento';
+        break;
+}
+
 $titulo = trim($_POST['titulo'] ?? $nombre_original);
 $descripcion = trim($_POST['descripcion'] ?? '');
 
-$tipos_recurso_permitidos = ['Video', 'PDF', 'Documento'];
+$tipos_recurso_permitidos = [
+    'Video',
+    'PDF',
+    'Documento',
+    'Imagen',
+    'Presentación'
+];
 if (!in_array($tipo_recurso, $tipos_recurso_permitidos, true)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Tipo de recurso no válido']);

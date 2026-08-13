@@ -404,14 +404,58 @@ function iconoTipo($tipo)
 (function () {
     'use strict';
 
+    // Detecta automaticamente /AulamosWeb, /aulamos, etc.
+    const AULAMOS_BASE =
+        window.location.pathname.includes('/Docente/')
+            ? window.location.pathname.split('/Docente/')[0]
+            : '';
+
     function construirUrl(ruta) {
         if (!ruta) return null;
+
         let limpia = String(ruta).trim().replace(/\\/g, '/');
-        if (/^https?:\/\//i.test(limpia)) return limpia;
-        if (limpia.startsWith('/')) {
+        const marcador = '/uploads/recursos/';
+
+        // Corrige URLs antiguas que pudieran apuntar a :3000.
+        if (/^https?:\/\//i.test(limpia)) {
+            try {
+                const absoluta = new URL(limpia);
+                const posicion = absoluta.pathname.indexOf(marcador);
+
+                if (posicion >= 0) {
+                    limpia = absoluta.pathname.substring(posicion);
+                } else {
+                    return limpia;
+                }
+            } catch (error) {
+                return limpia;
+            }
+        }
+
+        // No duplicar /AulamosWeb si ya existe.
+        if (
+            AULAMOS_BASE &&
+            limpia.startsWith(AULAMOS_BASE + '/')
+        ) {
             return window.location.origin + limpia;
         }
-        return window.location.origin + '/' + limpia.replace(/^\.\.\//, '');
+
+        const posicionRecurso = limpia.indexOf(marcador);
+
+        if (posicionRecurso >= 0) {
+            limpia = limpia.substring(posicionRecurso);
+        }
+
+        limpia = limpia
+            .replace(/^(\.\.\/)+/, '')
+            .replace(/^\/+/, '');
+
+        return (
+            window.location.origin +
+            AULAMOS_BASE +
+            '/' +
+            limpia
+        );
     }
 
     document.querySelectorAll('.js-abrir-recurso').forEach(function (boton) {
