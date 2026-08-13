@@ -236,3 +236,22 @@
         padding: 6px 10px;
     }
 }
+.student-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.student-card:hover {
+    background: #f8fafc;
+    border-color: #3b71f3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 113, 243, 0.1);
+}
+
+.student-card a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
