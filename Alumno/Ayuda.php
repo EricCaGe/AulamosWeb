@@ -83,9 +83,9 @@ if ($resultAyuda) {
                 <p>Encuentra respuestas y recursos para ti</p>
             </div>
             <div class="header-actions">
-                <a href="Chatbot.php" class="btn-assistant" id="btnAsistente" aria-label="Abrir el asistente virtual AulaBot">
-                    Asistente Virtual <span class="robot-icon" aria-hidden="true">🤖</span>
-                </a>
+                <button class="btn-assistant" id="btn-asistente" onclick="window.open('Chatbot.php', '_blank')">
+    Asistente Virtual <span class="robot-icon">🤖</span>
+</button>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
                 <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar" class="avatar">
             </div>

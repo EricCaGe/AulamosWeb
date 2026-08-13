@@ -129,9 +129,10 @@ $conexion->close();
                 <p>Aquí están tus tareas, evaluaciones y actividades asignadas</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btnAsistente" onclick="window.location.href='../Alumno/ChatbotAlumno.php?rol=alumno'">
-                    Asistente Virtual <span class="robot-icon">🤖</span>
-                </button>
+               <button class="btn-assistant" id="btn-asistente"
+        onclick="window.open('Chatbot.php?rol=alumno', '_blank')">
+    Asistente Virtual <span class="robot-icon">🤖</span>
+</button>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
                 <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar" class="avatar">
             </div>
