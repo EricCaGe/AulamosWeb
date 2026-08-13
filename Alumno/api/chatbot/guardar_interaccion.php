@@ -7,8 +7,7 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
-$rol = obtenerRolUsuarioSesion();
-$moduloOrigen = obtenerModuloOrigenPorRol($rol);
+obtenerRolUsuarioSesion();
 
 $datos = obtenerEntradaJson();
 
@@ -97,8 +96,10 @@ $tiempoRespuesta = max(
 
 /*
 |--------------------------------------------------------------------------
-| Verificar que la sesión pertenece al usuario
+| Verificar conversación
 |--------------------------------------------------------------------------
+| La conversación pertenece al usuario, no al dispositivo.
+| Puede haber sido iniciada desde Web o desde Móvil.
 */
 
 $verificacion = $bdChatbot->prepare(
@@ -107,17 +108,15 @@ $verificacion = $bdChatbot->prepare(
         FROM sesiones_chatbot
         WHERE id_sesion = ?
           AND id_usuario = ?
-          AND modulo_origen = ?
           AND fecha_fin IS NULL
         LIMIT 1
     '
 );
 
 $verificacion->bind_param(
-    'iis',
+    'ii',
     $idSesion,
-    $idUsuario,
-    $moduloOrigen
+    $idUsuario
 );
 
 $verificacion->execute();
@@ -129,7 +128,7 @@ if ($verificacion->num_rows === 0) {
     responderJson(
         [
             'success' => false,
-            'message' => 'La sesión de AulaBot no existe o ya fue cerrada.',
+            'message' => 'La sesión de AulaBot no existe, fue cerrada o no pertenece al usuario.',
         ],
         403
     );
@@ -139,7 +138,7 @@ $verificacion->close();
 
 /*
 |--------------------------------------------------------------------------
-| Guardar la pregunta y la respuesta
+| Guardar pregunta y respuesta
 |--------------------------------------------------------------------------
 */
 
@@ -181,14 +180,15 @@ $insercion->bind_param(
 
 $insercion->execute();
 
-$idMensaje = $insercion->insert_id;
+$idMensaje = (int) $insercion->insert_id;
 
 $insercion->close();
 
 responderJson(
     [
         'success' => true,
-        'idMensaje' => (int) $idMensaje,
+        'idMensaje' => $idMensaje,
+        'idSesion' => (int) $idSesion,
         'message' => 'Interacción guardada correctamente.',
     ],
     201

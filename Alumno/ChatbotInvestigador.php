@@ -9,7 +9,7 @@ if (
     !isset($_SESSION['usuario']['id_usuario']) ||
     (
         $_SESSION['usuario']['rol'] ?? ''
-    ) !== 'Admin'
+    ) !== 'Investigador'
 ) {
     header('Location: ../InicioSesion/login.php');
     exit;
@@ -22,7 +22,7 @@ $id_usuario =
 
 $nombre =
     $_SESSION['usuario']['nombre']
-    ?? 'Administrador';
+    ?? 'Investigador';
 
 $apellido_paterno =
     $_SESSION['usuario']['apellido_paterno']
@@ -82,13 +82,13 @@ $configuracionChatbot =
                 'api/chatbot/responder.php',
 
             'rol' =>
-                'admin',
+                'investigador',
 
             'moduloOrigen' =>
-                'Web Admin',
+                'Web Investigador',
 
             'urlRegreso' =>
-                '../Administrador/admin_dashboard.php',
+                '../Investigador/dashboard.php',
 
             'nombre' =>
                 $nombre,
@@ -118,7 +118,7 @@ $configuracionChatbot =
     >
 
     <title>
-        AulaBot Administrador - AulaMos
+        AulaBot Investigador - AulaMos
     </title>
 
     <link
@@ -142,6 +142,7 @@ $configuracionChatbot =
 
 <div class="dashboard-container">
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
 
         <div class="logo-section">
@@ -156,11 +157,11 @@ $configuracionChatbot =
 
         <nav
             class="menu"
-            aria-label="Menú principal del administrador"
+            aria-label="Menú principal del investigador"
         >
 
             <a
-                href="../Administrador/admin_dashboard.php"
+                href="../Investigador/dashboard.php"
                 class="menu-item"
             >
                 <i
@@ -172,19 +173,19 @@ $configuracionChatbot =
             </a>
 
             <a
-                href="../Administrador/ciclos_escolares.php"
+                href="../Investigador/metricas_uso.php"
                 class="menu-item"
             >
                 <i
-                    class="fa-solid fa-calendar"
+                    class="fa-solid fa-chart-bar"
                     aria-hidden="true"
                 ></i>
 
-                Ciclos escolares
+                Uso de la plataforma
             </a>
 
             <a
-                href="../Administrador/periodos.php"
+                href="../Investigador/tiempos_actividades.php"
                 class="menu-item"
             >
                 <i
@@ -192,59 +193,35 @@ $configuracionChatbot =
                     aria-hidden="true"
                 ></i>
 
-                Periodos
+                Tiempos de actividades
             </a>
 
             <a
-                href="../Administrador/materias.php"
+                href="../Investigador/errores_navegacion.php"
                 class="menu-item"
             >
                 <i
-                    class="fa-solid fa-book"
+                    class="fa-solid fa-triangle-exclamation"
                     aria-hidden="true"
                 ></i>
 
-                Materias
+                Errores de navegación
             </a>
 
             <a
-                href="../Administrador/grupos.php"
+                href="../Investigador/metricas_chatbot.php"
                 class="menu-item"
             >
                 <i
-                    class="fa-solid fa-layer-group"
+                    class="fa-solid fa-chart-column"
                     aria-hidden="true"
                 ></i>
 
-                Grupos
+                Uso del chatbot
             </a>
 
             <a
-                href="../Administrador/cursos.php"
-                class="menu-item"
-            >
-                <i
-                    class="fa-solid fa-cubes"
-                    aria-hidden="true"
-                ></i>
-
-                Cursos
-            </a>
-
-            <a
-                href="../Administrador/inscripciones.php"
-                class="menu-item"
-            >
-                <i
-                    class="fa-solid fa-pen-to-square"
-                    aria-hidden="true"
-                ></i>
-
-                Inscripciones
-            </a>
-
-            <a
-                href="ChatbotAdmin.php"
+                href="ChatbotInvestigador.php"
                 class="menu-item active"
                 aria-current="page"
             >
@@ -257,15 +234,51 @@ $configuracionChatbot =
             </a>
 
             <a
-                href="../Administrador/configuracion.php"
+                href="../Investigador/progreso_academico.php"
                 class="menu-item"
             >
                 <i
-                    class="fa-solid fa-gear"
+                    class="fa-solid fa-chart-line"
                     aria-hidden="true"
                 ></i>
 
-                Configuración
+                Progreso académico
+            </a>
+
+            <a
+                href="../Investigador/metricas_accesibilidad.php"
+                class="menu-item"
+            >
+                <i
+                    class="fa-solid fa-universal-access"
+                    aria-hidden="true"
+                ></i>
+
+                Accesibilidad
+            </a>
+
+            <a
+                href="../Investigador/reportes.php"
+                class="menu-item"
+            >
+                <i
+                    class="fa-solid fa-file-alt"
+                    aria-hidden="true"
+                ></i>
+
+                Reportes
+            </a>
+
+            <a
+                href="../Investigador/mas.php"
+                class="menu-item"
+            >
+                <i
+                    class="fa-solid fa-ellipsis-h"
+                    aria-hidden="true"
+                ></i>
+
+                Más
             </a>
 
         </nav>
@@ -273,6 +286,7 @@ $configuracionChatbot =
     </aside>
 
 
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
 
         <header
@@ -282,17 +296,19 @@ $configuracionChatbot =
             <div class="welcome-text">
 
                 <h1>
+
                     <i
                         class="fa-solid fa-robot"
                         aria-hidden="true"
                     ></i>
 
                     AulaBot
+
                 </h1>
 
                 <p>
-                    Asistente para consultar información
-                    administrativa de AulaMos.
+                    Asistente para consultar métricas e información
+                    de investigación de AulaMos.
                 </p>
 
             </div>
@@ -300,9 +316,9 @@ $configuracionChatbot =
             <div class="header-actions">
 
                 <a
-                    href="../Administrador/admin_dashboard.php"
+                    href="../Investigador/dashboard.php"
                     class="header-icon-button"
-                    aria-label="Regresar al panel administrativo"
+                    aria-label="Regresar al panel del investigador"
                     title="Regresar al panel"
                 >
                     <i
@@ -331,16 +347,18 @@ $configuracionChatbot =
                         ENT_QUOTES,
                         'UTF-8'
                     ) ?>"
-                    aria-label="Administrador <?= htmlspecialchars(
+                    aria-label="Investigador <?= htmlspecialchars(
                         $nombre_completo,
                         ENT_QUOTES,
                         'UTF-8'
                     ) ?>"
                 >
+
                     <i
-                        class="fa-solid fa-user-shield"
+                        class="fa-solid fa-magnifying-glass-chart"
                         aria-hidden="true"
                     ></i>
+
                 </div>
 
             </div>
@@ -348,6 +366,7 @@ $configuracionChatbot =
         </header>
 
 
+        <!-- CHATBOT -->
         <section
             class="chatbot-container"
             aria-labelledby="tituloConversacion"
@@ -355,6 +374,7 @@ $configuracionChatbot =
 
             <div class="chatbot-card">
 
+                <!-- ENCABEZADO -->
                 <div class="chatbot-header">
 
                     <div
@@ -371,12 +391,14 @@ $configuracionChatbot =
                         </h2>
 
                         <p>
+
                             <span
                                 class="status-indicator"
                                 aria-hidden="true"
                             ></span>
 
-                            Datos administrativos de AulaMos
+                            Métricas de investigación de AulaMos
+
                         </p>
 
                     </div>
@@ -388,15 +410,18 @@ $configuracionChatbot =
                         aria-label="Leer última respuesta"
                         title="Leer última respuesta"
                     >
+
                         <i
                             class="fa-solid fa-volume-high"
                             aria-hidden="true"
                         ></i>
+
                     </button>
 
                 </div>
 
 
+                <!-- PREGUNTAS RÁPIDAS -->
                 <div
                     class="quick-questions"
                     aria-label="Preguntas sugeridas"
@@ -409,25 +434,25 @@ $configuracionChatbot =
                         <button
                             type="button"
                             class="quick-question"
-                            data-question="¿Cuántos estudiantes tienen una inscripción activa?"
+                            data-question="¿Cuántos alumnos activos hay actualmente?"
                         >
-                            Estudiantes inscritos
+                            Alumnos activos
                         </button>
 
                         <button
                             type="button"
                             class="quick-question"
-                            data-question="¿Cuántos cursos activos tenemos?"
+                            data-question="¿Cuántos mensajes se han registrado en AulaBot?"
                         >
-                            Cursos activos
+                            Uso de AulaBot
                         </button>
 
                         <button
                             type="button"
                             class="quick-question"
-                            data-question="¿Cuáles son los usuarios registrados recientemente?"
+                            data-question="¿Cuántos errores están registrados en la plataforma?"
                         >
-                            Usuarios recientes
+                            Errores registrados
                         </button>
 
                     </div>
@@ -435,6 +460,7 @@ $configuracionChatbot =
                 </div>
 
 
+                <!-- MENSAJES -->
                 <div
                     class="chat-messages"
                     id="chatMessages"
@@ -471,9 +497,10 @@ $configuracionChatbot =
                                 </strong>.
 
                                 Soy AulaBot.
+
                                 Puedo ayudarte a consultar
-                                información administrativa
-                                registrada en AulaMos.
+                                métricas agregadas de investigación
+                                registradas en AulaMos.
 
                             </p>
 
@@ -486,6 +513,7 @@ $configuracionChatbot =
                 </div>
 
 
+                <!-- ESTADO -->
                 <div
                     class="chat-status"
                     id="chatStatus"
@@ -494,6 +522,7 @@ $configuracionChatbot =
                 ></div>
 
 
+                <!-- FORMULARIO -->
                 <form
                     class="chat-form"
                     id="chatForm"
@@ -513,7 +542,7 @@ $configuracionChatbot =
                             name="mensaje"
                             rows="1"
                             maxlength="1000"
-                            placeholder="Pregunta sobre AulaMos..."
+                            placeholder="Pregunta sobre las métricas de AulaMos..."
                             aria-describedby="mensajeAyuda contadorMensaje"
                             required
                         ></textarea>
@@ -524,12 +553,14 @@ $configuracionChatbot =
                             id="btnEnviarMensaje"
                             aria-label="Enviar mensaje"
                         >
+
                             <i
                                 class="fa-solid fa-paper-plane"
                                 aria-hidden="true"
                             ></i>
 
                             <span>Enviar</span>
+
                         </button>
 
                     </div>
@@ -542,7 +573,11 @@ $configuracionChatbot =
                         </small>
 
                         <small id="contadorMensaje">
-                            <span id="cantidadCaracteres">0</span>/1000
+
+                            <span id="cantidadCaracteres">
+                                0
+                            </span>/1000
+
                         </small>
 
                     </div>
@@ -552,6 +587,7 @@ $configuracionChatbot =
             </div>
 
 
+            <!-- INFORMACIÓN -->
             <aside class="chatbot-information-card">
 
                 <i
@@ -562,14 +598,14 @@ $configuracionChatbot =
                 <div>
 
                     <h2>
-                        Consulta administrativa segura
+                        Consulta de investigación segura
                     </h2>
 
                     <p>
-                        AulaBot utiliza información disponible
-                        para la sesión autenticada y no debe
-                        mostrar contraseñas, claves API ni
-                        credenciales.
+                        AulaBot utiliza métricas agregadas
+                        registradas en AulaMos y evita mostrar
+                        información personal, contraseñas,
+                        claves API o credenciales.
                     </p>
 
                 </div>
@@ -579,6 +615,7 @@ $configuracionChatbot =
         </section>
 
 
+        <!-- ACCESIBILIDAD -->
         <footer class="accessibility-bar">
 
             <div class="acc-info">
@@ -611,12 +648,16 @@ $configuracionChatbot =
                     class="acc-opt-btn"
                     id="btn-contrast"
                 >
+
                     <i
                         class="fa-solid fa-eye"
                         aria-hidden="true"
                     ></i>
 
-                    <span>Alto contraste</span>
+                    <span>
+                        Alto contraste
+                    </span>
+
                 </button>
 
                 <button
@@ -624,12 +665,16 @@ $configuracionChatbot =
                     class="acc-opt-btn"
                     id="btn-darkmode"
                 >
+
                     <i
                         class="fa-solid fa-moon"
                         aria-hidden="true"
                     ></i>
 
-                    <span>Modo oscuro</span>
+                    <span>
+                        Modo oscuro
+                    </span>
+
                 </button>
 
                 <button
@@ -637,12 +682,16 @@ $configuracionChatbot =
                     class="acc-opt-btn"
                     id="btn-text-size"
                 >
+
                     <i
                         class="fa-solid fa-font"
                         aria-hidden="true"
                     ></i>
 
-                    <span>Texto grande</span>
+                    <span>
+                        Texto grande
+                    </span>
+
                 </button>
 
                 <button
@@ -650,12 +699,16 @@ $configuracionChatbot =
                     class="acc-opt-btn"
                     id="btn-leer"
                 >
+
                     <i
                         class="fa-solid fa-volume-high"
                         aria-hidden="true"
                     ></i>
 
-                    <span>Leer pantalla</span>
+                    <span>
+                        Leer pantalla
+                    </span>
+
                 </button>
 
             </div>

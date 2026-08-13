@@ -7,8 +7,8 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('GET');
 
 $idUsuario = obtenerIdUsuarioSesion();
-$rol = obtenerRolUsuarioSesion();
-$moduloOrigen = obtenerModuloOrigenPorRol($rol);
+
+obtenerRolUsuarioSesion();
 
 $idSesion = filter_input(
     INPUT_GET,
@@ -20,46 +20,48 @@ if (!$idSesion || $idSesion <= 0) {
     responderJson(
         [
             'success' => false,
-            'message' => 'El ID de la sesión no es válido.',
+            'message' => 'La conversación no es válida.',
         ],
         422
     );
 }
 
-/*
-|--------------------------------------------------------------------------
-| Verificar que la sesión pertenece al usuario
-|--------------------------------------------------------------------------
-*/
-
 $verificacion = $bdChatbot->prepare(
     '
-        SELECT id_sesion
+        SELECT
+            modulo_origen,
+            fecha_fin
+
         FROM sesiones_chatbot
+
         WHERE id_sesion = ?
           AND id_usuario = ?
-          AND modulo_origen = ?
+
         LIMIT 1
     '
 );
 
 $verificacion->bind_param(
-    'iis',
+    'ii',
     $idSesion,
-    $idUsuario,
-    $moduloOrigen
+    $idUsuario
 );
 
 $verificacion->execute();
-$verificacion->store_result();
 
-if ($verificacion->num_rows === 0) {
+$verificacion->bind_result(
+    $moduloOrigen,
+    $fechaFin
+);
+
+if (!$verificacion->fetch()) {
     $verificacion->close();
 
     responderJson(
         [
             'success' => false,
-            'message' => 'No tienes acceso a esta conversación.',
+            'message' =>
+                'No tienes acceso a esta conversación.',
         ],
         403
     );
@@ -67,24 +69,29 @@ if ($verificacion->num_rows === 0) {
 
 $verificacion->close();
 
-/*
-|--------------------------------------------------------------------------
-| Obtener las interacciones
-|--------------------------------------------------------------------------
-*/
-
 $consulta = $bdChatbot->prepare(
     '
         SELECT
             id_mensaje,
             pregunta,
             respuesta,
+            tipo_consulta,
             modelo_ia,
+            origen_conocimiento,
+            tipo_respuesta,
+            nivel_respuesta,
+            utilidad_usuario,
             tiempo_respuesta_ms,
             fecha_mensaje
+
         FROM mensajes_chatbot
+
         WHERE id_sesion = ?
-        ORDER BY fecha_mensaje ASC, id_mensaje ASC
+
+        ORDER BY
+            fecha_mensaje ASC,
+            id_mensaje ASC
+
         LIMIT 100
     '
 );
@@ -96,20 +103,50 @@ $consulta->bind_param(
 
 $consulta->execute();
 
-$resultado = $consulta->get_result();
+$resultado =
+    $consulta->get_result();
+
 $interacciones = [];
 
-while ($fila = $resultado->fetch_assoc()) {
+while (
+    $fila =
+        $resultado->fetch_assoc()
+) {
     $interacciones[] = [
-        'idMensaje' => (int) $fila['id_mensaje'],
-        'pregunta' => $fila['pregunta'],
-        'respuesta' => $fila['respuesta'],
-        'modeloIa' => $fila['modelo_ia'],
+        'idMensaje' =>
+            (int) $fila['id_mensaje'],
+
+        'pregunta' =>
+            (string) $fila['pregunta'],
+
+        'respuesta' =>
+            (string) $fila['respuesta'],
+
+        'tipoConsulta' =>
+            $fila['tipo_consulta'],
+
+        'modeloIa' =>
+            $fila['modelo_ia'],
+
+        'origenConocimiento' =>
+            $fila['origen_conocimiento'],
+
+        'tipoRespuesta' =>
+            $fila['tipo_respuesta'],
+
+        'nivelRespuesta' =>
+            $fila['nivel_respuesta'],
+
+        'utilidadUsuario' =>
+            $fila['utilidad_usuario'],
+
         'tiempoRespuestaMs' =>
             $fila['tiempo_respuesta_ms'] !== null
                 ? (int) $fila['tiempo_respuesta_ms']
                 : null,
-        'fechaMensaje' => $fila['fecha_mensaje'],
+
+        'fechaMensaje' =>
+            $fila['fecha_mensaje'],
     ];
 }
 
@@ -117,6 +154,16 @@ $consulta->close();
 
 responderJson([
     'success' => true,
-    'idSesion' => (int) $idSesion,
-    'interacciones' => $interacciones,
+
+    'idSesion' =>
+        (int) $idSesion,
+
+    'moduloOrigen' =>
+        (string) $moduloOrigen,
+
+    'activa' =>
+        $fechaFin === null,
+
+    'interacciones' =>
+        $interacciones,
 ]);

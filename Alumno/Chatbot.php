@@ -441,10 +441,12 @@ $configuracionChatbot = json_encode(
 
 <script src="js/Inicio.js"></script>
 <script src="js/Chatbot.js"></script>
+<script src="js/ChatbotHistorial.js"></script>
+<script src="js/ChatbotFeedback.js"></script>
 </body>
 </html>
 
 <script src="js/Inicio.js"></script>
-<script src="js/Chatbot.js"></script>
+
 </body>
 </html>

@@ -20,10 +20,18 @@ document.addEventListener("DOMContentLoaded", () => {
             ? config.rol.trim()
             : "alumno";
 
-            const moduloOrigen =
-    rol === "docente"
-        ? "Web Docente"
-        : "Web Alumno";
+            const modulosPorRol = {
+    alumno: "Web Alumno",
+    docente: "Web Docente",
+    admin: "Web Admin",
+    investigador: "Web Investigador",
+};
+
+const moduloOrigen =
+    typeof config.moduloOrigen === "string" &&
+    config.moduloOrigen.trim()
+        ? config.moduloOrigen.trim()
+        : (modulosPorRol[rol] ?? "Web Desconocido");
 
     const idUsuario =
         Number.isInteger(Number(config.idUsuario))
@@ -68,6 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
 let ultimaRespuesta = "";
 let historial = [];
 let idSesionChatbot = null;
+let firmaHistorialServidor = "";
+let intervaloSincronizacion = null;
+let sincronizandoHistorial = false;
 
 void inicializarChatbot();
 
@@ -150,8 +161,11 @@ void inicializarChatbot();
     return datos;
 }
 
-async function iniciarSesionChatbot() {
+async function iniciarSesionChatbot(
+    forzarConsulta = false,
+) {
     if (
+        !forzarConsulta &&
         Number.isInteger(idSesionChatbot) &&
         idSesionChatbot > 0
     ) {
@@ -178,7 +192,9 @@ async function iniciarSesionChatbot() {
         respuestaHttp,
     );
 
-    const idRecibido = Number(datos.idSesion);
+    const idRecibido = Number(
+        datos.idSesion,
+    );
 
     if (
         !Number.isInteger(idRecibido) ||
@@ -189,42 +205,46 @@ async function iniciarSesionChatbot() {
         );
     }
 
-    idSesionChatbot = idRecibido;
+    const sesionAnterior =
+        idSesionChatbot;
 
-    console.log(
-        `Sesión activa: ${idSesionChatbot} - ${moduloOrigen}`,
-    );
+    idSesionChatbot =
+        idRecibido;
+
+    if (
+        Number.isInteger(sesionAnterior) &&
+        sesionAnterior > 0 &&
+        sesionAnterior !== idSesionChatbot
+    ) {
+        /*
+         * La conversación activa cambió desde
+         * Web o Móvil.
+         *
+         * Vaciamos la firma para obligar a
+         * reconstruir el historial.
+         */
+        firmaHistorialServidor = "";
+
+        console.log(
+            `AulaBot cambió de sesión: ` +
+            `${sesionAnterior} -> ${idSesionChatbot}`,
+        );
+    }
 
     return idSesionChatbot;
 }
-
-async function guardarInteraccionChatbot(
-    pregunta,
-    respuesta,
-    tiempoRespuestaMs,
-) {
-    const idSesion = await iniciarSesionChatbot();
-
-    const respuestaHttp = await fetch(
-        apiPersistencia.guardar,
-        {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify({
-                idSesion,
-                pregunta,
-                respuesta,
-                modeloIa: "Gemini",
-                tiempoRespuestaMs,
-            }),
-        },
-    );
-
-    return procesarRespuestaJson(respuestaHttp);
+async function guardarInteraccionChatbot() {
+    /*
+     * La API central Node ya guarda la interacción
+     * al generar la respuesta.
+     *
+     * Esta función se conserva temporalmente para
+     * no romper el flujo actual de la interfaz Web.
+     */
+    return {
+        success: true,
+        guardadoPorCore: true,
+    };
 }
 function convertirFechaEnHora(fechaMysql) {
     if (
@@ -259,79 +279,158 @@ function eliminarMensajesDinamicos() {
     });
 }
 
-async function cargarHistorialPersistente() {
-    const idSesion = await iniciarSesionChatbot();
+async function cargarHistorialPersistente(
+    silencioso = false,
+) {
+    if (
+        silencioso &&
+        (
+            enviandoMensaje ||
+            sincronizandoHistorial
+        )
+    ) {
+        return false;
+    }
 
-    const url =
-        `${apiPersistencia.historial}` +
-        `?id_sesion=${encodeURIComponent(idSesion)}`;
+    sincronizandoHistorial = true;
 
-    const respuestaHttp = await fetch(url, {
-        method: "GET",
-        credentials: "same-origin",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+    try {
+        const idSesion =
+            await iniciarSesionChatbot(
+                silencioso,
+            );
 
-    const datos = await procesarRespuestaJson(
-        respuestaHttp,
-    );
+        const url =
+            `${apiPersistencia.historial}` +
+            `?id_sesion=${encodeURIComponent(idSesion)}`;
 
-    const interacciones =
-        Array.isArray(datos.interacciones)
-            ? datos.interacciones
-            : [];
+        const respuestaHttp = await fetch(url, {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                Accept: "application/json",
+            },
+            cache: "no-store",
+        });
 
-    historial = [];
-    eliminarMensajesDinamicos();
+        const datos =
+            await procesarRespuestaJson(
+                respuestaHttp,
+            );
 
-    interacciones.forEach((interaccion) => {
-        const hora = convertirFechaEnHora(
-            interaccion.fechaMensaje,
+        const interacciones =
+            Array.isArray(datos.interacciones)
+                ? datos.interacciones
+                : [];
+
+        const nuevaFirma = JSON.stringify(
+            interacciones.map((interaccion) => ({
+                idMensaje:
+                    Number(interaccion.idMensaje) || 0,
+                pregunta:
+                    String(interaccion.pregunta || ""),
+                respuesta:
+                    String(interaccion.respuesta || ""),
+                fechaMensaje:
+                    String(interaccion.fechaMensaje || ""),
+            })),
         );
 
-        crearMensaje({
-            tipo: "usuario",
-            texto: interaccion.pregunta,
-            hora,
-            guardar: false,
-        });
+        if (
+            silencioso &&
+            nuevaFirma === firmaHistorialServidor
+        ) {
+            return false;
+        }
 
-        crearMensaje({
-            tipo: "bot",
-            texto: interaccion.respuesta,
-            hora,
-            guardar: false,
-        });
+        firmaHistorialServidor =
+            nuevaFirma;
 
-        historial.push(
-            {
+        historial = [];
+        eliminarMensajesDinamicos();
+
+        interacciones.forEach((interaccion) => {
+            const hora = convertirFechaEnHora(
+                interaccion.fechaMensaje,
+            );
+
+            crearMensaje({
                 tipo: "usuario",
                 texto: interaccion.pregunta,
                 hora,
-                error: false,
-            },
-            {
+                guardar: false,
+            });
+
+            crearMensaje({
                 tipo: "bot",
                 texto: interaccion.respuesta,
                 hora,
-                error: false,
-            },
-        );
-    });
+                guardar: false,
+            });
 
-    guardarHistorial();
+            historial.push(
+                {
+                    tipo: "usuario",
+                    texto: interaccion.pregunta,
+                    hora,
+                    error: false,
+                },
+                {
+                    tipo: "bot",
+                    texto: interaccion.respuesta,
+                    hora,
+                    error: false,
+                },
+            );
+        });
 
-    console.log(
-        `${interacciones.length} interacciones recuperadas de MySQL.`,
-    );
+        guardarHistorial();
+
+        if (!silencioso) {
+            console.log(
+                `${interacciones.length} interacciones recuperadas de MySQL.`,
+            );
+        }
+
+        return true;
+    } finally {
+        sincronizandoHistorial = false;
+    }
 }
 
+function iniciarSincronizacionAutomatica() {
+    if (intervaloSincronizacion !== null) {
+        return;
+    }
+
+    intervaloSincronizacion =
+        window.setInterval(() => {
+            void cargarHistorialPersistente(true)
+                .catch((error) => {
+                    console.warn(
+                        "No se pudo sincronizar AulaBot:",
+                        error,
+                    );
+                });
+        }, 3000);
+}
+
+function detenerSincronizacionAutomatica() {
+    if (intervaloSincronizacion === null) {
+        return;
+    }
+
+    window.clearInterval(
+        intervaloSincronizacion,
+    );
+
+    intervaloSincronizacion = null;
+}
 async function inicializarChatbot() {
     try {
         await iniciarSesionChatbot();
         await cargarHistorialPersistente();
+        iniciarSincronizacionAutomatica();
     } catch (error) {
         console.warn(
             "No se pudo recuperar el historial desde MySQL:",
@@ -905,6 +1004,8 @@ try {
     );
 
     window.addEventListener("beforeunload", () => {
+        detenerSincronizacionAutomatica();
+
         if ("speechSynthesis" in window) {
             window.speechSynthesis.cancel();
         }

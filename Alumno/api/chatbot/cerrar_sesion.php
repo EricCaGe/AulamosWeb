@@ -7,8 +7,7 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
-$rol = obtenerRolUsuarioSesion();
-$moduloOrigen = obtenerModuloOrigenPorRol($rol);
+obtenerRolUsuarioSesion();
 
 $datos = obtenerEntradaJson();
 
@@ -27,27 +26,33 @@ if (!$idSesion || $idSesion <= 0) {
     );
 }
 
+/*
+|--------------------------------------------------------------------------
+| Cerrar conversación
+|--------------------------------------------------------------------------
+| Al cerrarse aquí también queda cerrada para Móvil.
+*/
+
 $actualizacion = $bdChatbot->prepare(
     '
         UPDATE sesiones_chatbot
         SET fecha_fin = CURRENT_TIMESTAMP
         WHERE id_sesion = ?
           AND id_usuario = ?
-          AND modulo_origen = ?
           AND fecha_fin IS NULL
     '
 );
 
 $actualizacion->bind_param(
-    'iis',
+    'ii',
     $idSesion,
-    $idUsuario,
-    $moduloOrigen
+    $idUsuario
 );
 
 $actualizacion->execute();
 
-$filasActualizadas = $actualizacion->affected_rows;
+$filasActualizadas =
+    $actualizacion->affected_rows;
 
 $actualizacion->close();
 

@@ -7,29 +7,23 @@ require_once __DIR__ . '/bootstrap.php';
 requerirMetodo('POST');
 
 $idUsuario = obtenerIdUsuarioSesion();
-
-/*
-|--------------------------------------------------------------------------
-| Rol real del usuario
-|--------------------------------------------------------------------------
-| El rol proviene exclusivamente de la sesion PHP.
-*/
-
 $rol = obtenerRolUsuarioSesion();
-$moduloOrigen = obtenerModuloOrigenPorRol($rol);
 
 /*
 |--------------------------------------------------------------------------
-| Buscar una sesión abierta del módulo correcto
+| Buscar la conversación abierta del usuario
 |--------------------------------------------------------------------------
+| La conversación pertenece al usuario, no al dispositivo.
+| Por eso puede haber sido iniciada desde Web o desde Móvil.
 */
 
 $consulta = $bdChatbot->prepare(
     '
-        SELECT id_sesion
+        SELECT
+            id_sesion,
+            modulo_origen
         FROM sesiones_chatbot
         WHERE id_usuario = ?
-          AND modulo_origen = ?
           AND fecha_fin IS NULL
         ORDER BY id_sesion DESC
         LIMIT 1
@@ -37,13 +31,16 @@ $consulta = $bdChatbot->prepare(
 );
 
 $consulta->bind_param(
-    'is',
-    $idUsuario,
-    $moduloOrigen
+    'i',
+    $idUsuario
 );
 
 $consulta->execute();
-$consulta->bind_result($idSesionExistente);
+
+$consulta->bind_result(
+    $idSesionExistente,
+    $moduloOrigenExistente
+);
 
 if ($consulta->fetch()) {
     $consulta->close();
@@ -52,7 +49,7 @@ if ($consulta->fetch()) {
         'success' => true,
         'idSesion' => (int) $idSesionExistente,
         'nuevaSesion' => false,
-        'moduloOrigen' => $moduloOrigen,
+        'moduloOrigen' => (string) $moduloOrigenExistente,
         'rol' => $rol,
     ]);
 }
@@ -61,9 +58,12 @@ $consulta->close();
 
 /*
 |--------------------------------------------------------------------------
-| Crear una nueva sesión
+| Crear conversación nueva
 |--------------------------------------------------------------------------
+| Solo se crea si el usuario no tiene ninguna conversación abierta.
 */
+
+$moduloOrigen = obtenerModuloOrigenPorRol($rol);
 
 $insercion = $bdChatbot->prepare(
     '
