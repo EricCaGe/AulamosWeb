@@ -1,0 +1,952 @@
+/* =========================================================
+   AULAMOS
+   PERFIL DEL ALUMNO
+   ========================================================= */
+
+
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f4f5f8;
+
+    color: #172b4d;
+
+}
+
+
+/* =========================================================
+   CONTENEDOR
+   ========================================================= */
+
+.perfil-container {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 25px 45px 50px;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.perfil-header {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+
+}
+
+
+.perfil-header-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+}
+
+
+/* =========================================================
+   BOTÓN REGRESAR
+   ========================================================= */
+
+.btn-regresar {
+
+    width: 48px;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #ffffff;
+
+    border: 1px solid #dce1ea;
+
+    border-radius: 14px;
+
+    color: #172b4d;
+
+    text-decoration: none;
+
+    font-size: 20px;
+
+    transition: all 0.2s ease;
+
+}
+
+
+.btn-regresar:hover {
+
+    background: #edf3ff;
+
+    color: #3478f6;
+
+    transform: translateX(-2px);
+
+}
+
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+.perfil-header h1 {
+
+    font-size: 32px;
+
+    font-weight: 700;
+
+    color: #172b4d;
+
+    margin-bottom: 5px;
+
+}
+
+
+.perfil-header p {
+
+    font-size: 16px;
+
+    color: #667085;
+
+}
+
+
+/* =========================================================
+   CERRAR SESIÓN
+   ========================================================= */
+
+.btn-cerrar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #3478f6;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+}
+
+
+.btn-cerrar:hover {
+
+    text-decoration: underline;
+
+}
+
+
+/* =========================================================
+   MENSAJES
+   ========================================================= */
+
+.mensaje {
+
+    width: 100%;
+
+    padding: 14px 18px;
+
+    border-radius: 12px;
+
+    margin-bottom: 22px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+}
+
+
+.mensaje.exito {
+
+    background: #dcfce7;
+
+    color: #166534;
+
+    border-left: 5px solid #22c55e;
+
+}
+
+
+.mensaje.error {
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    border-left: 5px solid #dc2626;
+
+}
+
+
+/* =========================================================
+   TARJETA PRINCIPAL DEL ALUMNO
+   ========================================================= */
+
+.perfil-card {
+
+    width: 100%;
+
+    min-height: 155px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    padding: 28px 30px;
+
+    margin-bottom: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0ddff,
+            #f8ecff
+        );
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 4px 12px rgba(
+            74,
+            45,
+            110,
+            0.12
+        );
+
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.perfil-avatar {
+
+    flex-shrink: 0;
+
+}
+
+
+.avatar {
+
+    width: 105px;
+
+    height: 105px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #ffffff;
+
+    border: 1px solid #dcdcdc;
+
+    border-radius: 24px;
+
+}
+
+
+.avatar i {
+
+    font-size: 54px;
+
+    color: #111827;
+
+}
+
+
+/* =========================================================
+   DATOS PRINCIPALES
+   ========================================================= */
+
+.perfil-datos {
+
+    flex: 1;
+
+}
+
+
+.perfil-datos h2 {
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+    margin-bottom: 8px;
+
+}
+
+
+.correo {
+
+    font-size: 16px;
+
+    color: #374151;
+
+    margin-bottom: 12px;
+
+}
+
+
+/* =========================================================
+   ROL
+   ========================================================= */
+
+.rol {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 8px 14px;
+
+    background: #ffffff;
+
+    border: 1px solid #d4d4d4;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: #222222;
+
+}
+
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+.seccion {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e5ed;
+
+    border-radius: 22px;
+
+    padding: 28px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 3px 10px rgba(
+            0,
+            0,
+            0,
+            0.05
+        );
+
+}
+
+
+.seccion h2 {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 22px;
+
+    color: #172b4d;
+
+    margin-bottom: 22px;
+
+}
+
+
+.seccion h2 i {
+
+    color: #5a189a;
+
+}
+
+
+/* =========================================================
+   INFORMACIÓN PERSONAL
+   ========================================================= */
+
+.informacion-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 20px 35px;
+
+}
+
+
+.dato {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 15px;
+
+    background: #f8fafc;
+
+    border-radius: 12px;
+
+    border: 1px solid #edf0f4;
+
+}
+
+
+.dato span {
+
+    font-size: 12px;
+
+    color: #94a3b8;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+
+}
+
+
+.dato strong {
+
+    font-size: 16px;
+
+    color: #172b4d;
+
+}
+
+
+.texto-rol {
+
+    color: #5a189a !important;
+
+}
+
+
+/* =========================================================
+   SEGURIDAD
+   ========================================================= */
+
+.seguridad-card {
+
+    background: #f8fafc;
+
+    border: 1px solid #e8edf2;
+
+    border-radius: 15px;
+
+    padding: 22px;
+
+}
+
+
+.seguridad-titulo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 22px;
+
+}
+
+
+.seguridad-titulo > i {
+
+    width: 45px;
+
+    height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f1e3ff;
+
+    border-radius: 12px;
+
+    color: #5a189a;
+
+    font-size: 20px;
+
+}
+
+
+.seguridad-titulo h3 {
+
+    font-size: 18px;
+
+    color: #172b4d;
+
+    margin-bottom: 4px;
+
+}
+
+
+.seguridad-titulo p {
+
+    font-size: 14px;
+
+    color: #667085;
+
+}
+
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+.formulario {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+}
+
+
+.formulario-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 18px 25px;
+
+}
+
+
+.campo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+}
+
+
+.campo label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #172b4d;
+
+}
+
+
+.campo input {
+
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    color: #172b4d;
+
+    background: #ffffff;
+
+    transition: border-color 0.2s,
+                box-shadow 0.2s;
+
+}
+
+
+.campo input:focus {
+
+    border-color: #5a189a;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            90,
+            24,
+            154,
+            0.10
+        );
+
+}
+
+
+/* =========================================================
+   BOTÓN GUARDAR
+   ========================================================= */
+
+.btn-guardar {
+
+    width: fit-content;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 11px 20px;
+
+    background: #5a189a;
+
+    color: #ffffff;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s,
+                transform 0.2s;
+
+}
+
+
+.btn-guardar:hover {
+
+    background: #7b2fbe;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.acciones {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 5px;
+
+}
+
+
+.btn-secundario,
+.btn-salir {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+.btn-secundario {
+
+    background: #ffffff;
+
+    border: 1px solid #dce1ea;
+
+    color: #172b4d;
+
+}
+
+
+.btn-secundario:hover {
+
+    background: #f8faff;
+
+}
+
+
+.btn-salir {
+
+    background: #fee2e2;
+
+    color: #dc2626;
+
+}
+
+
+.btn-salir:hover {
+
+    background: #fecaca;
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .perfil-container {
+
+        padding: 25px;
+
+    }
+
+    .informacion-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .formulario-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .perfil-container {
+
+        padding: 18px;
+
+    }
+
+
+    .perfil-header {
+
+        align-items: flex-start;
+
+    }
+
+
+    .perfil-header h1 {
+
+        font-size: 27px;
+
+    }
+
+
+    .perfil-header p {
+
+        font-size: 14px;
+
+    }
+
+
+    .btn-regresar {
+
+        width: 44px;
+
+        height: 44px;
+
+    }
+
+
+    .btn-cerrar {
+
+        font-size: 0;
+
+    }
+
+
+    .btn-cerrar i {
+
+        font-size: 20px;
+
+    }
+
+
+    .perfil-card {
+
+        padding: 20px;
+
+        gap: 15px;
+
+        border-radius: 20px;
+
+    }
+
+
+    .avatar {
+
+        width: 75px;
+
+        height: 75px;
+
+        border-radius: 18px;
+
+    }
+
+
+    .avatar i {
+
+        font-size: 40px;
+
+    }
+
+
+    .perfil-datos h2 {
+
+        font-size: 19px;
+
+    }
+
+
+    .correo {
+
+        font-size: 13px;
+
+        word-break: break-word;
+
+    }
+
+
+    .rol {
+
+        padding: 6px 10px;
+
+        font-size: 13px;
+
+    }
+
+
+    .seccion {
+
+        padding: 20px;
+
+        border-radius: 18px;
+
+    }
+
+
+    .seccion h2 {
+
+        font-size: 19px;
+
+    }
+
+
+    .informacion-grid {
+
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+
+    }
+
+
+    .formulario-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .acciones {
+
+        flex-direction: column;
+
+    }
+
+
+    .btn-secundario,
+    .btn-salir {
+
+        width: 100%;
+
+    }
+
+}

@@ -293,6 +293,7 @@ $conexion->close();
             <a href="Biblioteca.php" class="menu-item active"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
             <a href="avances.php" class="menu-item"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
             <a href="ayuda.php" class="menu-item"><i class="fa-solid fa-circle-question"></i> Ayuda</a>
+            <a href="mas.php" class="menu-item"> <i class="fa-solid fa-bars"></i> Más</a>
         </nav>
         <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
         <div class="menu-spacer"></div>

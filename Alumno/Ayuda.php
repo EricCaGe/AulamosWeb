@@ -65,6 +65,7 @@ if ($resultAyuda) {
             <a href="biblioteca.php" class="menu-item"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
             <a href="avances.php" class="menu-item"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
             <a href="ayuda.php" class="menu-item active"><i class="fa-solid fa-circle-question"></i> Ayuda</a>
+            <a href="mas.php" class="menu-item"> <i class="fa-solid fa-bars"></i> Más</a>
            
         </nav>
         
@@ -115,7 +116,7 @@ if ($resultAyuda) {
                     <div class="help-icon"><i class="fa-solid fa-volume-high"></i></div>
                     <h3>Lee en voz alta</h3>
                     <p>Activa la lectura en voz alta de toda la información</p>
-                    <button class="help-btn btn-secondary">Activar</button>
+                    <button class="help-btn btn-secondary" id="btnLectorAyuda">Activar</button>
                 </div>
             </div>
         </section>

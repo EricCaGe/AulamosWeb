@@ -1,0 +1,459 @@
+/* =========================================================
+   AULAMOS
+   PÁGINA MÁS
+   ========================================================= */
+
+
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+   ========================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    background: #f4f5f8;
+    color: #172b4d;
+}
+
+
+/* =========================================================
+   CONTENEDOR
+   ========================================================= */
+
+.mas-container {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 25px 45px 50px;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.mas-header {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+
+}
+
+
+.mas-header-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+}
+
+
+/* =========================================================
+   BOTÓN REGRESAR
+   ========================================================= */
+
+.btn-regresar {
+
+    width: 48px;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #ffffff;
+
+    border: 1px solid #dce1ea;
+
+    border-radius: 14px;
+
+    color: #172b4d;
+
+    text-decoration: none;
+
+    font-size: 20px;
+
+    transition: all 0.2s ease;
+
+}
+
+
+.btn-regresar:hover {
+
+    background: #edf3ff;
+
+    color: #3478f6;
+
+    transform: translateX(-2px);
+
+}
+
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+.mas-titulo h1 {
+
+    font-size: 32px;
+
+    font-weight: 700;
+
+    color: #172b4d;
+
+    margin-bottom: 5px;
+
+}
+
+
+.mas-titulo p {
+
+    font-size: 16px;
+
+    color: #667085;
+
+}
+
+
+/* =========================================================
+   CERRAR SESIÓN
+   ========================================================= */
+
+.btn-cerrar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #3478f6;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+}
+
+
+.btn-cerrar:hover {
+
+    text-decoration: underline;
+
+}
+
+
+/* =========================================================
+   TARJETA DEL USUARIO
+   ========================================================= */
+
+.usuario-card {
+
+    width: 100%;
+
+    min-height: 145px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    padding: 25px 30px;
+
+    margin-bottom: 32px;
+
+    background:
+        linear-gradient(135deg,
+            #f0ddff,
+            #f8ecff);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 4px 12px rgba(74, 45, 110, 0.12);
+
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+.usuario-avatar {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 24px;
+}
+.usuario-avatar i {
+    font-size: 52px;
+    color: #111827;
+}
+/* =========================================================
+   INFORMACIÓN USUARIO
+   ========================================================= */
+.usuario-info h2 {
+    font-size: 25px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+.usuario-info .correo {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+/* =========================================================
+   TIPO DE USUARIO
+   ========================================================= */
+.tipo-usuario {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    background: #ffffff;
+    border: 1px solid #d4d4d4;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #222222;
+}
+.tipo-usuario i {
+    font-size: 16px;
+}
+/* =========================================================
+   TÍTULO CUENTA
+   ========================================================= */
+.seccion-titulo {
+    font-size: 26px;
+    font-weight: 700;
+    color: #172b4d;
+    margin-bottom: 18px;
+}
+/* =========================================================
+   CONTENEDOR DE OPCIONES
+   ========================================================= */
+.opciones-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e1e5ed;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.05);
+}
+/* =========================================================
+   OPCIONES
+   ========================================================= */
+.opcion {
+    width: 100%;
+    min-height: 105px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 20px 25px;
+
+    text-decoration: none;
+
+    color: #172b4d;
+
+    border: none;
+    border-bottom: 1px solid #e8ebf0;
+
+    background: #ffffff;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: inherit;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.opcion:last-child {
+    border-bottom: none;
+}
+
+.opcion:hover {
+    background: #f8faff;
+}
+/* =========================================================
+   ICONO DE OPCIÓN
+   ========================================================= */
+.opcion-icono {
+    width: 65px;
+    height: 65px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    background: #f1e3ff;
+    border-radius: 18px;
+}
+.opcion-icono i {
+    font-size: 28px;
+    color: #111827;
+}
+/* =========================================================
+   TEXTO DE OPCIÓN
+   ========================================================= */
+.opcion-contenido {
+    flex: 1;
+}
+.opcion-contenido h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #172b4d;
+    margin-bottom: 6px;
+}
+.opcion-contenido p {
+    font-size: 15px;
+    line-height: 1.4;
+    color: #667085;
+}
+/* =========================================================
+   FLECHA
+   ========================================================= */
+.opcion-flecha {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #172b4d;
+    font-size: 19px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+.opcion:hover .opcion-flecha {
+    background: #edf3ff;
+    color: #3478f6;
+}
+/* =========================================================
+   TABLET
+   ========================================================= */
+@media (max-width: 900px) {
+    .mas-container {
+        padding: 25px;
+    }
+}
+/* =========================================================
+   CELULAR
+   ========================================================= */
+@media (max-width: 600px) {
+    .mas-container {
+        padding: 18px;
+    }
+    .mas-header {
+        margin-bottom: 20px;
+    }
+    .mas-titulo h1 {
+        font-size: 28px;
+    }
+    .mas-titulo p {
+        font-size: 14px;
+    }
+    .btn-regresar {
+        width: 44px;
+        height: 44px;
+    }
+    .btn-cerrar {
+        font-size: 0;
+    }
+    .btn-cerrar i {
+        font-size: 20px;
+    }
+    .usuario-card {
+        padding: 20px;
+        gap: 15px;
+        border-radius: 20px;
+    }
+    .usuario-avatar {
+        width: 75px;
+        height: 75px;
+        border-radius: 18px;
+    }
+    .usuario-avatar i {
+        font-size: 40px;
+    }
+    .usuario-info h2 {
+        font-size: 19px;
+    }
+    .usuario-info .correo {
+        font-size: 13px;
+        word-break: break-word;
+    }
+    .tipo-usuario {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    .seccion-titulo {
+        font-size: 22px;
+    }
+    .opcion {
+        min-height: 90px;
+        padding: 16px;
+    }
+    .opcion-icono {
+        width: 52px;
+        height: 52px;
+        margin-right: 14px;
+        border-radius: 15px;
+    }
+    .opcion-icono i {
+        font-size: 23px;
+    }
+    .opcion-contenido h3 {
+        font-size: 17px;
+    }
+    .opcion-contenido p {
+        font-size: 13px;
+    }
+
+    .opcion-flecha {
+
+        width: 35px;
+
+        height: 35px;
+
+        font-size: 16px;
+
+    }
+
+}

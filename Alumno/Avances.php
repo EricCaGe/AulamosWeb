@@ -188,6 +188,7 @@ if (empty($statsMateria)) {
             <a href="biblioteca.php" class="menu-item"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
             <a href="avances.php" class="menu-item active"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
             <a href="ayuda.php" class="menu-item"><i class="fa-solid fa-circle-question"></i> Ayuda</a>
+            <a href="mas.php" class="menu-item"> <i class="fa-solid fa-bars"></i> Más</a>
           
         </nav>
         
