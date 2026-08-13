@@ -18,7 +18,22 @@ $id_docente = $_SESSION['usuario']['id_usuario'];
 // Verificar que se recibió un archivo
 if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'No se recibió ningún archivo']);
+    $error_msg = 'No se recibió ningún archivo. Error: ';
+    switch ($_FILES['archivo']['error'] ?? UPLOAD_ERR_NO_FILE) {
+        case UPLOAD_ERR_INI_SIZE:
+        case UPLOAD_ERR_FORM_SIZE:
+            $error_msg .= 'El archivo excede el tamaño máximo permitido.';
+            break;
+        case UPLOAD_ERR_PARTIAL:
+            $error_msg .= 'El archivo se subió parcialmente.';
+            break;
+        case UPLOAD_ERR_NO_FILE:
+            $error_msg .= 'No se seleccionó ningún archivo.';
+            break;
+        default:
+            $error_msg .= 'Error desconocido.';
+    }
+    echo json_encode(['success' => false, 'error' => $error_msg]);
     exit;
 }
 
@@ -30,12 +45,12 @@ $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
 // VALIDAR TIPO DE ARCHIVO
 // =====================================================
 $tipos_permitidos = [
-    'pdf', 'mp4', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'jpg', 'png'
+    'pdf', 'mp4', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'jpg', 'png', 'jpeg', 'gif', 'webp'
 ];
 
 if (!in_array($extension, $tipos_permitidos, true)) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Tipo de archivo no permitido']);
+    echo json_encode(['success' => false, 'error' => 'Tipo de archivo no permitido. Extensiones permitidas: ' . implode(', ', $tipos_permitidos)]);
     exit;
 }
 
@@ -55,7 +70,6 @@ if ($archivo['size'] > 50 * 1024 * 1024) {
 $tipo_recurso = $_POST['tipo_curso'] ?? 'Documento';
 $titulo = trim($_POST['titulo'] ?? $nombre_original);
 $descripcion = trim($_POST['descripcion'] ?? '');
-$compartido_tipo = $_POST['compartido_tipo'] ?? 'Curso';
 
 $tipos_recurso_permitidos = ['Video', 'PDF', 'Documento'];
 if (!in_array($tipo_recurso, $tipos_recurso_permitidos, true)) {
@@ -67,7 +81,7 @@ if (!in_array($tipo_recurso, $tipos_recurso_permitidos, true)) {
 // =====================================================
 // CREAR CARPETA SI NO EXISTE
 // =====================================================
-$carpeta_fisica = 'C:/AulamosCom/aulamos-api/uploads/recursos/';
+$carpeta_fisica = __DIR__ . '/../uploads/recursos/';
 
 if (!is_dir($carpeta_fisica)) {
     if (!mkdir($carpeta_fisica, 0777, true)) {
@@ -91,7 +105,7 @@ if (!move_uploaded_file($archivo['tmp_name'], $ruta_fisica)) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Error al mover el archivo'
+        'error' => 'Error al mover el archivo. Verifica los permisos de la carpeta.'
     ]);
     exit;
 }
@@ -109,19 +123,19 @@ $stmt = $conexion->prepare("
         url_recurso,
         id_docente,
         compartido_tipo,
-        estado
+        estado,
+        fecha_publicacion
     )
-    VALUES (?, ?, ?, ?, ?, ?, 'Activo')
+    VALUES (?, ?, ?, ?, ?, 'Publico', 'Activo', NOW())
 ");
 
 $stmt->bind_param(
-    "ssssis",
+    "ssssi",
     $titulo,
     $descripcion,
     $tipo_recurso,
     $ruta_publica,
-    $id_docente,
-    $compartido_tipo
+    $id_docente
 );
 
 if ($stmt->execute()) {

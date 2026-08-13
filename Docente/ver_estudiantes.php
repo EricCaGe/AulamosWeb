@@ -72,7 +72,7 @@ $conexion->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ver Estudiantes - Aulamos</title>
+    <title>Ver Estudiantes</title>
 
     <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">
@@ -102,9 +102,8 @@ $conexion->close();
             <a href="ver_estudiantes.php" class="menu-item active"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
             <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
             <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
-
             <div class="menu-spacer"></div>
+            <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
             <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -119,17 +118,18 @@ $conexion->close();
                 <p>Gestiona tu lista de estudiantes</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <button type="button" class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
                 <div class="icon-bell-container">
                     <i class="fa-regular fa-bell"></i>
                 </div>
                 <div class="user-profile">
-                    <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
                     <div class="user-info">
                         <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                         <span class="user-role">Docente</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
                 </div>
             </div>
         </header>
@@ -160,51 +160,16 @@ $conexion->close();
                             <i class="fa-solid fa-users-slash"></i>
                             <p>No hay estudiantes inscritos en tus cursos.</p>
                         </div>
-                        
-                    </div>
-                </div>
-            </header>
-
-            <!-- BARRA DE BÚSQUEDA Y PESTAÑAS (TABS) -->
-            <div class="students-header-tools">
-                <div class="search-bar-container">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" class="student-search-input" placeholder="Buscar estudiante">
-                </div>
-
-                <div class="group-tabs" id="filter-tabs">
-                    <!-- Botón "Todos" -->
-                    <button class="tab-btn active" data-filter="todos">Todos</button>
-                    <!-- Botones dinámicos para cada grupo -->
-                    <?php foreach ($grupos_unicos as $grupo): ?>
-                        <button class="tab-btn" data-filter="<?php echo htmlspecialchars($grupo); ?>">
-                            <?php echo htmlspecialchars($grupo); ?>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <!-- LISTA DE ESTUDIANTES -->
-            <div class="main-grid mt-20">
-                <div class="left-column">
-                    <div class="students-list-container" id="students-list">
-                        <?php if (empty($estudiantes)): ?>
-                            <div class="no-students-message">
-                                <i class="fa-solid fa-users-slash"></i>
-                                <p>No hay estudiantes inscritos en tus cursos.</p>
-                            </div>
-                        <?php else: ?>
-                            <?php foreach ($estudiantes as $estudiante): ?>
-                                <div class="student-card" data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>">
-                                    <div class="student-info-left">
-                                        <i class="fa-solid fa-circle-user avatar-icon"></i>
-                                        <div class="student-details">
-                                            <h4><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno']); ?></h4>
-                                            <p><?php echo htmlspecialchars($estudiante['grupo_nombre']); ?></p>
-                                        </div>
+                    <?php else: ?>
+                        <?php foreach ($estudiantes as $estudiante): ?>
+                            <div class="student-card" data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>">
+                                <div class="student-info-left">
+                                    <i class="fa-solid fa-circle-user avatar-icon"></i>
+                                    <div class="student-details">
+                                        <h4><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno']); ?></h4>
+                                        <p><?php echo htmlspecialchars($estudiante['grupo_nombre']); ?></p>
                                     </div>
                                 </div>
-                                <button class="btn-message"><i class="fa-regular fa-envelope"></i></button>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -237,24 +202,18 @@ $conexion->close();
             </aside>
         </div>
 
-        <!-- ========================================== -->
-        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
-        <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD -->
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<!-- ========================================== -->
-<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
-<!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD -->
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
 
-<!-- ========================================== -->
-<!-- SCRIPTS                                    -->
-<!-- ========================================== -->
+<!-- SCRIPTS -->
 <script src="jss/ver_estudiantes_ocultos.js?v=2"></script>
 <script src="jss/docente_dashboard.js"></script>
 

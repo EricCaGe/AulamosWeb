@@ -27,15 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ==========================================
-    // 2. ASISTENTE VIRTUAL
-    // ==========================================
-    const btnAsistente = document.getElementById("btn-asistente");
-    if (btnAsistente) {
-        btnAsistente.addEventListener("click", () => {
-            alert("🤖 ¡Hola! Soy tu asistente virtual de Aulamos. ¿En qué te puedo ayudar hoy, Profesora Ana?");
-        });
-    }
+   
 
     // ==========================================
     // 3. CALENDARIO DINÁMICO

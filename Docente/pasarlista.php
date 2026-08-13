@@ -323,10 +323,10 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                 <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
                 <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
                 <a href="pasarlista.php" class="menu-item active"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
                 <div class="menu-spacer"></div>
-                <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-            </nav>
+            <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
+            <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
@@ -339,19 +339,20 @@ $fecha_formateada = "{$dia_nombre}, {$dia_num} de {$mes_nombre} de {$anio}";
                     <p>Registra la asistencia de tus estudiantes</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
-                    <div class="icon-bell-container">
-                        <i class="fa-regular fa-bell"></i>
-                    </div>
-                    <div class="user-profile">
-                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
-                        <div class="user-info">
-                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                            <span class="user-role">Docente</span>
-                        </div>
-                        
+                <button type="button" class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
+                <div class="icon-bell-container">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+                <div class="user-profile">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                        <span class="user-role">Docente</span>
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- CONTENIDO PRINCIPAL -->

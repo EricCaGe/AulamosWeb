@@ -148,7 +148,7 @@ $stmt_evaluaciones->close();
 // 4. CONSULTAS PARA LOS REPORTES DETALLADOS
 // =====================================================
 
-// 4.1. Rendimiento por actividad
+// 4.1. Rendimiento por actividad (CORREGIDO)
 $query_rendimiento_actividad = "
     SELECT
         a.titulo,
@@ -160,7 +160,7 @@ $query_rendimiento_actividad = "
     JOIN cursos c ON a.id_curso = c.id_curso
     LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
     WHERE c.id_docente = ? AND a.estado = 'Publicada'
-    GROUP BY a.id_actividad
+    GROUP BY a.id_actividad, a.titulo   -- ✅ Corregido
 ";
 $query_rendimiento_actividad = aplicarFiltros($query_rendimiento_actividad, $materia_seleccionada, $periodo_seleccionado, $id_docente);
 $stmt = $conexion->prepare($query_rendimiento_actividad);
@@ -169,7 +169,7 @@ $stmt->execute();
 $rendimiento_actividad = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// 4.2. Rendimiento por evaluación
+// 4.2. Rendimiento por evaluación (CORREGIDO)
 $query_rendimiento_evaluacion = "
     SELECT
         a.titulo,
@@ -181,7 +181,7 @@ $query_rendimiento_evaluacion = "
     JOIN cursos c ON a.id_curso = c.id_curso
     LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
     WHERE c.id_docente = ? AND a.tipo = 'Evaluacion' AND a.estado = 'Publicada'
-    GROUP BY a.id_actividad
+    GROUP BY a.id_actividad, a.titulo   -- ✅ Corregido
 ";
 $query_rendimiento_evaluacion = aplicarFiltros($query_rendimiento_evaluacion, $materia_seleccionada, $periodo_seleccionado, $id_docente);
 $stmt = $conexion->prepare($query_rendimiento_evaluacion);
@@ -190,7 +190,7 @@ $stmt->execute();
 $rendimiento_evaluacion = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// 4.3. Asistencia y participación
+// 4.3. Asistencia y participación (CORREGIDO)
 $query_asistencia_participacion = "
     SELECT
         a.titulo,
@@ -200,7 +200,7 @@ $query_asistencia_participacion = "
     JOIN actividad_estudiantes ae ON a.id_actividad = ae.id_actividad
     JOIN cursos c ON a.id_curso = c.id_curso
     WHERE c.id_docente = ? AND a.estado = 'Publicada'
-    GROUP BY a.id_actividad
+    GROUP BY a.id_actividad, a.titulo   -- ✅ Corregido
 ";
 $query_asistencia_participacion = aplicarFiltros($query_asistencia_participacion, $materia_seleccionada, $periodo_seleccionado, $id_docente);
 $stmt = $conexion->prepare($query_asistencia_participacion);
@@ -208,8 +208,6 @@ $stmt->bind_param("i", $id_docente);
 $stmt->execute();
 $asistencia_participacion = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-
-$conexion->close();
 
 // --- Generar datos para el gráfico de línea (SVG) ---
 $puntos_svg = [];
@@ -248,7 +246,7 @@ $path_area = "M0,30 L" . implode(" L", array_map(fn($p) => $p['x'] . "," . $p['y
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes - Aulamos</title>
+    <title>Reportes</title>
 
     <link rel="stylesheet" href="styles/docente.css">
     <link rel="stylesheet" href="styles/reportes.css">
@@ -274,8 +272,8 @@ $path_area = "M0,30 L" . implode(" L", array_map(fn($p) => $p['x'] . "," . $p['y
             <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
             <a href="reporte.php" class="menu-item active"><i class="fa-solid fa-chart-column"></i> Reportes</a>
             <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-universal-access"></i> Accesibilidad</a>
             <div class="menu-spacer"></div>
+            <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
             <a href="../InicioSesion/cerrar_sesion.php" class="menu-item btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -290,17 +288,18 @@ $path_area = "M0,30 L" . implode(" L", array_map(fn($p) => $p['x'] . "," . $p['y
                 <p>Analiza el progreso de tus clases</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <button type="button" class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
+                    Asistente Virtual <span class="robot-icon">🤖</span>
+                </button>
                 <div class="icon-bell-container">
                     <i class="fa-regular fa-bell"></i>
                 </div>
                 <div class="user-profile">
-                    <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
+                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
                     <div class="user-info">
                         <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
                         <span class="user-role">Docente</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
                 </div>
             </div>
         </header>
@@ -339,20 +338,17 @@ $path_area = "M0,30 L" . implode(" L", array_map(fn($p) => $p['x'] . "," . $p['y
                 </form>
             </div>
 
-            <!-- CALENDARIO -->
+            <!-- Calendario -->
             <aside class="calendar-container">
                 <div class="calendar-header">
                     <div class="nav-left">
                         <button id="prev-year" class="nav-btn" title="Año anterior">&laquo;</button>
                         <button id="prev-month" class="nav-btn" title="Mes anterior">&lsaquo;</button>
                     </div>
-                    <div class="user-profile">
-                        <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Docente" class="avatar">
-                        <div class="user-info">
-                            <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                            <span class="user-role">Docente</span>
-                        </div>
-                        
+                    <h2 id="month-year-title">MES AÑO</h2>
+                    <div class="nav-right">
+                        <button id="next-month" class="nav-btn" title="Mes siguiente">&rsaquo;</button>
+                        <button id="next-year" class="nav-btn" title="Año siguiente">&raquo;</button>
                     </div>
                 </div>
                 <div class="calendar-weekdays">
