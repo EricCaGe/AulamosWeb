@@ -84,6 +84,9 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <i class="fa-solid fa-universal-access"></i>
             Accesibilidad
         </a>
+        <a href="catalogo_estandares.php" class="menu-item">
+    <i class="fa-solid fa-book"></i> Catálogo WCAG
+</a>
 
         <a
             href="reportes.php"
