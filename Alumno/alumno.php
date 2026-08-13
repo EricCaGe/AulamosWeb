@@ -194,7 +194,7 @@ $racha_dias = $row['dias_activos'] ?? 0;
                     </div>
                     <span class="progress-text"><?php echo $progreso_celula; ?>%</span>
                 </div>
-                <button class="btn-action btn-purple">Continuar</button>
+                <button class="btn-action btn-purple" onclick="location.assign('actividades.php')">Continuar</button>
             </div>
 
             <div class="card card-orange">
@@ -204,7 +204,7 @@ $racha_dias = $row['dias_activos'] ?? 0;
                     <p class="subtitle"><?php echo htmlspecialchars($proxima_materia); ?></p>
                     <p class="date-text"><i class="fa-regular fa-calendar"></i> Vence: <?php echo $proxima_fecha_formateada; ?></p>
                 </div>
-                <button class="btn-action btn-orange">Ver actividad</button>
+                <button class="btn-action btn-orange" onclick="location.assign('actividades.php')">Continuar</button>
             </div>
         </section>
 

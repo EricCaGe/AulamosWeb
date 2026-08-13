@@ -121,12 +121,11 @@ $configuracionChatbot = json_encode(
                 Ayuda
             </a>
 
-            <a href="accesibilidad.php" class="menu-item">
-                <i
-                    class="fa-solid fa-universal-access"
-                    aria-hidden="true"
-                ></i>
-                Accesibilidad
+            <a href="mas.php" class="menu-item">
+                 <i 
+                    class="fa-solid fa-bars"
+                 ></i> 
+                 Más
             </a>
         </nav>
 
