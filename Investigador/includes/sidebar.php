@@ -92,7 +92,9 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <i class="fa-solid fa-file-alt"></i>
             Reportes
         </a>
-
+<a href="pruebas_investigacion.php" class="menu-item <?php echo ($pagina_actual == 'pruebas_investigacion.php') ? 'active' : ''; ?>">
+    <i class="fa-solid fa-flask"></i> Pruebas
+</a>
         <a
             href="mas.php"
             class="menu-item <?php echo ($pagina_actual == 'mas.php') ? 'active' : ''; ?>"

@@ -12,7 +12,7 @@ $nombre_investigador = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario
         <div class="icon-bell">
             <i class="fa-regular fa-bell"></i>
         </div>
-        <a href="perfil.php" class="user-profile">
+        <a href="perfil_investigador.php" class="user-profile">
             <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar" class="avatar">
             <span class="user-name"><?php echo htmlspecialchars($nombre_investigador); ?></span>
             <i class="fa-solid fa-chevron-down drop-icon"></i>

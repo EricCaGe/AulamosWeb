@@ -61,6 +61,38 @@ $resultado = $stmt->get_result();
 $total_chatbot = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
+// =====================================================
+// PRUEBAS DE INVESTIGACIÓN
+// =====================================================
+
+// Total de pruebas
+$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM pruebas_investigacion");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$total_pruebas = $resultado->fetch_assoc()['total'] ?? 0;
+$stmt->close();
+
+// Pruebas activas
+$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM pruebas_investigacion WHERE estado = 'Activa'");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$pruebas_activas = $resultado->fetch_assoc()['total'] ?? 0;
+$stmt->close();
+
+// Total de participantes en pruebas
+$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM participantes_prueba");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$total_participantes = $resultado->fetch_assoc()['total'] ?? 0;
+$stmt->close();
+
+// Prueba activa actual
+$stmt = $conexion->prepare("SELECT nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$prueba_activa_nombre = $resultado->fetch_assoc()['nombre'] ?? 'Ninguna';
+$stmt->close();
+
 // Módulos más visitados
 $stmt = $conexion->prepare("
     SELECT modulo, COUNT(*) AS visitas
@@ -178,6 +210,16 @@ $stmt->close();
                         <span class="stat-label">Chatbot</span>
                     </div>
                 </div>
+                <!-- ===== NUEVA TARJETA: PRUEBAS ===== -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f3e8fd;">
+                        <i class="fa-solid fa-flask" style="color: #7b1fa2;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number"><?php echo $pruebas_activas; ?> / <?php echo $total_pruebas; ?></span>
+                        <span class="stat-label">Pruebas activas</span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -227,6 +269,29 @@ $stmt->close();
                         <span class="detalle-label">Interacciones chatbot</span>
                         <span class="detalle-valor"><?php echo $total_chatbot; ?></span>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PRUEBAS DE INVESTIGACIÓN ===== -->
+        <section class="modulos-progreso" style="margin-top: 30px;">
+            <div class="modulos-visitados" style="grid-column: span 2;">
+                <h3><i class="fa-solid fa-flask"></i> Pruebas de investigación</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px;">
+                        <span style="font-size: 28px; font-weight: 800; color: #5a189a;"><?php echo $pruebas_activas; ?></span>
+                        <span style="display: block; font-size: 14px; color: #64748b;">Pruebas activas</span>
+                    </div>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px;">
+                        <span style="font-size: 28px; font-weight: 800; color: #5a189a;"><?php echo $total_participantes; ?></span>
+                        <span style="display: block; font-size: 14px; color: #64748b;">Participantes en pruebas</span>
+                        <span style="font-size: 12px; color: #94a3b8;">Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong></span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <a href="pruebas_investigacion.php" class="btn-nueva" style="display: inline-flex; align-items: center; gap: 8px; background: #5a189a; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; transition: background 0.2s;">
+                        <i class="fa-solid fa-arrow-right"></i> Gestionar pruebas
+                    </a>
                 </div>
             </div>
         </section>
