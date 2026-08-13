@@ -144,6 +144,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $archivo = $_FILES['archivo'];
         $nombre_original = basename($archivo['name']);
         $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
+        // AULAMOS: detectar tipo real por extension
+        switch ($extension) {
+            case 'mp4':
+                $tipo_recurso = 'Video';
+                break;
+            case 'pdf':
+                $tipo_recurso = 'PDF';
+                break;
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'webp':
+                $tipo_recurso = 'Imagen';
+                break;
+            case 'ppt':
+            case 'pptx':
+                $tipo_recurso = 'Presentación';
+                break;
+            default:
+                $tipo_recurso = 'Documento';
+                break;
+        }
 
         // Tipos de archivo permitidos
         $tipos_archivo_permitidos = ['pdf', 'mp4', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'jpg', 'png', 'jpeg', 'gif', 'webp'];
@@ -593,10 +616,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
         
-        // Seleccionar el primero por defecto
-        if (typeCards.length > 0) {
-            typeCards[0].classList.add('selected');
-            tipoCursoInput.value = typeCards[0].dataset.tipo;
+        // Documento por defecto. El servidor valida el tipo real.
+        const tarjetaDocumento =
+            document.querySelector('.type-card[data-tipo="Documento"]');
+
+        if (tarjetaDocumento) {
+            typeCards.forEach(c => c.classList.remove('selected'));
+            tarjetaDocumento.classList.add('selected');
+            tipoCursoInput.value = 'Documento';
         }
 
         // ==========================================
@@ -606,6 +633,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const fileInput = document.getElementById('archivo');
         const uploadText = document.getElementById('uploadText');
         const btnPublicar = document.getElementById('btnPublicar');
+
+        function detectarTipoPorArchivo(archivo) {
+            if (!archivo) return;
+
+            const nombre = String(archivo.name || '').toLowerCase();
+            const extension = nombre.includes('.')
+                ? nombre.split('.').pop()
+                : '';
+
+            let tipo = 'Documento';
+
+            if (extension === 'mp4') {
+                tipo = 'Video';
+            } else if (extension === 'pdf') {
+                tipo = 'PDF';
+            }
+
+            tipoCursoInput.value = tipo;
+            typeCards.forEach(c => c.classList.remove('selected'));
+
+            const tarjeta =
+                document.querySelector(
+                    '.type-card[data-tipo="' + tipo + '"]'
+                );
+
+            if (tarjeta) {
+                tarjeta.classList.add('selected');
+            }
+        }
 
         // Click en el área de upload
         uploadArea.addEventListener('click', function() {
@@ -618,6 +674,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const archivo = this.files[0];
                 uploadText.textContent = '📎 ' + archivo.name + ' (' + (archivo.size / 1024 / 1024).toFixed(2) + ' MB)';
                 uploadText.className = 'upload-text archivo-seleccionado';
+                detectarTipoPorArchivo(archivo);
             } else {
                 uploadText.textContent = 'Toca para seleccionar o arrastra tu archivo aquí';
                 uploadText.className = 'upload-text';
@@ -647,6 +704,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const archivo = e.dataTransfer.files[0];
                 uploadText.textContent = '📎 ' + archivo.name + ' (' + (archivo.size / 1024 / 1024).toFixed(2) + ' MB)';
                 uploadText.className = 'upload-text archivo-seleccionado';
+                detectarTipoPorArchivo(archivo);
             }
         });
 
