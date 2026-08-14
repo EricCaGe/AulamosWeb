@@ -206,7 +206,9 @@ if (empty($statsMateria)) {
                 <p>Revisa tu progreso en cada materia</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btnAsistente">Asistente Virtual <span class="robot-icon">🤖</span></button>
+                <button class="btn-assistant" id="btn-asistente" onclick="window.open('Chatbot.php', '_blank')">
+    Asistente Virtual <span class="robot-icon">🤖</span>
+</button>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
                 <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar" class="avatar">
             </div>

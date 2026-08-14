@@ -309,8 +309,8 @@ $conexion->close();
                 <p>Explora los recursos compartidos en tus cursos.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btnAsistente" onclick="window.location.href='../Alumno/ChatbotAlumno.php?rol=alumno'">
-                    Asistente Virtual <span class="robot-icon">🤖</span>
+                <button class="btn-assistant" id="btn-asistente"onclick="window.open('Chatbot.php', '_blank')">
+                Asistente Virtual <span class="robot-icon">🤖</span>
                 </button>
                 <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
             </div>

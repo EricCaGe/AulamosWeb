@@ -116,7 +116,7 @@ $conexion->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ver Estudiantes - Aulamos</title>
+    <title>Ver Estudiantes</title>
 
     <!-- CSS Base -->
     <link rel="stylesheet" href="styles/docente.css">

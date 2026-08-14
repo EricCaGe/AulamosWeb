@@ -145,21 +145,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // =============================================
-    // BOTONES "CONTINUAR" y "VER ACTIVIDAD"
-    // =============================================
-    const btnContinuar = document.querySelector('.btn-purple');
-    if (btnContinuar) {
-        btnContinuar.addEventListener('click', function() {
-            alert('▶️ Continuando con la actividad...');
-        });
-    }
-
-    const btnVerActividad = document.querySelector('.btn-orange');
-    if (btnVerActividad) {
-        btnVerActividad.addEventListener('click', function() {
-            alert('👀 Abriendo la actividad próxima...');
-        });
-    }
+   
 
 });

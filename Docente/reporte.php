@@ -85,15 +85,20 @@ $result_promedio = $stmt_promedio->get_result();
 $promedio_general = $result_promedio->fetch_assoc()['promedio_general'] ?? 0;
 $stmt_promedio->close();
 
-// --- 3.2. Estudiantes aprobados ---
+// --- 3.2. Estudiantes aprobados (CORREGIDO) ---
 $query_aprobados = "
     SELECT
         COUNT(DISTINCT ae.id_alumno) AS total_estudiantes,
-        SUM(CASE WHEN e.calificacion >= 6.0 THEN 1 ELSE 0 END) AS aprobados
+        COUNT(DISTINCT CASE 
+            WHEN EXISTS (
+                SELECT 1 FROM entregas e2 
+                WHERE e2.id_actividad_estudiante = ae.id_actividad_estudiante 
+                AND e2.calificacion >= 6.0
+            ) THEN ae.id_alumno 
+        END) AS aprobados
     FROM actividad_estudiantes ae
     JOIN actividades a ON ae.id_actividad = a.id_actividad
     JOIN cursos c ON a.id_curso = c.id_curso
-    LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
     WHERE c.id_docente = ? AND ae.estado = 'Calificada'
 ";
 $query_aprobados = aplicarFiltros($query_aprobados, $materia_seleccionada, $periodo_seleccionado, $id_docente);
@@ -160,7 +165,7 @@ $query_rendimiento_actividad = "
     JOIN cursos c ON a.id_curso = c.id_curso
     LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
     WHERE c.id_docente = ? AND a.estado = 'Publicada'
-    GROUP BY a.id_actividad, a.titulo   -- ✅ Corregido
+    GROUP BY a.id_actividad, a.titulo
 ";
 $query_rendimiento_actividad = aplicarFiltros($query_rendimiento_actividad, $materia_seleccionada, $periodo_seleccionado, $id_docente);
 $stmt = $conexion->prepare($query_rendimiento_actividad);
@@ -181,7 +186,7 @@ $query_rendimiento_evaluacion = "
     JOIN cursos c ON a.id_curso = c.id_curso
     LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
     WHERE c.id_docente = ? AND a.tipo = 'Evaluacion' AND a.estado = 'Publicada'
-    GROUP BY a.id_actividad, a.titulo   -- ✅ Corregido
+    GROUP BY a.id_actividad, a.titulo
 ";
 $query_rendimiento_evaluacion = aplicarFiltros($query_rendimiento_evaluacion, $materia_seleccionada, $periodo_seleccionado, $id_docente);
 $stmt = $conexion->prepare($query_rendimiento_evaluacion);
@@ -200,7 +205,7 @@ $query_asistencia_participacion = "
     JOIN actividad_estudiantes ae ON a.id_actividad = ae.id_actividad
     JOIN cursos c ON a.id_curso = c.id_curso
     WHERE c.id_docente = ? AND a.estado = 'Publicada'
-    GROUP BY a.id_actividad, a.titulo   -- ✅ Corregido
+    GROUP BY a.id_actividad, a.titulo
 ";
 $query_asistencia_participacion = aplicarFiltros($query_asistencia_participacion, $materia_seleccionada, $periodo_seleccionado, $id_docente);
 $stmt = $conexion->prepare($query_asistencia_participacion);
