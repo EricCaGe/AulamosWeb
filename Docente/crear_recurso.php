@@ -249,6 +249,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="styles/docente.css">
     <link rel="stylesheet" href="styles/curso.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
 <body>
 
@@ -486,30 +488,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- BARRA ACCESIBILIDAD -->
-            <footer class="accessibility-bar">
-                <div class="acc-info">
-                    <div class="acc-icon-box">
-                        <i class="fa-solid fa-universal-access acc-icon-main"></i>
-                    </div>
-                    <div>
-                        <strong>Accesibilidad siempre disponible</strong>
-                        <p>Personaliza tu experiencia en cualquier momento.</p>
-                    </div>
-                </div>
-                <div class="acc-options">
-                    <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                    <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                    <button class="acc-opt-btn" id="btn-text-size"><span class="font-icon">Aa</span><span>Texto grande</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-                    <button class="acc-opt-btn"><i class="fa-solid fa-keyboard"></i><span>Navegación<br>por teclado</span></button>
-                </div>
-                <button class="btn-open-config">Abrir configuración</button>
-            </footer>
+            <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+        <!-- ========================================== -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
+
+</main>
 
         </main>
     </div>
+    <!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+<!-- ========================================== -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
+<!-- NUEVA ACCESIBILIDAD -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
+<script src="../Accesibilidad/navegacionTeclado.js"></script> 
 
     <script src="jss/docente_dashboard.js"></script>
     <!-- ✅ AGREGAR AQUÍ EL CÓDIGO DE SUBIDA DE ARCHIVOS -->

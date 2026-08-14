@@ -409,54 +409,32 @@ function iconoTipo($tipo)
         window.location.pathname.includes('/Docente/')
             ? window.location.pathname.split('/Docente/')[0]
             : '';
+function construirUrl(ruta) {
+    if (!ruta) return null;
 
-    function construirUrl(ruta) {
-        if (!ruta) return null;
+    let limpia = String(ruta).trim().replace(/\\/g, '/');
 
-        let limpia = String(ruta).trim().replace(/\\/g, '/');
-        const marcador = '/uploads/recursos/';
-
-        // Corrige URLs antiguas que pudieran apuntar a :3000.
-        if (/^https?:\/\//i.test(limpia)) {
-            try {
-                const absoluta = new URL(limpia);
-                const posicion = absoluta.pathname.indexOf(marcador);
-
-                if (posicion >= 0) {
-                    limpia = absoluta.pathname.substring(posicion);
-                } else {
-                    return limpia;
-                }
-            } catch (error) {
-                return limpia;
-            }
+    if (/^https?:\/\//i.test(limpia)) {
+        try {
+            const url = new URL(limpia);
+            limpia = url.pathname;
+        } catch (e) {
+            return limpia;
         }
-
-        // No duplicar /AulamosWeb si ya existe.
-        if (
-            AULAMOS_BASE &&
-            limpia.startsWith(AULAMOS_BASE + '/')
-        ) {
-            return window.location.origin + limpia;
-        }
-
-        const posicionRecurso = limpia.indexOf(marcador);
-
-        if (posicionRecurso >= 0) {
-            limpia = limpia.substring(posicionRecurso);
-        }
-
-        limpia = limpia
-            .replace(/^(\.\.\/)+/, '')
-            .replace(/^\/+/, '');
-
-        return (
-            window.location.origin +
-            AULAMOS_BASE +
-            '/' +
-            limpia
-        );
     }
+
+    if (!limpia.startsWith('/')) {
+        limpia = '/' + limpia;
+    }
+
+    return (
+        window.location.protocol +
+        '//' +
+        window.location.hostname +
+        ':3000' +
+        limpia
+    );
+}
 
     document.querySelectorAll('.js-abrir-recurso').forEach(function (boton) {
         boton.addEventListener('click', function () {
