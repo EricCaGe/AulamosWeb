@@ -142,6 +142,10 @@ $tipo = $_GET['tipo'] ?? '';
                 <p><?php echo __('administra_inscripciones'); ?></p>
             </div>
             <div class="header-actions">
+                <!-- ✅ BOTÓN CHATBOT -->
+<button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+    <i class="fa-solid fa-comment-dots"></i> <?php echo __('chatbot'); ?>
+</button>
                 <div class="icon-bell">
                     <i class="fa-regular fa-bell"></i>
                 </div>

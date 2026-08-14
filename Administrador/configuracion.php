@@ -43,6 +43,10 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
 <div class="dashboard-container">
     
     <aside class="sidebar">
+        <!-- ✅ BOTÓN CHATBOT -->
+<button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+    <i class="fa-solid fa-comment-dots"></i> <?php echo __('chatbot'); ?>
+</button>
         <div class="logo-section">
             <img src="../img/logogeneral.png" alt="Logo Aulamos" class="logo">
         </div>
@@ -107,6 +111,9 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
 
         <div class="config-grid">
             
+            <!-- ========================================== -->
+            <!-- INFORMACIÓN GENERAL (se mantiene)          -->
+            <!-- ========================================== -->
             <div class="config-card">
                 <div class="config-header">
                     <i class="fa-solid fa-circle-info"></i>
@@ -130,6 +137,10 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                 </form>
             </div>
 
+            <!-- ========================================== -->
+            <!-- PREFERENCIAS - OCULTAS (comentadas)        -->
+            <!-- ========================================== -->
+            <!--
             <div class="config-card">
                 <div class="config-header">
                     <i class="fa-solid fa-sliders"></i>
@@ -137,7 +148,6 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                 </div>
                 <form method="POST" action="logica/procesar_configuracion.php" id="formConfiguracion">
                     
-                    <!-- IDIOMA -->
                     <div class="form-group">
                         <label><?php echo __('idioma'); ?></label>
                         <div class="radio-group">
@@ -152,7 +162,6 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                         </div>
                     </div>
 
-                    <!-- TAMAÑO DE TEXTO -->
                     <div class="form-group">
                         <label><?php echo __('tamano_texto'); ?></label>
                         <div class="radio-group">
@@ -169,9 +178,9 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                                 <span style="font-size: 20px;">A</span> <?php echo __('grande'); ?>
                             </label>
                             <label for="tamano_muy_grande">
-            <input type="radio" name="tamano_texto" id="tamano_muy_grande" value="muy_grande" <?php echo ($tamano_actual === 'muy_grande') ? 'checked' : ''; ?>>
-            <span style="font-size: 24px;">A</span> <?php echo __('muy_grande'); ?>
-        </label>
+                                <input type="radio" name="tamano_texto" id="tamano_muy_grande" value="muy_grande" <?php echo ($tamano_actual === 'muy_grande') ? 'checked' : ''; ?>>
+                                <span style="font-size: 24px;">A</span> <?php echo __('muy_grande'); ?>
+                            </label>
                         </div>
                     </div>
 
@@ -179,6 +188,27 @@ $color_contraste = $_SESSION['contraste_color'] ?? 'azul';
                         <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
                     </div>
                 </form>
+            </div>
+            -->
+
+            <!-- ========================================== -->
+            <!-- MENSAJE DE PREFERENCIAS OCULTAS            -->
+            <!-- ========================================== -->
+            <div class="config-card" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                <div class="config-header">
+                    <i class="fa-solid fa-sliders" style="color: #94a3b8;"></i>
+                    <h3 style="color: #64748b;">Preferencias de plataforma</h3>
+                </div>
+                <div style="padding: 10px 0; text-align: center; color: #94a3b8;">
+                    <i class="fa-solid fa-universal-access" style="font-size: 28px; display: block; margin-bottom: 10px;"></i>
+                    <p style="font-size: 14px; font-weight: 500; margin: 0;">
+                        Las preferencias de accesibilidad (tamaño de texto, contraste, modo oscuro) 
+                        se gestionan desde la <strong>barra de accesibilidad</strong> disponible en toda la plataforma.
+                    </p>
+                    <p style="font-size: 12px; color: #cbd5e1; margin-top: 6px;">
+                        Haz clic en el botón ♿ en la esquina inferior derecha para personalizarlas.
+                    </p>
+                </div>
             </div>
 
         </div>

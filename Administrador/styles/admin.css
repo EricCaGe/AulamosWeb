@@ -555,3 +555,21 @@ body {
    ALTO CONTRASTE - ELIMINADO (USA LA NUEVA ACCESIBILIDAD)
    ========================================================= */
 /* Los estilos de alto contraste ahora están en Accesibilidad/accesibilidad.css */
+
+/* =========================================================
+   FIX: FORZAR SIDEBAR EN CONFIGURACIÓN
+   ========================================================= */
+.sidebar {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100% !important;
+        min-width: unset !important;
+        max-width: unset !important;
+    }
+}

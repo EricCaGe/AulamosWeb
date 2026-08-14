@@ -110,6 +110,7 @@
 .form-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid #e2e8f0;
@@ -189,7 +190,7 @@ body.modo-oscuro .form-actions {
 }
 
 /* ========================================== */
-/* RESPONSIVE                                 */
+/* RESPONSIVE - SOLO PARA CONFIGURACIÓN      */
 /* ========================================== */
 @media (max-width: 992px) {
     .config-grid {
@@ -198,11 +199,6 @@ body.modo-oscuro .form-actions {
 }
 
 @media (max-width: 768px) {
-    .stats-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
     .radio-group {
         flex-direction: column;
         gap: 8px;
@@ -269,19 +265,4 @@ body.modo-oscuro .btn-idioma {
 
 body.modo-oscuro .btn-idioma:hover {
     background: #3d3d5c;
-}
-
-/* =========================================================
-   BORDES CON VARIABLES CSS
-   ========================================================= */
-.config-card {
-    border-color: #e2e8f0;
-}
-
-.config-header {
-    border-bottom-color: #f1f5f9;
-}
-
-.form-actions {
-    border-top-color: #e2e8f0;
 }

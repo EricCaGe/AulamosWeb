@@ -19,6 +19,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <title>Mi Perfil - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="<?php echo $clases_body; ?>">
@@ -61,9 +62,9 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             </a>
         </nav>
         
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i> Accesibilidad
-        </button>
+        <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
+    <i class="fa-solid fa-universal-access"></i> Accesibilidad
+</button>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -76,6 +77,10 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 <p>Administra tu información personal</p>
             </div>
             <div class="header-actions">
+                <!-- ✅ BOTÓN CHATBOT -->
+<button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+    <i class="fa-solid fa-comment-dots"></i> <?php echo __('chatbot'); ?>
+</button>
                 <div class="user-profile">
                     <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
                     <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
@@ -131,31 +136,21 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 </div>
             </form>
         </section>
-
-        <!-- BARRA DE ACCESIBILIDAD -->
-        <footer class="accessibility-bar">
-            <div class="acc-info">
-                <i class="fa-solid fa-eye-low-vision acc-icon-main"></i>
-                <div>
-                    <strong>Accesibilidad siempre disponible</strong>
-                    <p>Personaliza tu experiencia en cualquier momento.</p>
-                </div>
-            </div>
-            <div class="acc-options">
-                <button class="acc-opt-btn" id="btn-contrast"><i class="fa-solid fa-eye"></i><span>Alto contraste</span></button>
-                <button class="acc-opt-btn" id="btn-darkmode"><i class="fa-solid fa-moon"></i><span>Modo oscuro</span></button>
-                <button class="acc-opt-btn" id="btn-text-size"><span class="font-icon">Aa</span><span>Texto grande</span></button>
-                <button class="acc-opt-btn"><i class="fa-solid fa-volume-high"></i><span>Leer pantalla</span></button>
-                <button class="acc-opt-btn"><i class="fa-solid fa-closed-captioning"></i><span>Subtítulos</span></button>
-                <button class="acc-opt-btn"><i class="fa-solid fa-keyboard"></i><span>Navegación</span></button>
-            </div>
-            <button class="btn-open-config">Abrir configuración</button>
-        </footer>
+ <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
+<!-- ✅ BOTÓN FLOTANTE DE ACCESIBILIDAD -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 <script src="js/admin.js"></script>
 <script src="js/lector.js"></script>
+
+<!-- ✅ NUEVA ACCESIBILIDAD JS -->
+<script src="../Accesibilidad/accesibilidad.js"></script>
 </body>
 </html>
