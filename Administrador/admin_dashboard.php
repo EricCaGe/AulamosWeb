@@ -10,7 +10,6 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../Conexion/conexion.php';
-require_once 'includes/preferencias.php';
 
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -48,19 +47,17 @@ $usuarios_recientes = $conexion->query("
 ")->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo __('dashboard'); ?> - Administrador</title>
+    <title>Dashboard - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- ✅ NUEVA ACCESIBILIDAD -->
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
-<body class="<?php echo $clases_body; ?>">
+<body>
 
 <div class="dashboard-container">
     
@@ -72,103 +69,105 @@ $usuarios_recientes = $conexion->query("
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
+                <i class="fa-solid fa-house"></i> Dashboard
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
+                <i class="fa-solid fa-calendar"></i> Ciclos escolares
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
+                <i class="fa-solid fa-clock"></i> Periodos
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
+                <i class="fa-solid fa-book"></i> Materias
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
+                <i class="fa-solid fa-layer-group"></i> Grupos
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
+                <i class="fa-solid fa-cubes"></i> Cursos
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
+                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
-           
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
+                <i class="fa-solid fa-gear"></i> Configuración
             </a>
         </nav>
         
-        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
         <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
-            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
+            <i class="fa-solid fa-universal-access"></i> Accesibilidad
         </button>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
         
-        <!-- ENCABEZADO -->
-        <header class="content-header">
-            <div class="welcome-text">
-                <h1><?php echo __('panel_administrativo'); ?></h1>
-                <h2>¡Hola, <span class="admin-name"><?php echo htmlspecialchars($nombre_admin); ?></span>! 👋</h2>
-                <p><?php echo __('bienvenido_admin'); ?></p>
-            </div>
-            <div class="header-actions">
-                <!-- ✅ BOTÓN CHATBOT -->
-                <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
-                    <i class="fa-solid fa-comment-dots"></i> <?php echo __('chatbot'); ?>
-                </button>
+        <!-- ENCABEZADO CON FOTO DE PERFIL -->
+<?php
+// Obtener foto de perfil del administrador
+$foto_perfil_admin = $_SESSION['usuario']['foto_perfil'] ?? null;
+$ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_perfil_admin : 'https://placehold.co/40x40/3b71f3/white?text=👤';
+?>
+<header class="content-header">
+    <div class="welcome-text">
+        <h1>Panel Administrativo</h1>
+        <h2>¡Hola, <span class="admin-name"><?php echo htmlspecialchars($nombre_admin); ?></span>! 👋</h2>
+        <p>Bienvenido al panel de administración del sistema</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+            <i class="fa-solid fa-comment-dots"></i> Chatbot
+        </button>
 
-                <div class="icon-bell">
-                    <i class="fa-regular fa-bell"></i>
-                </div>
+        <div class="icon-bell">
+            <i class="fa-regular fa-bell"></i>
+        </div>
 
-                <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
-                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </a>
-                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </header>
+        <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+            <img src="<?php echo $ruta_foto_admin; ?>" alt="Avatar Admin" class="avatar">
+            <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+            <i class="fa-solid fa-chevron-down drop-icon"></i>
+        </a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+    </div>
+</header>
 
         <!-- PANEL ACADÉMICO (DASHBOARD) -->
         <section class="panel-academico">
-            <h3 class="section-title"><?php echo __('panel_academico'); ?></h3>
+            <h3 class="section-title">Panel Académico</h3>
             <div class="stats-grid">
                 <div class="stat-box bg-blue">
                     <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
                     <div class="stat-content">
-                        <p class="stat-label"><?php echo __('planeacion'); ?></p>
+                        <p class="stat-label">Planeación</p>
                         <h4 class="stat-number"><?php echo $ciclos_activos; ?></h4>
-                        <p class="stat-sub"><?php echo __('ciclos_activos'); ?></p>
+                        <p class="stat-sub">Ciclos activos</p>
                     </div>
                 </div>
                 <div class="stat-box bg-purple">
                     <div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                     <div class="stat-content">
-                        <p class="stat-label"><?php echo __('academico'); ?></p>
+                        <p class="stat-label">Académico</p>
                         <h4 class="stat-number"><?php echo $materias_activas; ?></h4>
-                        <p class="stat-sub"><?php echo __('materias'); ?></p>
+                        <p class="stat-sub">Materias</p>
                     </div>
                 </div>
                 <div class="stat-box bg-green">
                     <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
                     <div class="stat-content">
-                        <p class="stat-label"><?php echo __('estudiantes'); ?></p>
+                        <p class="stat-label">Estudiantes</p>
                         <h4 class="stat-number"><?php echo $estudiantes_inscritos; ?></h4>
-                        <p class="stat-sub"><?php echo __('inscritos'); ?></p>
+                        <p class="stat-sub">Inscritos</p>
                     </div>
                 </div>
                 <div class="stat-box bg-orange">
                     <div class="stat-icon"><i class="fa-solid fa-cubes"></i></div>
                     <div class="stat-content">
-                        <p class="stat-label"><?php echo __('modulos'); ?></p>
+                        <p class="stat-label">Módulos</p>
                         <h4 class="stat-number"><?php echo $cursos_activos; ?></h4>
-                        <p class="stat-sub"><?php echo __('cursos_activos'); ?></p>
+                        <p class="stat-sub">Cursos activos</p>
                     </div>
                 </div>
             </div>
@@ -176,31 +175,31 @@ $usuarios_recientes = $conexion->query("
 
         <!-- ACCESOS RÁPIDOS -->
         <section class="accesos-rapidos">
-            <h3 class="section-title"><?php echo __('accesos_rapidos'); ?></h3>
+            <h3 class="section-title">Accesos Rápidos</h3>
             <div class="quick-access-grid">
                 <a href="ciclos_escolares.php" class="quick-btn bg-blue-light">
                     <i class="fa-solid fa-calendar"></i>
-                    <span><?php echo __('ciclos'); ?></span>
+                    <span>Ciclos</span>
                 </a>
                 <a href="periodos.php" class="quick-btn bg-purple-light">
                     <i class="fa-solid fa-clock"></i>
-                    <span><?php echo __('periodos'); ?></span>
+                    <span>Periodos</span>
                 </a>
                 <a href="materias.php" class="quick-btn bg-green-light">
                     <i class="fa-solid fa-book"></i>
-                    <span><?php echo __('materias'); ?></span>
+                    <span>Materias</span>
                 </a>
                 <a href="grupos.php" class="quick-btn bg-orange-light">
                     <i class="fa-solid fa-layer-group"></i>
-                    <span><?php echo __('grupos'); ?></span>
+                    <span>Grupos</span>
                 </a>
                 <a href="cursos.php" class="quick-btn bg-pink-light">
                     <i class="fa-solid fa-cubes"></i>
-                    <span><?php echo __('cursos'); ?></span>
+                    <span>Cursos</span>
                 </a>
                 <a href="inscripciones.php" class="quick-btn bg-cyan-light">
                     <i class="fa-solid fa-pen-to-square"></i>
-                    <span><?php echo __('inscripciones'); ?></span>
+                    <span>Inscripciones</span>
                 </a>
             </div>
         </section>
@@ -209,33 +208,31 @@ $usuarios_recientes = $conexion->query("
         <section class="gestion-academica">
             <div class="gestion-card">
                 <div class="gestion-content">
-                    <h3><?php echo __('gestion_academica'); ?></h3>
-                    <p><?php echo __('gestion_descripcion'); ?></p>
+                    <h3>Gestión Académica</h3>
+                    <p>Administra la configuración general del sistema académico</p>
                     <a href="configuracion.php" class="btn-configuracion">
-                        <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
+                        <i class="fa-solid fa-gear"></i> Configuración
                     </a>
                 </div>
                 <div class="gestion-nota">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span><?php echo __('gestion_nota'); ?></span>
+                    <span>Accede a la configuración para gestionar ciclos, periodos, materias y más</span>
                 </div>
             </div>
         </section>
 
-        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <!-- BARRA DE ACCESIBILIDAD -->
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<!-- ✅ BOTÓN FLOTANTE -->
+<!-- BOTÓN FLOTANTE -->
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
 
 <script src="js/admin.js"></script>
-
-<!-- ✅ NUEVA ACCESIBILIDAD JS -->
 <script src="../Accesibilidad/accesibilidad.js"></script>
 
 </body>

@@ -18,7 +18,7 @@ $correo = $_SESSION['usuario']['correo'];
 $rol = 'Investigador';
 
 // Obtener datos adicionales del usuario
-$stmt = $conexion->prepare("SELECT fecha_registro, ultimo_acceso FROM usuarios WHERE id_usuario = ?");
+$stmt = $conexion->prepare("SELECT fecha_registro, ultimo_acceso, foto_perfil FROM usuarios WHERE id_usuario = ?");
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -27,6 +27,7 @@ $stmt->close();
 
 $fecha_registro = $usuario_data['fecha_registro'] ?? date('d/m/Y');
 $ultimo_acceso = $usuario_data['ultimo_acceso'] ?? 'Nunca';
+$foto_perfil = $usuario_data['foto_perfil'] ?? null;
 
 // Procesar actualización de perfil
 $mensaje = '';
@@ -44,23 +45,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (empty($nombre) || empty($apellido_paterno) || empty($correo_nuevo)) {
                     $mensaje = 'Los campos nombre, apellido paterno y correo son obligatorios.';
                     $tipo_mensaje = 'error';
+                } elseif (!filter_var($correo_nuevo, FILTER_VALIDATE_EMAIL)) {
+                    $mensaje = 'El correo electrónico no es válido.';
+                    $tipo_mensaje = 'error';
                 } else {
-                    $stmt = $conexion->prepare("UPDATE usuarios SET nombre = ?, apellido_paterno = ?, apellido_materno = ?, correo = ? WHERE id_usuario = ?");
-                    $stmt->bind_param("ssssi", $nombre, $apellido_paterno, $apellido_materno, $correo_nuevo, $id_usuario);
-                    if ($stmt->execute()) {
-                        $_SESSION['usuario']['nombre'] = $nombre;
-                        $_SESSION['usuario']['apellido_paterno'] = $apellido_paterno;
-                        $_SESSION['usuario']['apellido_materno'] = $apellido_materno;
-                        $_SESSION['usuario']['correo'] = $correo_nuevo;
-                        $nombre_completo = $nombre . ' ' . $apellido_paterno . ' ' . $apellido_materno;
-                        $correo = $correo_nuevo;
-                        $mensaje = 'Perfil actualizado correctamente.';
-                        $tipo_mensaje = 'exito';
-                    } else {
-                        $mensaje = 'Error al actualizar el perfil.';
+                    // Validación: Verificar que el correo no esté en uso por otro usuario
+                    $stmt = $conexion->prepare("SELECT id_usuario FROM usuarios WHERE correo = ? AND id_usuario != ?");
+                    $stmt->bind_param("si", $correo_nuevo, $id_usuario);
+                    $stmt->execute();
+                    $resultado = $stmt->get_result();
+                    if ($resultado->num_rows > 0) {
+                        $mensaje = 'El correo ya está registrado por otro usuario.';
                         $tipo_mensaje = 'error';
+                    } else {
+                        $stmt = $conexion->prepare("UPDATE usuarios SET nombre = ?, apellido_paterno = ?, apellido_materno = ?, correo = ? WHERE id_usuario = ?");
+                        $stmt->bind_param("ssssi", $nombre, $apellido_paterno, $apellido_materno, $correo_nuevo, $id_usuario);
+                        if ($stmt->execute()) {
+                            $_SESSION['usuario']['nombre'] = $nombre;
+                            $_SESSION['usuario']['apellido_paterno'] = $apellido_paterno;
+                            $_SESSION['usuario']['apellido_materno'] = $apellido_materno;
+                            $_SESSION['usuario']['correo'] = $correo_nuevo;
+                            $nombre_completo = $nombre . ' ' . $apellido_paterno . ' ' . $apellido_materno;
+                            $correo = $correo_nuevo;
+                            $mensaje = 'Perfil actualizado correctamente.';
+                            $tipo_mensaje = 'exito';
+                        } else {
+                            $mensaje = 'Error al actualizar el perfil.';
+                            $tipo_mensaje = 'error';
+                        }
+                        $stmt->close();
                     }
-                    $stmt->close();
                 }
                 break;
 
@@ -86,7 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $usuario = $resultado->fetch_assoc();
                     $stmt->close();
 
-                    if (password_verify($password_actual, $usuario['password_hash'])) {
+                    if (!password_verify($password_actual, $usuario['password_hash'])) {
+                        $mensaje = 'La contraseña actual es incorrecta.';
+                        $tipo_mensaje = 'error';
+                    } elseif (password_verify($password_nuevo, $usuario['password_hash'])) {
+                        $mensaje = 'La nueva contraseña debe ser diferente a la actual.';
+                        $tipo_mensaje = 'error';
+                    } else {
                         $nuevo_hash = password_hash($password_nuevo, PASSWORD_DEFAULT);
                         $stmt = $conexion->prepare("UPDATE usuarios SET password_hash = ? WHERE id_usuario = ?");
                         $stmt->bind_param("si", $nuevo_hash, $id_usuario);
@@ -98,34 +118,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $tipo_mensaje = 'error';
                         }
                         $stmt->close();
-                    } else {
-                        $mensaje = 'La contraseña actual es incorrecta.';
-                        $tipo_mensaje = 'error';
                     }
                 }
                 break;
 
-            case 'guardar_preferencias':
-                $idioma = $_POST['idioma'] ?? 'es';
-                $notificaciones = isset($_POST['notificaciones']) ? 1 : 0;
-                $tema = $_POST['tema'] ?? 'claro';
-
-                $_SESSION['preferencias'] = [
-                    'idioma' => $idioma,
-                    'notificaciones' => $notificaciones,
-                    'tema' => $tema
-                ];
-
-                $mensaje = 'Preferencias guardadas correctamente.';
-                $tipo_mensaje = 'exito';
+            // =============================================
+            // NUEVO: SUBIR FOTO DE PERFIL
+            // =============================================
+            case 'subir_foto':
+                if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+                    $archivo = $_FILES['foto_perfil'];
+                    $nombre_original = $archivo['name'];
+                    $tipo = $archivo['type'];
+                    $tamano = $archivo['size'];
+                    $temp = $archivo['tmp_name'];
+                    
+                    // Validar tipo de archivo
+                    $extensiones_permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
+                    
+                    if (!in_array($extension, $extensiones_permitidas)) {
+                        $mensaje = 'Solo se permiten imágenes JPG, PNG, GIF o WEBP.';
+                        $tipo_mensaje = 'error';
+                    } elseif ($tamano > 2097152) { // 2MB
+                        $mensaje = 'La imagen no debe superar los 2MB.';
+                        $tipo_mensaje = 'error';
+                    } else {
+                        // Crear carpeta si no existe
+                        $carpeta_destino = '../uploads/perfiles/';
+                        if (!is_dir($carpeta_destino)) {
+                            mkdir($carpeta_destino, 0777, true);
+                        }
+                        
+                        // Generar nombre único
+                        $nombre_archivo = 'perfil_' . $id_usuario . '_' . time() . '.' . $extension;
+                        $ruta_completa = $carpeta_destino . $nombre_archivo;
+                        
+                        // Mover archivo
+                        if (move_uploaded_file($temp, $ruta_completa)) {
+                            // Eliminar foto anterior si existe
+                            if ($foto_perfil && file_exists($carpeta_destino . $foto_perfil)) {
+                                unlink($carpeta_destino . $foto_perfil);
+                            }
+                            
+                            // Actualizar base de datos
+                            $stmt = $conexion->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?");
+                            $stmt->bind_param("si", $nombre_archivo, $id_usuario);
+                            if ($stmt->execute()) {
+                                // Actualizar sesión
+                                $_SESSION['usuario']['foto_perfil'] = $nombre_archivo;
+                                $foto_perfil = $nombre_archivo;
+                                
+                                $mensaje = 'Foto de perfil actualizada correctamente.';
+                                $tipo_mensaje = 'exito';
+                            } else {
+                                $mensaje = 'Error al guardar la foto en la base de datos.';
+                                $tipo_mensaje = 'error';
+                            }
+                            $stmt->close();
+                        } else {
+                            $mensaje = 'Error al subir la imagen.';
+                            $tipo_mensaje = 'error';
+                        }
+                    }
+                } else {
+                    $mensaje = 'No se seleccionó ninguna imagen.';
+                    $tipo_mensaje = 'error';
+                }
                 break;
         }
     }
 }
 
-$idioma_actual = $_SESSION['preferencias']['idioma'] ?? 'es';
-$notificaciones_actual = $_SESSION['preferencias']['notificaciones'] ?? 1;
-$tema_actual = $_SESSION['preferencias']['tema'] ?? 'claro';
+// Actualizar la variable de sesión de foto para el header
+$foto_perfil_actual = $_SESSION['usuario']['foto_perfil'] ?? $foto_perfil;
 
 // Páginas del investigador
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -203,7 +269,11 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <i class="fa-regular fa-bell"></i>
                 </div>
                 <a href="perfil_investigador.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar" class="avatar">
+                    <?php if (!empty($foto_perfil_actual)): ?>
+                        <img src="../uploads/perfiles/<?php echo htmlspecialchars($foto_perfil_actual); ?>" alt="Avatar" class="avatar">
+                    <?php else: ?>
+                        <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar" class="avatar">
+                    <?php endif; ?>
                     <span class="user-name"><?php echo htmlspecialchars($nombre_completo); ?></span>
                     <i class="fa-solid fa-chevron-down drop-icon"></i>
                 </a>
@@ -227,11 +297,21 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <section class="perfil-seccion datos-personales">
                 <div class="perfil-avatar">
                     <div class="avatar-grande">
-                        <img src="https://placehold.co/120x120/3b71f3/white?text=👤" alt="Avatar">
+                        <?php if (!empty($foto_perfil_actual)): ?>
+                            <img src="../uploads/perfiles/<?php echo htmlspecialchars($foto_perfil_actual); ?>" alt="Foto de perfil">
+                        <?php else: ?>
+                            <img src="https://placehold.co/120x120/3b71f3/white?text=👤" alt="Avatar por defecto">
+                        <?php endif; ?>
                     </div>
-                    <button class="btn-cambiar-foto">
-                        <i class="fa-solid fa-camera"></i> Cambiar foto
-                    </button>
+                    
+                    <!-- FORMULARIO SUBIR FOTO -->
+                    <form method="POST" enctype="multipart/form-data" id="formFotoPerfil">
+                        <input type="hidden" name="accion" value="subir_foto">
+                        <label for="inputFotoPerfil" class="btn-cambiar-foto" style="cursor:pointer;">
+                            <i class="fa-solid fa-camera"></i> Cambiar foto
+                        </label>
+                        <input type="file" name="foto_perfil" id="inputFotoPerfil" accept="image/*" style="display:none;">
+                    </form>
                 </div>
 
                 <div class="perfil-info">
@@ -267,7 +347,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- Cambiar contraseña -->
                     <div class="config-card">
                         <h3><i class="fa-solid fa-lock"></i> Cambiar contraseña</h3>
-                        <form method="POST" action="" class="config-form">
+                        <form method="POST" action="" class="config-form" id="formPassword">
                             <input type="hidden" name="accion" value="cambiar_password">
                             <div class="form-group">
                                 <label for="password_actual">Contraseña actual</label>
@@ -285,36 +365,31 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                         </form>
                     </div>
 
-                    <!-- Preferencias -->
+                    <!-- Mostrar datos del usuario (reemplaza preferencias) -->
                     <div class="config-card">
-                        <h3><i class="fa-solid fa-sliders"></i> Preferencias</h3>
-                        <form method="POST" action="" class="config-form">
-                            <input type="hidden" name="accion" value="guardar_preferencias">
+                        <h3><i class="fa-solid fa-user"></i> Datos del usuario</h3>
+                        <div class="config-form">
                             <div class="form-group">
-                                <label for="idioma">Idioma</label>
-                                <select id="idioma" name="idioma" class="clean-select">
-                                    <option value="es" <?php echo $idioma_actual === 'es' ? 'selected' : ''; ?>>Español</option>
-                                    <option value="en" <?php echo $idioma_actual === 'en' ? 'selected' : ''; ?>>English</option>
-                                </select>
-                            </div>
-                            <div class="form-group toggle-group">
-                                <label for="notificaciones">Notificaciones</label>
-                                <label class="switch">
-                                    <input type="checkbox" id="notificaciones" name="notificaciones" <?php echo $notificaciones_actual ? 'checked' : ''; ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                                <span class="toggle-label"><?php echo $notificaciones_actual ? 'Activadas' : 'Desactivadas'; ?></span>
+                                <label>ID de usuario</label>
+                                <input type="text" value="<?php echo $id_usuario; ?>" disabled style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
                             </div>
                             <div class="form-group">
-                                <label for="tema">Tema</label>
-                                <select id="tema" name="tema" class="clean-select">
-                                    <option value="claro" <?php echo $tema_actual === 'claro' ? 'selected' : ''; ?>>Claro</option>
-                                    <option value="oscuro" <?php echo $tema_actual === 'oscuro' ? 'selected' : ''; ?>>Oscuro</option>
-                                    <option value="sistema" <?php echo $tema_actual === 'sistema' ? 'selected' : ''; ?>>Sistema</option>
-                                </select>
+                                <label>Rol</label>
+                                <input type="text" value="<?php echo $rol; ?>" disabled style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
                             </div>
-                            <button type="submit" class="btn-guardar">Guardar preferencias</button>
-                        </form>
+                            <div class="form-group">
+                                <label>Estado</label>
+                                <input type="text" value="Activo" disabled style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha de registro</label>
+                                <input type="text" value="<?php echo date('d/m/Y H:i', strtotime($fecha_registro)); ?>" disabled style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Último acceso</label>
+                                <input type="text" value="<?php echo $ultimo_acceso !== 'Nunca' ? date('d/m/Y H:i', strtotime($ultimo_acceso)) : 'Nunca'; ?>" disabled style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -324,7 +399,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <section class="perfil-seccion acciones">
                 <h2><i class="fa-solid fa-ellipsis-h"></i> Acciones</h2>
                 <div class="acciones-grid">
-                    <button class="btn-accion btn-editar" onclick="abrirModalEditar()">
+                    <button class="btn-accion btn-editar" id="btnEditarPerfil">
                         <i class="fa-solid fa-pen"></i> Editar perfil
                     </button>
                     <a href="../InicioSesion/cerrar_sesion.php" class="btn-accion btn-cerrar-sesion">
@@ -351,9 +426,9 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <div class="modal-container">
         <div class="modal-header">
             <h2><i class="fa-solid fa-pen"></i> Editar perfil</h2>
-            <button class="modal-cerrar" onclick="cerrarModalEditar()">&times;</button>
+            <button class="modal-cerrar" id="modalCerrar">&times;</button>
         </div>
-        <form method="POST" action="" class="modal-form">
+        <form method="POST" action="" class="modal-form" id="formEditarPerfil">
             <input type="hidden" name="accion" value="editar_perfil">
             <div class="form-group">
                 <label for="edit_nombre">Nombre <span class="text-danger">*</span></label>
@@ -372,7 +447,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 <input type="email" id="edit_correo" name="correo" value="<?php echo htmlspecialchars($_SESSION['usuario']['correo']); ?>" required>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-cancelar" onclick="cerrarModalEditar()">Cancelar</button>
+                <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
                 <button type="submit" class="btn-guardar">Guardar cambios</button>
             </div>
         </form>
@@ -386,17 +461,65 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 <script src="../Accesibilidad/navegacionTeclado.js"></script>
 
 <script>
+    // =============================================
+    // SUBIR FOTO - AUTO SUBMIT AL SELECCIONAR
+    // =============================================
+    const inputFoto = document.getElementById('inputFotoPerfil');
+    const formFoto = document.getElementById('formFotoPerfil');
+
+    if (inputFoto) {
+        inputFoto.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                // Validar tamaño y tipo antes de enviar
+                const archivo = this.files[0];
+                const extensionesPermitidas = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                const tamanoMaximo = 2097152; // 2MB
+
+                if (!extensionesPermitidas.includes(archivo.type)) {
+                    alert('⚠️ Solo se permiten imágenes JPG, PNG, GIF o WEBP.');
+                    this.value = '';
+                    return;
+                }
+
+                if (archivo.size > tamanoMaximo) {
+                    alert('⚠️ La imagen no debe superar los 2MB.');
+                    this.value = '';
+                    return;
+                }
+
+                // Enviar formulario automáticamente
+                if (confirm('¿Deseas actualizar tu foto de perfil?')) {
+                    formFoto.submit();
+                } else {
+                    this.value = '';
+                }
+            }
+        });
+    }
+
+    // =============================================
+    // MODAL - ABRIR Y CERRAR
+    // =============================================
+    const modalEditar = document.getElementById('modalEditar');
+    const btnEditarPerfil = document.getElementById('btnEditarPerfil');
+    const modalCerrar = document.getElementById('modalCerrar');
+    const modalCancelar = document.getElementById('modalCancelar');
+
     function abrirModalEditar() {
-        document.getElementById('modalEditar').classList.remove('modal-hidden');
+        modalEditar.classList.remove('modal-hidden');
         document.body.style.overflow = 'hidden';
     }
 
     function cerrarModalEditar() {
-        document.getElementById('modalEditar').classList.add('modal-hidden');
+        modalEditar.classList.add('modal-hidden');
         document.body.style.overflow = 'auto';
     }
 
-    document.getElementById('modalEditar').addEventListener('click', function(e) {
+    btnEditarPerfil.addEventListener('click', abrirModalEditar);
+    modalCerrar.addEventListener('click', cerrarModalEditar);
+    modalCancelar.addEventListener('click', cerrarModalEditar);
+
+    modalEditar.addEventListener('click', function(e) {
         if (e.target === this) {
             cerrarModalEditar();
         }
@@ -408,10 +531,61 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         }
     });
 
-    document.querySelector('.toggle-group .switch input').addEventListener('change', function() {
-        const label = this.closest('.toggle-group').querySelector('.toggle-label');
-        label.textContent = this.checked ? 'Activadas' : 'Desactivadas';
-    });
+    // =============================================
+    // VALIDACIÓN FORMULARIO CONTRASEÑA
+    // =============================================
+    const formPassword = document.getElementById('formPassword');
+    if (formPassword) {
+        formPassword.addEventListener('submit', function(e) {
+            const passwordActual = document.getElementById('password_actual').value;
+            const passwordNuevo = document.getElementById('password_nuevo').value;
+            const passwordConfirmar = document.getElementById('password_confirmar').value;
+
+            if (passwordNuevo.length < 6) {
+                e.preventDefault();
+                alert('La nueva contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+
+            if (passwordNuevo !== passwordConfirmar) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden.');
+                return;
+            }
+
+            if (passwordActual === passwordNuevo) {
+                e.preventDefault();
+                alert('La nueva contraseña debe ser diferente a la actual.');
+                return;
+            }
+        });
+    }
+
+    // =============================================
+    // VALIDACIÓN FORMULARIO EDITAR PERFIL
+    // =============================================
+    const formEditarPerfil = document.getElementById('formEditarPerfil');
+    if (formEditarPerfil) {
+        formEditarPerfil.addEventListener('submit', function(e) {
+            const nombre = document.getElementById('edit_nombre').value.trim();
+            const apellido = document.getElementById('edit_apellido_paterno').value.trim();
+            const correo = document.getElementById('edit_correo').value.trim();
+
+            if (!nombre || !apellido || !correo) {
+                e.preventDefault();
+                alert('Los campos nombre, apellido paterno y correo son obligatorios.');
+                return;
+            }
+
+            if (!correo.includes('@')) {
+                e.preventDefault();
+                alert('Ingresa un correo electrónico válido.');
+                return;
+            }
+        });
+    }
+
+    console.log('👤 Perfil de Investigador cargado correctamente');
 </script>
 
 </body>

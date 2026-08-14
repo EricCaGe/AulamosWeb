@@ -9,7 +9,6 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../Conexion/conexion.php';
-require_once 'includes/preferencias.php';
 
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -68,20 +67,18 @@ $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo __('cursos'); ?> - Administrador</title>
+    <title>Cursos - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/cursos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- ✅ NUEVA ACCESIBILIDAD -->
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
-<body class="<?php echo $clases_body; ?>">
+<body>
 
 <div class="dashboard-container">
     
@@ -93,34 +90,33 @@ $tipo = $_GET['tipo'] ?? '';
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
+                <i class="fa-solid fa-house"></i> Dashboard
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
+                <i class="fa-solid fa-calendar"></i> Ciclos escolares
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
+                <i class="fa-solid fa-clock"></i> Periodos
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
+                <i class="fa-solid fa-book"></i> Materias
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
+                <i class="fa-solid fa-layer-group"></i> Grupos
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
+                <i class="fa-solid fa-cubes"></i> Cursos
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
+                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
+                <i class="fa-solid fa-gear"></i> Configuración
             </a>
         </nav>
         
-        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
         <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
-            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
+            <i class="fa-solid fa-universal-access"></i> Accesibilidad
         </button>
     </aside>
 
@@ -128,33 +124,37 @@ $tipo = $_GET['tipo'] ?? '';
     <main class="main-content">
         
         <!-- ENCABEZADO -->
-        <header class="content-header">
-            <div class="welcome-text">
-                <h1><?php echo __('cursos'); ?></h1>
-                <p><?php echo __('administra_cursos'); ?></p>
-            </div>
-            <div class="header-actions">
-                <!-- ✅ BOTÓN CHATBOT -->
-<button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
-    <i class="fa-solid fa-comment-dots"></i> <?php echo __('chatbot'); ?>
-</button>
-                <div class="icon-bell">
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
-                    <i class="fa-solid fa-language"></i>
-                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
-                </button>
-                <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </a>
-                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </header>
+        <!-- ENCABEZADO CON FOTO DE PERFIL -->
+<?php
+// Obtener foto de perfil del administrador
+$foto_perfil_admin = $_SESSION['usuario']['foto_perfil'] ?? null;
+$ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_perfil_admin : 'https://placehold.co/40x40/3b71f3/white?text=👤';
+?>
+<header class="content-header">
+    <div class="welcome-text">
+        <h1>Panel Administrativo</h1>
+        <h2>¡Hola, <span class="admin-name"><?php echo htmlspecialchars($nombre_admin); ?></span>! 👋</h2>
+        <p>Bienvenido al panel de administración del sistema</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+            <i class="fa-solid fa-comment-dots"></i> Chatbot
+        </button>
+
+        <div class="icon-bell">
+            <i class="fa-regular fa-bell"></i>
+        </div>
+
+        <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+            <img src="<?php echo $ruta_foto_admin; ?>" alt="Avatar Admin" class="avatar">
+            <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+            <i class="fa-solid fa-chevron-down drop-icon"></i>
+        </a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+    </div>
+</header>
 
         <!-- MENSAJES -->
         <?php if ($mensaje): ?>
@@ -170,14 +170,14 @@ $tipo = $_GET['tipo'] ?? '';
             <div class="stats-row">
                 <div class="stat-card">
                     <span class="stat-number"><?php echo $total_cursos; ?></span>
-                    <span class="stat-label"><?php echo __('total'); ?></span>
+                    <span class="stat-label">Total</span>
                 </div>
                 <div class="stat-card stat-activa">
                     <span class="stat-number"><?php echo $cursos_activos; ?></span>
-                    <span class="stat-label"><?php echo __('activos'); ?></span>
+                    <span class="stat-label">Activos</span>
                 </div>
                 <button class="btn-nuevo-curso" id="btnNuevoCurso">
-                    <i class="fa-solid fa-plus"></i> <?php echo __('nuevo_curso'); ?>
+                    <i class="fa-solid fa-plus"></i> Nuevo curso
                 </button>
             </div>
         </section>
@@ -188,7 +188,7 @@ $tipo = $_GET['tipo'] ?? '';
         <section class="busqueda-cursos">
             <div class="busqueda-container">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" placeholder="<?php echo __('buscar_curso'); ?>" class="input-busqueda" id="buscarCurso">
+                <input type="text" placeholder="Buscar curso por nombre, materia o docente..." class="input-busqueda" id="buscarCurso">
             </div>
         </section>
 
@@ -197,18 +197,18 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ========================================== -->
         <section class="lista-cursos">
             <div class="cursos-header">
-                <h3><?php echo __('cursos_registrados'); ?></h3>
-                <span class="resultados" id="totalResultados"><?php echo count($cursos); ?> <?php echo __('resultados'); ?></span>
+                <h3>Cursos registrados</h3>
+                <span class="resultados" id="totalResultados"><?php echo count($cursos); ?> resultados</span>
             </div>
 
             <div class="cursos-grid" id="cursosGrid">
                 <?php if (empty($cursos)): ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-cubes"></i>
-                        <h4><?php echo __('sin_cursos'); ?></h4>
-                        <p><?php echo __('crear_primer_curso'); ?></p>
+                        <h4>No hay cursos registrados</h4>
+                        <p>Comienza creando el primer curso</p>
                         <button class="btn-agregar-empty" id="btnNuevoCursoEmpty">
-                            <i class="fa-solid fa-plus"></i> <?php echo __('crear_curso'); ?>
+                            <i class="fa-solid fa-plus"></i> Crear curso
                         </button>
                     </div>
                 <?php else: ?>
@@ -227,34 +227,34 @@ $tipo = $_GET['tipo'] ?? '';
 
                         <div class="curso-detalles">
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('materia'); ?>:</span>
+                                <span class="detalle-label">Materia:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($curso['materia']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('grupo'); ?>:</span>
+                                <span class="detalle-label">Grupo:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($curso['grupo']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('docente'); ?>:</span>
+                                <span class="detalle-label">Docente:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($curso['docente']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('ciclo'); ?>:</span>
+                                <span class="detalle-label">Ciclo:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($curso['ciclo']); ?></span>
                             </div>
                         </div>
 
                         <div class="curso-acciones">
                             <button class="btn-editar" data-id="<?php echo $curso['id_curso']; ?>">
-                                <i class="fa-regular fa-pen-to-square"></i> <?php echo __('editar'); ?>
+                                <i class="fa-regular fa-pen-to-square"></i> Editar
                             </button>
                             <?php if ($curso['estado'] !== 'Finalizado'): ?>
                             <button class="btn-deshabilitar" data-id="<?php echo $curso['id_curso']; ?>">
-                                <i class="fa-solid fa-eye-slash"></i> <?php echo __('deshabilitar'); ?>
+                                <i class="fa-solid fa-eye-slash"></i> Deshabilitar
                             </button>
                             <?php endif; ?>
                             <button class="btn-eliminar" data-id="<?php echo $curso['id_curso']; ?>">
-                                <i class="fa-regular fa-trash-can"></i> <?php echo __('eliminar'); ?>
+                                <i class="fa-regular fa-trash-can"></i> Eliminar
                             </button>
                         </div>
                     </div>
@@ -269,7 +269,7 @@ $tipo = $_GET['tipo'] ?? '';
         <div class="modal-overlay" id="modalCurso">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="modalTitulo"><?php echo __('nuevo_curso'); ?></h2>
+                    <h2 id="modalTitulo">Nuevo curso</h2>
                     <button class="modal-cerrar" id="modalCerrar">&times;</button>
                 </div>
                 <form id="formCurso" method="POST" action="logica/procesar_cursos.php">
@@ -278,10 +278,10 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Ciclo escolar -->
                     <div class="form-group">
-                        <label><?php echo __('ciclo_escolar'); ?> <span class="text-danger">*</span></label>
+                        <label>Ciclo escolar <span class="text-danger">*</span></label>
                         <div class="radio-group radio-inline" id="cicloOptions">
                             <?php if (empty($ciclos)): ?>
-                                <p style="color: #94a3b8; font-style: italic;"><?php echo __('sin_ciclos'); ?></p>
+                                <p style="color: #94a3b8; font-style: italic;">No hay ciclos activos</p>
                             <?php else: ?>
                                 <?php foreach ($ciclos as $index => $ciclo): ?>
                                 <label>
@@ -295,9 +295,9 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Grupo -->
                     <div class="form-group">
-                        <label for="modalGrupo"><?php echo __('grupo'); ?> <span class="text-danger">*</span></label>
+                        <label for="modalGrupo">Grupo <span class="text-danger">*</span></label>
                         <select id="modalGrupo" name="id_grupo" required>
-                            <option value="">-- <?php echo __('seleccionar_grupo'); ?> --</option>
+                            <option value="">-- Seleccionar grupo --</option>
                             <?php foreach ($grupos as $grupo): ?>
                             <option value="<?php echo $grupo['id_grupo']; ?>">
                                 <?php echo htmlspecialchars($grupo['nombre']); ?>
@@ -308,10 +308,10 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Materia -->
                     <div class="form-group">
-                        <label><?php echo __('materia'); ?> <span class="text-danger">*</span></label>
+                        <label>Materia <span class="text-danger">*</span></label>
                         <div class="radio-group radio-inline" id="materiaOptions">
                             <?php if (empty($materias)): ?>
-                                <p style="color: #94a3b8; font-style: italic;"><?php echo __('sin_materias'); ?></p>
+                                <p style="color: #94a3b8; font-style: italic;">No hay materias activas</p>
                             <?php else: ?>
                                 <?php foreach ($materias as $index => $materia): ?>
                                 <label>
@@ -325,10 +325,10 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Docente -->
                     <div class="form-group">
-                        <label><?php echo __('docente'); ?> <span class="text-danger">*</span></label>
+                        <label>Docente <span class="text-danger">*</span></label>
                         <div class="radio-group radio-inline" id="docenteOptions">
                             <?php if (empty($docentes)): ?>
-                                <p style="color: #94a3b8; font-style: italic;"><?php echo __('sin_docentes'); ?></p>
+                                <p style="color: #94a3b8; font-style: italic;">No hay docentes registrados</p>
                             <?php else: ?>
                                 <?php foreach ($docentes as $index => $docente): ?>
                                 <label>
@@ -342,59 +342,57 @@ $tipo = $_GET['tipo'] ?? '';
 
                     <!-- Nombre del curso -->
                     <div class="form-group">
-                        <label for="modalNombre"><?php echo __('nombre_curso'); ?> <span class="text-danger">*</span></label>
-                        <input type="text" id="modalNombre" name="nombre" placeholder="<?php echo __('ej_curso'); ?>" required>
+                        <label for="modalNombre">Nombre del curso <span class="text-danger">*</span></label>
+                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej: Matemáticas I - Grupo A" required>
                     </div>
 
                     <!-- Descripción -->
                     <div class="form-group">
-                        <label for="modalDescripcion"><?php echo __('descripcion'); ?></label>
-                        <textarea id="modalDescripcion" name="descripcion" rows="3" placeholder="<?php echo __('descripcion_curso'); ?>"></textarea>
+                        <label for="modalDescripcion">Descripción</label>
+                        <textarea id="modalDescripcion" name="descripcion" rows="3" placeholder="Descripción del curso"></textarea>
                         <p class="contador-caracteres"><span id="modalContador">0</span>/1000</p>
                     </div>
 
                     <!-- Estado -->
                     <div class="form-group">
-                        <label><?php echo __('estado'); ?></label>
+                        <label>Estado</label>
                         <div class="radio-group">
                             <label>
                                 <input type="radio" name="estado" value="Activo" checked>
-                                <i class="fa-solid fa-circle-check"></i> <?php echo __('activo'); ?>
+                                <i class="fa-solid fa-circle-check"></i> Activo
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Inactivo">
-                                <i class="fa-solid fa-circle-xmark"></i> <?php echo __('inactivo'); ?>
+                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Finalizado">
-                                <i class="fa-solid fa-lock"></i> <?php echo __('finalizado'); ?>
+                                <i class="fa-solid fa-lock"></i> Finalizado
                             </label>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="modalCancelar"><?php echo __('cancelar'); ?></button>
-                        <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
+                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
+                        <button type="submit" class="btn-guardar">Guardar</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <!-- BARRA DE ACCESIBILIDAD -->
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<!-- ✅ BOTÓN FLOTANTE -->
+<!-- BOTÓN FLOTANTE -->
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
 
 <script src="js/admin.js"></script>
 <script src="js/cursos.js"></script>
-
-<!-- ✅ NUEVA ACCESIBILIDAD JS -->
 <script src="../Accesibilidad/accesibilidad.js"></script>
 
 </body>

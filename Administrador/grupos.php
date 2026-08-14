@@ -9,7 +9,6 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
 }
 
 require_once '../Conexion/conexion.php';
-require_once 'includes/preferencias.php';
 
 $nombre_admin = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 $pagina_actual = basename($_SERVER['PHP_SELF']);
@@ -47,20 +46,18 @@ $mensaje = $_GET['mensaje'] ?? '';
 $tipo = $_GET['tipo'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $idioma_actual === 'es' ? 'es' : 'en'; ?>">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo __('grupos'); ?> - Administrador</title>
+    <title>Grupos - Administrador</title>
     
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/grupos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- ✅ NUEVA ACCESIBILIDAD -->
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 </head>
-<body class="<?php echo $clases_body; ?>">
+<body>
 
 <div class="dashboard-container">
     
@@ -72,68 +69,70 @@ $tipo = $_GET['tipo'] ?? '';
         
         <nav class="menu">
             <a href="admin_dashboard.php" class="menu-item <?php echo ($pagina_actual == 'admin_dashboard.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i> <?php echo __('dashboard'); ?>
+                <i class="fa-solid fa-house"></i> Dashboard
             </a>
             <a href="ciclos_escolares.php" class="menu-item <?php echo ($pagina_actual == 'ciclos_escolares.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-calendar"></i> <?php echo __('ciclos'); ?>
+                <i class="fa-solid fa-calendar"></i> Ciclos escolares
             </a>
             <a href="periodos.php" class="menu-item <?php echo ($pagina_actual == 'periodos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-clock"></i> <?php echo __('periodos'); ?>
+                <i class="fa-solid fa-clock"></i> Periodos
             </a>
             <a href="materias.php" class="menu-item <?php echo ($pagina_actual == 'materias.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-book"></i> <?php echo __('materias'); ?>
+                <i class="fa-solid fa-book"></i> Materias
             </a>
             <a href="grupos.php" class="menu-item <?php echo ($pagina_actual == 'grupos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-layer-group"></i> <?php echo __('grupos'); ?>
+                <i class="fa-solid fa-layer-group"></i> Grupos
             </a>
             <a href="cursos.php" class="menu-item <?php echo ($pagina_actual == 'cursos.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-cubes"></i> <?php echo __('cursos'); ?>
+                <i class="fa-solid fa-cubes"></i> Cursos
             </a>
             <a href="inscripciones.php" class="menu-item <?php echo ($pagina_actual == 'inscripciones.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-pen-to-square"></i> <?php echo __('inscripciones'); ?>
+                <i class="fa-solid fa-pen-to-square"></i> Inscripciones
             </a>
             <a href="configuracion.php" class="menu-item <?php echo ($pagina_actual == 'configuracion.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gear"></i> <?php echo __('configuracion'); ?>
+                <i class="fa-solid fa-gear"></i> Configuración
             </a>
         </nav>
         
-        <!-- ✅ BOTÓN ACCESIBILIDAD NUEVO -->
         <button class="btn-accesibilidad-header" id="btnAccesibilidad" onclick="toggleBarraAccesibilidad()" style="width:100%; margin-top:20px; background:#5a189a; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;">
-            <i class="fa-solid fa-universal-access"></i> <?php echo __('accesibilidad'); ?>
+            <i class="fa-solid fa-universal-access"></i> Accesibilidad
         </button>
     </aside>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
         
-        <!-- ENCABEZADO -->
-        <header class="content-header">
-            <div class="welcome-text">
-                <h1><?php echo __('grupos'); ?></h1>
-                <p><?php echo __('administra_grupos'); ?></p>
-            </div>
-            <div class="header-actions">
-                <!-- ✅ BOTÓN CHATBOT -->
-<button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
-    <i class="fa-solid fa-comment-dots"></i> <?php echo __('chatbot'); ?>
-</button>
-                <div class="icon-bell">
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-                <button class="btn-idioma" id="btnIdioma" title="Cambiar idioma">
-                    <i class="fa-solid fa-language"></i>
-                    <span id="idiomaTexto"><?php echo $idioma_actual === 'es' ? 'ES' : 'EN'; ?></span>
-                </button>
-                <a href="perfil.php" class="user-profile" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; cursor:pointer;">
-                    <img src="https://placehold.co/40x40/3b71f3/white?text=👤" alt="Avatar Admin" class="avatar">
-                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-                    <i class="fa-solid fa-chevron-down drop-icon"></i>
-                </a>
-                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </header>
+        <!-- ENCABEZADO CON FOTO DE PERFIL -->
+<?php
+// Obtener foto de perfil del administrador
+$foto_perfil_admin = $_SESSION['usuario']['foto_perfil'] ?? null;
+$ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_perfil_admin : 'https://placehold.co/40x40/3b71f3/white?text=👤';
+?>
+<header class="content-header">
+    <div class="welcome-text">
+        <h1>Panel Administrativo</h1>
+        <h2>¡Hola, <span class="admin-name"><?php echo htmlspecialchars($nombre_admin); ?></span>! 👋</h2>
+        <p>Bienvenido al panel de administración del sistema</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+            <i class="fa-solid fa-comment-dots"></i> Chatbot
+        </button>
+
+        <div class="icon-bell">
+            <i class="fa-regular fa-bell"></i>
+        </div>
+
+        <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+            <img src="<?php echo $ruta_foto_admin; ?>" alt="Avatar Admin" class="avatar">
+            <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+            <i class="fa-solid fa-chevron-down drop-icon"></i>
+        </a>
+        <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+    </div>
+</header>
 
         <!-- MENSAJES -->
         <?php if ($mensaje): ?>
@@ -149,18 +148,18 @@ $tipo = $_GET['tipo'] ?? '';
             <div class="stats-row">
                 <div class="stat-card">
                     <span class="stat-number"><?php echo $total_grupos; ?></span>
-                    <span class="stat-label"><?php echo __('total'); ?></span>
+                    <span class="stat-label">Total</span>
                 </div>
                 <div class="stat-card stat-activa">
                     <span class="stat-number"><?php echo $grupos_activos; ?></span>
-                    <span class="stat-label"><?php echo __('activos'); ?></span>
+                    <span class="stat-label">Activos</span>
                 </div>
                 <div class="stat-card stat-inactiva">
                     <span class="stat-number"><?php echo $grupos_inactivos; ?></span>
-                    <span class="stat-label"><?php echo __('inactivos'); ?></span>
+                    <span class="stat-label">Inactivos</span>
                 </div>
                 <button class="btn-nuevo-grupo" id="btnNuevoGrupo">
-                    <i class="fa-solid fa-plus"></i> <?php echo __('nuevo_grupo'); ?>
+                    <i class="fa-solid fa-plus"></i> Nuevo grupo
                 </button>
             </div>
         </section>
@@ -171,13 +170,13 @@ $tipo = $_GET['tipo'] ?? '';
         <section class="filtros-grupos">
             <div class="busqueda-container">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" placeholder="<?php echo __('buscar_grupo'); ?>" class="input-busqueda" id="buscarGrupo">
+                <input type="text" placeholder="Buscar grupo..." class="input-busqueda" id="buscarGrupo">
             </div>
             <div class="filtros-botones">
-                <button class="filtro-btn active" data-filtro="todas"><?php echo __('todos'); ?></button>
-                <button class="filtro-btn" data-filtro="Activo"><?php echo __('activo'); ?></button>
-                <button class="filtro-btn" data-filtro="Inactivo"><?php echo __('inactivo'); ?></button>
-                <button class="filtro-btn" data-filtro="Finalizado"><?php echo __('finalizado'); ?></button>
+                <button class="filtro-btn active" data-filtro="todas">Todos</button>
+                <button class="filtro-btn" data-filtro="Activo">Activo</button>
+                <button class="filtro-btn" data-filtro="Inactivo">Inactivo</button>
+                <button class="filtro-btn" data-filtro="Finalizado">Finalizado</button>
             </div>
         </section>
 
@@ -186,18 +185,18 @@ $tipo = $_GET['tipo'] ?? '';
         <!-- ========================================== -->
         <section class="lista-grupos">
             <div class="grupos-header">
-                <h3><?php echo __('grupos_registrados'); ?></h3>
-                <span class="resultados" id="totalResultados"><?php echo count($grupos); ?> <?php echo __('resultados'); ?></span>
+                <h3>Grupos registrados</h3>
+                <span class="resultados" id="totalResultados"><?php echo count($grupos); ?> resultados</span>
             </div>
 
             <div class="grupos-grid" id="gruposGrid">
                 <?php if (empty($grupos)): ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-layer-group"></i>
-                        <h4><?php echo __('sin_grupos'); ?></h4>
-                        <p><?php echo __('crear_primer_grupo'); ?></p>
+                        <h4>No hay grupos registrados</h4>
+                        <p>Comienza creando el primer grupo</p>
                         <button class="btn-agregar-empty" id="btnNuevoGrupoEmpty">
-                            <i class="fa-solid fa-plus"></i> <?php echo __('crear_grupo'); ?>
+                            <i class="fa-solid fa-plus"></i> Crear grupo
                         </button>
                     </div>
                 <?php else: ?>
@@ -229,42 +228,42 @@ $tipo = $_GET['tipo'] ?? '';
 
                         <div class="grupo-detalles">
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('ciclo'); ?>:</span>
+                                <span class="detalle-label">Ciclo:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($grupo['ciclo_nombre'] ?? 'Sin ciclo'); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('docente'); ?>:</span>
+                                <span class="detalle-label">Docente:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($grupo['docente_nombre'] ?? 'Sin docente'); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('turno'); ?>:</span>
+                                <span class="detalle-label">Turno:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($grupo['turno']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('modalidad'); ?>:</span>
+                                <span class="detalle-label">Modalidad:</span>
                                 <span class="detalle-valor"><?php echo htmlspecialchars($grupo['modalidad']); ?></span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('cupo'); ?>:</span>
-                                <span class="detalle-valor"><?php echo $grupo['cupo_maximo']; ?> <?php echo __('estudiantes'); ?></span>
+                                <span class="detalle-label">Cupo:</span>
+                                <span class="detalle-valor"><?php echo $grupo['cupo_maximo']; ?> estudiantes</span>
                             </div>
                             <div class="detalle-item">
-                                <span class="detalle-label"><?php echo __('cursos_relacionados'); ?>:</span>
+                                <span class="detalle-label">Cursos relacionados:</span>
                                 <span class="detalle-valor"><?php echo $grupo['total_cursos'] ?? 0; ?></span>
                             </div>
                         </div>
 
                         <div class="grupo-acciones">
                             <button class="btn-editar" data-id="<?php echo $grupo['id_grupo']; ?>">
-                                <i class="fa-regular fa-pen-to-square"></i> <?php echo __('editar'); ?>
+                                <i class="fa-regular fa-pen-to-square"></i> Editar
                             </button>
                             <?php if ($grupo['estado'] !== 'Finalizado'): ?>
                             <button class="btn-deshabilitar" data-id="<?php echo $grupo['id_grupo']; ?>">
-                                <i class="fa-solid fa-eye-slash"></i> <?php echo __('deshabilitar'); ?>
+                                <i class="fa-solid fa-eye-slash"></i> Deshabilitar
                             </button>
                             <?php endif; ?>
                             <button class="btn-eliminar" data-id="<?php echo $grupo['id_grupo']; ?>">
-                                <i class="fa-regular fa-trash-can"></i> <?php echo __('eliminar'); ?>
+                                <i class="fa-regular fa-trash-can"></i> Eliminar
                             </button>
                         </div>
                     </div>
@@ -279,7 +278,7 @@ $tipo = $_GET['tipo'] ?? '';
         <div class="modal-overlay" id="modalGrupo">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="modalTitulo"><?php echo __('nuevo_grupo'); ?></h2>
+                    <h2 id="modalTitulo">Nuevo grupo</h2>
                     <button class="modal-cerrar" id="modalCerrar">&times;</button>
                 </div>
                 <form id="formGrupo" method="POST" action="logica/procesar_grupos.php">
@@ -287,9 +286,9 @@ $tipo = $_GET['tipo'] ?? '';
                     <input type="hidden" name="id" id="modalId" value="">
 
                     <div class="form-group">
-                        <label for="modalCiclo"><?php echo __('ciclo_escolar'); ?> <span class="text-danger">*</span></label>
+                        <label for="modalCiclo">Ciclo escolar <span class="text-danger">*</span></label>
                         <select id="modalCiclo" name="id_ciclo" required>
-                            <option value="">-- <?php echo __('seleccionar_ciclo'); ?> --</option>
+                            <option value="">-- Seleccionar ciclo --</option>
                             <?php
                             $ciclos = $conexion->query("SELECT id_ciclo, nombre FROM ciclos_escolares WHERE estado = 'Activo' ORDER BY fecha_inicio DESC");
                             if ($ciclos && $ciclos->num_rows > 0) {
@@ -308,9 +307,9 @@ $tipo = $_GET['tipo'] ?? '';
                     </div>
 
                     <div class="form-group">
-                        <label for="modalDocente"><?php echo __('docente_a_cargo'); ?> <span class="text-danger">*</span></label>
+                        <label for="modalDocente">Docente a cargo <span class="text-danger">*</span></label>
                         <select id="modalDocente" name="id_docente" required>
-                            <option value="">-- <?php echo __('seleccionar_docente'); ?> --</option>
+                            <option value="">-- Seleccionar docente --</option>
                             <?php
                             $docentes = $conexion->query("
                                 SELECT u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno 
@@ -335,12 +334,12 @@ $tipo = $_GET['tipo'] ?? '';
                     </div>
 
                     <div class="form-group">
-                        <label for="modalNombre"><?php echo __('nombre_grupo'); ?> <span class="text-danger">*</span></label>
+                        <label for="modalNombre">Nombre del grupo <span class="text-danger">*</span></label>
                         <input type="text" id="modalNombre" name="nombre" placeholder="Ej. A" required>
                     </div>
 
                     <div class="form-group">
-                        <label><?php echo __('grado_escolar'); ?></label>
+                        <label>Grado escolar</label>
                         <div class="radio-group radio-inline">
                             <label>
                                 <input type="radio" name="grado" value="1°" checked> 1°
@@ -355,77 +354,75 @@ $tipo = $_GET['tipo'] ?? '';
                     </div>
 
                     <div class="form-group">
-                        <label><?php echo __('turno'); ?></label>
+                        <label>Turno</label>
                         <div class="radio-group radio-inline">
                             <label>
-                                <input type="radio" name="turno" value="Matutino" checked> <?php echo __('matutino'); ?>
+                                <input type="radio" name="turno" value="Matutino" checked> Matutino
                             </label>
                             <label>
-                                <input type="radio" name="turno" value="Vespertino"> <?php echo __('vespertino'); ?>
+                                <input type="radio" name="turno" value="Vespertino"> Vespertino
                             </label>
                             <label>
-                                <input type="radio" name="turno" value="Mixto"> <?php echo __('mixto'); ?>
+                                <input type="radio" name="turno" value="Mixto"> Mixto
                             </label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label><?php echo __('modalidad'); ?></label>
+                        <label>Modalidad</label>
                         <div class="radio-group radio-inline">
                             <label>
-                                <input type="radio" name="modalidad" value="Presencial" checked> <?php echo __('presencial'); ?>
+                                <input type="radio" name="modalidad" value="Presencial" checked> Presencial
                             </label>
                             <label>
-                                <input type="radio" name="modalidad" value="Hibrida"> <?php echo __('hibrida'); ?>
+                                <input type="radio" name="modalidad" value="Hibrida"> Híbrida
                             </label>
                             <label>
-                                <input type="radio" name="modalidad" value="Virtual"> <?php echo __('virtual'); ?>
+                                <input type="radio" name="modalidad" value="Virtual"> Virtual
                             </label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="modalCupo"><?php echo __('cupo_maximo'); ?></label>
+                        <label for="modalCupo">Cupo máximo</label>
                         <input type="number" id="modalCupo" name="cupo_maximo" placeholder="30" value="30" min="1">
                     </div>
 
                     <div class="form-group">
-                        <label><?php echo __('estado'); ?></label>
+                        <label>Estado</label>
                         <div class="radio-group">
                             <label>
                                 <input type="radio" name="estado" value="Activo" checked>
-                                <i class="fa-solid fa-circle-check"></i> <?php echo __('activo'); ?>
+                                <i class="fa-solid fa-circle-check"></i> Activo
                             </label>
                             <label>
                                 <input type="radio" name="estado" value="Inactivo">
-                                <i class="fa-solid fa-circle-xmark"></i> <?php echo __('inactivo'); ?>
+                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
                             </label>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="modalCancelar"><?php echo __('cancelar'); ?></button>
-                        <button type="submit" class="btn-guardar"><?php echo __('guardar'); ?></button>
+                        <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
+                        <button type="submit" class="btn-guardar">Guardar</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- ✅ NUEVA BARRA DE ACCESIBILIDAD (ELIMINADA LA VIEJA) -->
+        <!-- BARRA DE ACCESIBILIDAD -->
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
 
     </main>
 </div>
 
-<!-- ✅ BOTÓN FLOTANTE -->
+<!-- BOTÓN FLOTANTE -->
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
 
 <script src="js/admin.js"></script>
 <script src="js/grupos.js"></script>
-
-<!-- ✅ NUEVA ACCESIBILIDAD JS -->
 <script src="../Accesibilidad/accesibilidad.js"></script>
 
 </body>
