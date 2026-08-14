@@ -9,7 +9,6 @@
     --bg-main: #f3f4f6;
     --sidebar-bg: #ffffff;
     --primary-blue: #3a72f2;
-    --primary-purple: #5a189a;
     --text-dark: #1e293b;
     --text-muted: #64748b;
     --border-color: #e2e8f0;
@@ -44,7 +43,7 @@ body {
 }
 
 /* =========================================================
-   SIDEBAR - ESTILO ADMIN
+   SIDEBAR - ESTILO ADMIN (CORREGIDO)
    ========================================================= */
 .sidebar {
     width: 280px;
@@ -106,20 +105,25 @@ body {
 }
 
 .btn-accesibilidad-header {
-    width: 100%;
-    margin-top: 20px;
-    background: var(--primary-purple);
-    color: white;
-    border: none;
-    padding: 12px;
+    background: transparent;
+    border: 1px solid #bfdbfe;
+    color: var(--primary-blue);
+    padding: 14px;
     border-radius: var(--radius-md);
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    margin-top: 20px;
+    width: 100%;
     transition: background 0.2s;
 }
 
 .btn-accesibilidad-header:hover {
-    background: #7b2fbe;
+    background: #eff6ff;
 }
 
 /* =========================================================
@@ -135,7 +139,7 @@ body {
 }
 
 /* =========================================================
-   HEADER - ESTILO ADMIN
+   HEADER - ESTILO ADMIN (CORREGIDO)
    ========================================================= */
 .content-header {
     display: flex;
@@ -143,11 +147,11 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
-    background: #ffffff;
-    padding: 16px 24px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
 }
 
 .welcome-text h1 {
@@ -203,6 +207,7 @@ body {
     width: 40px;
     height: 40px;
     object-fit: cover;
+    border: 2px solid #e2e8f0;
 }
 
 .user-name {
@@ -230,7 +235,7 @@ body {
 }
 
 /* =========================================================
-   BOTÓN FLOTANTE
+   BOTÓN FLOTANTE (CORREGIDO)
    ========================================================= */
 .btn-accesibilidad-flotante {
     position: fixed;
@@ -239,19 +244,19 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--primary-purple);
+    background: var(--primary-blue);
     color: white;
     border: none;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(90, 24, 154, 0.4);
+    box-shadow: 0 4px 16px rgba(58, 114, 242, 0.4);
     transition: all 0.3s;
     z-index: 999;
 }
 
 .btn-accesibilidad-flotante:hover {
     transform: scale(1.1);
-    background: #7b2fbe;
+    background: #2563eb;
 }
 
 /* =========================================================
@@ -310,8 +315,8 @@ body {
     height: 120px;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid var(--primary-purple);
-    background: #f3e8fd;
+    border: 4px solid var(--primary-blue);
+    background: #eff6ff;
 }
 
 .avatar-grande img {
@@ -321,19 +326,27 @@ body {
 }
 
 .btn-cambiar-foto {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: none;
     border: 1px solid #d1d5db;
     border-radius: var(--radius-sm);
     padding: 6px 14px;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     color: var(--text-dark);
     transition: all 0.2s;
 }
 
 .btn-cambiar-foto:hover {
-    background: #f3e8fd;
-    border-color: var(--primary-purple);
+    background: #eff6ff;
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.btn-cambiar-foto i {
+    font-size: 14px;
 }
 
 .perfil-info {
@@ -365,8 +378,8 @@ body {
 
 .badge-rol {
     display: inline-block;
-    background: #f3e8fd;
-    color: var(--primary-purple);
+    background: #eff6ff;
+    color: var(--primary-blue);
     padding: 4px 16px;
     border-radius: 20px;
     font-size: 13px;
@@ -473,7 +486,7 @@ body {
     min-width: 80px;
 }
 
-/* ===== SWITCH ===== */
+/* ===== SWITCH (CORREGIDO) ===== */
 .switch {
     position: relative;
     display: inline-block;
@@ -512,7 +525,7 @@ body {
 }
 
 input:checked + .slider {
-    background: var(--primary-purple);
+    background: var(--primary-blue);
 }
 
 input:checked + .slider:before {
@@ -645,7 +658,7 @@ input:checked + .slider:before {
 }
 
 .modal-header h2 i {
-    color: var(--primary-purple);
+    color: var(--primary-blue);
 }
 
 .modal-cerrar {
@@ -695,6 +708,24 @@ input:checked + .slider:before {
 
 .text-danger {
     color: #dc2626;
+}
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mensaje {
+    animation: slideDown 0.3s ease;
 }
 
 /* =========================================================
@@ -809,83 +840,5 @@ input:checked + .slider:before {
     .configuracion,
     .acciones {
         padding: 16px;
-    }
-}
-
-/* =========================================================
-   ESTILOS PARA FOTO DE PERFIL
-   ========================================================= */
-
-.btn-cambiar-foto {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: none;
-    border: 1px solid #d1d5db;
-    border-radius: var(--radius-sm);
-    padding: 6px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--text-dark);
-    transition: all 0.2s;
-}
-
-.btn-cambiar-foto:hover {
-    background: #f3e8fd;
-    border-color: var(--primary-purple);
-    color: var(--primary-purple);
-}
-
-.btn-cambiar-foto i {
-    font-size: 14px;
-}
-
-/* Estilo para la imagen en el header */
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e2e8f0;
-}
-
-/* Estilo para la imagen grande */
-.avatar-grande img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* =========================================================
-   MENSAJES DE ÉXITO Y ERROR
-   ========================================================= */
-.mensaje {
-    padding: 14px 20px;
-    border-radius: var(--radius-md);
-    margin-bottom: 20px;
-    font-weight: 500;
-    animation: slideDown 0.3s ease;
-}
-
-.mensaje.exito {
-    background: #dcfce7;
-    color: #166534;
-    border-left: 4px solid #22c55e;
-}
-
-.mensaje.error {
-    background: #fee2e2;
-    color: #991b1b;
-    border-left: 4px solid #dc2626;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }

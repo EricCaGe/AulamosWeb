@@ -21,14 +21,19 @@ document.addEventListener('DOMContentLoaded', function() {
             modalAccion.value = 'guardar';
             modalId.value = '';
             
-            // Seleccionar primer estudiante y curso
-            const primerEstudiante = document.querySelector('input[name="id_alumno"]');
-            if (primerEstudiante) primerEstudiante.checked = true;
+            // Deseleccionar todos los checkboxes de estudiantes
+            document.querySelectorAll('.checkbox-estudiante-simple').forEach(el => {
+                el.checked = false;
+            });
             
+            // Seleccionar primer curso
             const primerCurso = document.querySelector('input[name="id_curso"]');
             if (primerCurso) primerCurso.checked = true;
             
             document.querySelector('input[name="estado"][value="Activo"]').checked = true;
+            
+            // Resetear contador
+            actualizarContadorSimple();
             
             modal.classList.add('active');
         });
@@ -61,8 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     modalAccion.value = 'editar';
                     modalId.value = id;
 
-                    // Estudiante
-                    document.querySelectorAll('input[name="id_alumno"]').forEach(el => {
+                    // ✅ Estudiante - marcar el checkbox correspondiente
+                    document.querySelectorAll('.checkbox-estudiante-simple').forEach(el => {
                         el.checked = parseInt(el.value) === parseInt(data.id_alumno);
                     });
                     
@@ -79,6 +84,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         document.querySelector('input[name="estado"][value="Finalizado"]').checked = true;
                     }
+
+                    // Actualizar contador
+                    actualizarContadorSimple();
 
                     modal.classList.add('active');
                 })
@@ -164,6 +172,177 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             totalResultados.textContent = contador + ' resultados';
+        });
+    }
+
+    // ========================================== */
+    // ✅ CHECKBOXES EN MODAL SIMPLE              */
+    // ========================================== */
+    
+    const checkboxesSimple = document.querySelectorAll('.checkbox-estudiante-simple');
+    const contadorSimple = document.getElementById('contadorSeleccionadosSimple');
+    const btnSeleccionarTodosSimple = document.getElementById('btnSeleccionarTodosSimple');
+
+    function actualizarContadorSimple() {
+        const seleccionados = document.querySelectorAll('.checkbox-estudiante-simple:checked');
+        const total = document.querySelectorAll('.checkbox-estudiante-simple').length;
+        if (contadorSimple) {
+            if (total === 0) {
+                contadorSimple.innerHTML = '<i class="fa-regular fa-circle"></i> 0 estudiantes seleccionados';
+            } else {
+                contadorSimple.innerHTML = `<i class="fa-regular fa-circle-check"></i> ${seleccionados.length} de ${total} estudiantes seleccionados`;
+            }
+        }
+    }
+
+    if (btnSeleccionarTodosSimple) {
+        btnSeleccionarTodosSimple.addEventListener('click', function() {
+            const todos = document.querySelectorAll('.checkbox-estudiante-simple');
+            const todosSeleccionados = document.querySelectorAll('.checkbox-estudiante-simple:checked').length === todos.length;
+            
+            todos.forEach(cb => {
+                cb.checked = !todosSeleccionados;
+            });
+            actualizarContadorSimple();
+            
+            if (todosSeleccionados) {
+                btnSeleccionarTodosSimple.innerHTML = '<i class="fa-solid fa-check-double"></i> Seleccionar todos';
+            } else {
+                btnSeleccionarTodosSimple.innerHTML = '<i class="fa-regular fa-square"></i> Deseleccionar todos';
+            }
+        });
+    }
+
+    // Actualizar contador al cambiar checkbox simple
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('checkbox-estudiante-simple')) {
+            actualizarContadorSimple();
+        }
+    });
+
+    // ========================================== */
+    // ✅ NUEVO: INSCRIPCIÓN MASIVA              */
+    // ========================================== */
+
+    // Elementos del modal masivo
+    const modalMasiva = document.getElementById('modalInscripcionMasiva');
+    const btnMasiva = document.getElementById('btnInscripcionMasiva');
+    const btnCerrarMasiva = document.getElementById('modalCerrarMasiva');
+    const btnCancelarMasiva = document.getElementById('modalCancelarMasiva');
+    const btnSeleccionarTodos = document.getElementById('btnSeleccionarTodos');
+    const contadorSeleccionados = document.getElementById('contadorSeleccionados');
+    const formMasiva = document.getElementById('formInscripcionMasiva');
+
+    // ========================================== */
+    // ABRIR MODAL MASIVO                         */
+    // ========================================== */
+    if (btnMasiva) {
+        btnMasiva.addEventListener('click', function() {
+            if (modalMasiva) {
+                modalMasiva.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                actualizarContadorMasiva();
+            }
+        });
+    }
+
+    // ========================================== */
+    // CERRAR MODAL MASIVO                        */
+    // ========================================== */
+    function cerrarModalMasiva() {
+        if (modalMasiva) {
+            modalMasiva.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    if (btnCerrarMasiva) {
+        btnCerrarMasiva.addEventListener('click', cerrarModalMasiva);
+    }
+
+    if (btnCancelarMasiva) {
+        btnCancelarMasiva.addEventListener('click', cerrarModalMasiva);
+    }
+
+    if (modalMasiva) {
+        modalMasiva.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModalMasiva();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalMasiva && modalMasiva.classList.contains('active')) {
+            cerrarModalMasiva();
+        }
+    });
+
+    // ========================================== */
+    // SELECCIONAR TODOS / CONTADOR MASIVO       */
+    // ========================================== */
+    function actualizarContadorMasiva() {
+        const checkboxes = document.querySelectorAll('.checkbox-estudiante');
+        const seleccionados = document.querySelectorAll('.checkbox-estudiante:checked');
+        const total = checkboxes.length;
+        
+        if (contadorSeleccionados) {
+            if (total === 0) {
+                contadorSeleccionados.innerHTML = '<i class="fa-regular fa-circle"></i> 0 estudiantes seleccionados';
+            } else {
+                contadorSeleccionados.innerHTML = `<i class="fa-regular fa-circle-check"></i> ${seleccionados.length} de ${total} estudiantes seleccionados`;
+            }
+        }
+    }
+
+    if (btnSeleccionarTodos) {
+        btnSeleccionarTodos.addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('.checkbox-estudiante');
+            const todosSeleccionados = document.querySelectorAll('.checkbox-estudiante:checked').length === checkboxes.length;
+            
+            checkboxes.forEach(cb => {
+                cb.checked = !todosSeleccionados;
+            });
+            actualizarContadorMasiva();
+            
+            if (todosSeleccionados) {
+                btnSeleccionarTodos.innerHTML = '<i class="fa-solid fa-check-double"></i> Seleccionar todos';
+            } else {
+                btnSeleccionarTodos.innerHTML = '<i class="fa-regular fa-square"></i> Deseleccionar todos';
+            }
+        });
+    }
+
+    // Actualizar contador al cambiar checkbox masivo
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('checkbox-estudiante')) {
+            actualizarContadorMasiva();
+        }
+    });
+
+    // ========================================== */
+    // VALIDACIÓN FORMULARIO MASIVO              */
+    // ========================================== */
+    if (formMasiva) {
+        formMasiva.addEventListener('submit', function(e) {
+            const curso = document.getElementById('selectCursoMasivo');
+            const seleccionados = document.querySelectorAll('.checkbox-estudiante:checked');
+            
+            if (!curso || !curso.value) {
+                e.preventDefault();
+                alert('⚠️ Selecciona un curso');
+                return;
+            }
+            
+            if (seleccionados.length === 0) {
+                e.preventDefault();
+                alert('⚠️ Selecciona al menos un estudiante');
+                return;
+            }
+            
+            if (!confirm(`¿Estás seguro de inscribir ${seleccionados.length} estudiantes en este curso?`)) {
+                e.preventDefault();
+            }
         });
     }
 

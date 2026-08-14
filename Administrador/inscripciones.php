@@ -50,7 +50,7 @@ $inscripciones = $conexion->query("
 // DATOS PARA EL MODAL                        */
 // ========================================== */
 
-// Estudiantes (usuarios con rol Alumno)
+// Estudiantes (usuarios con rol Alumno) - PARA INSCRIPCIÓN INDIVIDUAL
 $estudiantes = $conexion->query("
     SELECT u.id_usuario, CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) AS nombre_completo
     FROM usuarios u
@@ -59,8 +59,35 @@ $estudiantes = $conexion->query("
     ORDER BY u.nombre
 ")->fetch_all(MYSQLI_ASSOC);
 
-// Cursos activos
+// Cursos activos - PARA INSCRIPCIÓN INDIVIDUAL
 $cursos = $conexion->query("
+    SELECT c.id_curso, 
+           CONCAT(c.nombre, ' · ', m.nombre, ' · ', g.nombre, ' · ', ce.nombre) AS info_completa
+    FROM cursos c
+    INNER JOIN materias m ON c.id_materia = m.id_materia
+    INNER JOIN grupos g ON c.id_grupo = g.id_grupo
+    INNER JOIN ciclos_escolares ce ON c.id_ciclo = ce.id_ciclo
+    WHERE c.estado = 'Activo'
+    ORDER BY c.nombre
+")->fetch_all(MYSQLI_ASSOC);
+
+// ========================================== */
+// DATOS PARA INSCRIPCIÓN MASIVA              */
+// ========================================== */
+
+// Todos los estudiantes activos (para el checklist)
+$estudiantes_masivos = $conexion->query("
+    SELECT u.id_usuario, 
+           CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) AS nombre_completo,
+           u.correo
+    FROM usuarios u
+    INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+    WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+    ORDER BY u.nombre
+")->fetch_all(MYSQLI_ASSOC);
+
+// Cursos activos para el select de inscripción masiva
+$cursos_masivos = $conexion->query("
     SELECT c.id_curso, 
            CONCAT(c.nombre, ' · ', m.nombre, ' · ', g.nombre, ' · ', ce.nombre) AS info_completa
     FROM cursos c
@@ -131,38 +158,35 @@ $tipo = $_GET['tipo'] ?? '';
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
         
-        <!-- ENCABEZADO -->
         <!-- ENCABEZADO CON FOTO DE PERFIL -->
-<?php
-// Obtener foto de perfil del administrador
-$foto_perfil_admin = $_SESSION['usuario']['foto_perfil'] ?? null;
-$ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_perfil_admin : 'https://placehold.co/40x40/3b71f3/white?text=👤';
-?>
-<header class="content-header">
-    <div class="welcome-text">
-        <h1>Panel Administrativo</h1>
-        <h2>¡Hola, <span class="admin-name"><?php echo htmlspecialchars($nombre_admin); ?></span>! 👋</h2>
-        <p>Bienvenido al panel de administración del sistema</p>
-    </div>
-    <div class="header-actions">
-        <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
-            <i class="fa-solid fa-comment-dots"></i> Chatbot
-        </button>
+        <?php
+        $foto_perfil_admin = $_SESSION['usuario']['foto_perfil'] ?? null;
+        $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_perfil_admin : 'https://placehold.co/40x40/3b71f3/white?text=👤';
+        ?>
+        <header class="content-header">
+            <div class="welcome-text">
+                <h1>Inscripciones</h1>
+                <p>Administra las inscripciones de los estudiantes</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-assistant" id="btn-asistente" onclick="window.location.href='../Alumno/ChatbotAdmin.php'">
+                    <i class="fa-solid fa-comment-dots"></i> Chatbot
+                </button>
 
-        <div class="icon-bell">
-            <i class="fa-regular fa-bell"></i>
-        </div>
+                <div class="icon-bell">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
 
-        <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
-            <img src="<?php echo $ruta_foto_admin; ?>" alt="Avatar Admin" class="avatar">
-            <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
-            <i class="fa-solid fa-chevron-down drop-icon"></i>
-        </a>
-        <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        </a>
-    </div>
-</header>
+                <a href="perfil.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    <img src="<?php echo $ruta_foto_admin; ?>" alt="Avatar Admin" class="avatar">
+                    <span class="user-name"><?php echo htmlspecialchars($nombre_admin); ?></span>
+                    <i class="fa-solid fa-chevron-down drop-icon"></i>
+                </a>
+                <a href="../InicioSesion/cerrar_sesion.php" class="btn-logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </header>
 
         <!-- MENSAJES -->
         <?php if ($mensaje): ?>
@@ -187,6 +211,8 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
                 <button class="btn-nueva-inscripcion" id="btnNuevaInscripcion">
                     <i class="fa-solid fa-plus"></i> Nueva inscripción
                 </button>
+                <!-- ✅ NUEVO BOTÓN: INSCRIPCIÓN MASIVA -->
+                
             </div>
         </section>
 
@@ -289,21 +315,37 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
                     <input type="hidden" name="id" id="modalId" value="">
 
                     <!-- Estudiante -->
-                    <div class="form-group">
-                        <label>Estudiante <span class="text-danger">*</span></label>
-                        <div class="radio-group radio-inline" id="estudianteOptions">
-                            <?php if (empty($estudiantes)): ?>
-                                <p style="color: #94a3b8; font-style: italic;">No hay estudiantes disponibles</p>
-                            <?php else: ?>
-                                <?php foreach ($estudiantes as $index => $estudiante): ?>
-                                <label>
-                                    <input type="radio" name="id_alumno" value="<?php echo $estudiante['id_usuario']; ?>" <?php echo $index === 0 ? 'checked' : ''; ?>>
-                                    <?php echo htmlspecialchars($estudiante['nombre_completo']); ?>
-                                </label>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    <!-- Estudiante - AHORA CON CHECKBOXES -->
+<div class="form-group">
+    <label>Estudiantes <span class="text-danger">*</span></label>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+        <span style="font-size: 13px; color: #64748b;">
+            <i class="fa-regular fa-circle-check"></i> Selecciona uno o más estudiantes
+        </span>
+        <button type="button" id="btnSeleccionarTodosSimple" style="background: #e8f0fe; border: none; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; color: #3b71f3;">
+            <i class="fa-solid fa-check-double"></i> Seleccionar todos
+        </button>
+    </div>
+    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; background: #fafafa;">
+        <?php if (empty($estudiantes)): ?>
+            <p style="color: #94a3b8; text-align: center; padding: 20px;">No hay estudiantes disponibles</p>
+        <?php else: ?>
+            <?php foreach ($estudiantes as $estudiante): ?>
+            <label style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid #f1f5f9;" 
+                   onmouseover="this.style.background='#f1f5f9'" 
+                   onmouseout="this.style.background='transparent'">
+                <input type="checkbox" name="id_alumno[]" value="<?php echo $estudiante['id_usuario']; ?>" class="checkbox-estudiante-simple" style="width: 18px; height: 18px; cursor: pointer; accent-color: #7C3AED;">
+                <div>
+                    <strong><?php echo htmlspecialchars($estudiante['nombre_completo']); ?></strong>
+                </div>
+            </label>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+    <p style="font-size: 12px; color: #94a3b8; margin-top: 6px;" id="contadorSeleccionadosSimple">
+        <i class="fa-regular fa-circle"></i> 0 estudiantes seleccionados
+    </p>
+</div>
 
                     <!-- Curso -->
                     <div class="form-group">
@@ -344,6 +386,90 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
                     <div class="form-actions">
                         <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
                         <button type="submit" class="btn-guardar">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MODAL PARA INSCRIPCIÓN MASIVA              -->
+        <!-- ========================================== -->
+        <div class="modal-overlay" id="modalInscripcionMasiva">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h2><i class="fa-solid fa-users"></i> Inscripción masiva</h2>
+                    <button class="modal-cerrar" id="modalCerrarMasiva">&times;</button>
+                </div>
+                <form id="formInscripcionMasiva" method="POST" action="logica/procesar_inscripciones.php">
+                    <input type="hidden" name="accion" value="guardar_masivo">
+
+                    <!-- Selección de curso -->
+                    <div class="form-group">
+                        <label>Curso <span class="text-danger">*</span></label>
+                        <select name="id_curso" id="selectCursoMasivo" required>
+                            <option value="">-- Seleccionar curso --</option>
+                            <?php if (empty($cursos_masivos)): ?>
+                                <option value="" disabled>No hay cursos disponibles</option>
+                            <?php else: ?>
+                                <?php foreach ($cursos_masivos as $curso_masivo): ?>
+                                <option value="<?php echo $curso_masivo['id_curso']; ?>">
+                                    <?php echo htmlspecialchars($curso_masivo['info_completa']); ?>
+                                </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <!-- Lista de estudiantes con checkboxes -->
+                    <div class="form-group">
+                        <label>Estudiantes disponibles <span class="text-danger">*</span></label>
+                        <div>
+                            <span style="font-size: 13px; color: #64748b;">
+                                <i class="fa-regular fa-circle-check"></i> Selecciona los estudiantes a inscribir
+                            </span>
+                            <button type="button" id="btnSeleccionarTodos">
+                                <i class="fa-solid fa-check-double"></i> Seleccionar todos
+                            </button>
+                        </div>
+                        
+                        <div id="listaEstudiantes">
+                            <?php if (empty($estudiantes_masivos)): ?>
+                                <p style="color: #94a3b8; text-align: center; padding: 20px;">No hay estudiantes disponibles</p>
+                            <?php else: ?>
+                                <?php foreach ($estudiantes_masivos as $estudiante_masivo): ?>
+                                <label>
+                                    <input type="checkbox" name="alumnos[]" value="<?php echo $estudiante_masivo['id_usuario']; ?>" class="checkbox-estudiante">
+                                    <div>
+                                        <strong><?php echo htmlspecialchars($estudiante_masivo['nombre_completo']); ?></strong>
+                                        <span><?php echo htmlspecialchars($estudiante_masivo['correo']); ?></span>
+                                    </div>
+                                </label>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                        <p id="contadorSeleccionados">
+                            <i class="fa-regular fa-circle"></i> 0 estudiantes seleccionados
+                        </p>
+                    </div>
+
+                    <!-- Estado de inscripción -->
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="estado" value="Activo" checked>
+                                <i class="fa-solid fa-circle-check"></i> Activo
+                            </label>
+                            <label>
+                                <input type="radio" name="estado" value="Inactivo">
+                                <i class="fa-solid fa-circle-xmark"></i> Inactivo
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" id="modalCancelarMasiva">Cancelar</button>
+                        <button type="submit" class="btn-guardar">Inscribir seleccionados</button>
                     </div>
                 </form>
             </div>

@@ -334,9 +334,15 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
                     </div>
 
                     <div class="form-group">
-                        <label for="modalNombre">Nombre del grupo <span class="text-danger">*</span></label>
-                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej. A" required>
-                    </div>
+    <label for="modalNombre">Nombre del grupo <span class="text-danger">*</span></label>
+    <select id="modalNombre" name="nombre" required style="width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:10px; font-size:14px; background:#f8fafc;">
+        <option value="">-- Seleccionar grupo --</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+    </select>
+</div>
 
                     <div class="form-group">
                         <label>Grado escolar</label>

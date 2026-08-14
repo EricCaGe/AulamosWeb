@@ -15,7 +15,7 @@ $foto_perfil_header = $_SESSION['usuario']['foto_perfil'] ?? null;
 
 // Si la sesión NO tiene la foto, obtenerla de la BD
 if (empty($foto_perfil_header) && $id_usuario > 0) {
-    require_once __DIR__ . '/../Conexion/conexion.php';
+    require_once __DIR__ . '../../Conexion/conexion.php';
     $stmt = $conexion->prepare("SELECT foto_perfil FROM usuarios WHERE id_usuario = ?");
     $stmt->bind_param("i", $id_usuario);
     $stmt->execute();
