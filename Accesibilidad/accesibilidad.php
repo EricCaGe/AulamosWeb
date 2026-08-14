@@ -19,9 +19,9 @@
       <i class="fa-solid fa-moon"></i>
       <span>Modo oscuro</span>
     </button>
-    <button class="acc-btn" onclick="toggleTextoGrande()">
-      <span class="acc-text-icon">Aa</span>
-      <span>Texto grande</span>
+    <button class="acc-btn" onclick="abrirModalTexto()">
+      <span class="acc-text-icon">Tamaño</span>
+      <span>Texto</span>
     </button>
     <button class="acc-btn" onclick="abrirModalContraste()">
       <i class="fa-solid fa-palette"></i>
@@ -79,6 +79,30 @@
     <div class="modal-contraste-footer">
       <button class="btn-restablecer" onclick="limpiarSeleccionesVisuales()">Desactivar Contraste</button>
       <button class="acc-btn-primary" onclick="aplicarPersonalizacion()">Aplicar y Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE TAMAÑO DE TEXTO -->
+<div id="modalTexto" class="modal-contraste-overlay modal-contraste-hidden">
+  <div class="modal-contraste-container">
+    <div class="modal-contraste-header">
+      <h3><i class="fa-solid fa-text-height"></i> Tamaño de texto</h3>
+      <button class="btn-cerrar-modal" onclick="cerrarModalTexto()">&times;</button>
+    </div>
+    <div class="modal-contraste-body">
+      <div class="opcion-grupo">
+        <label>Selecciona el tamaño de texto:</label>
+        <div class="opciones-botones" id="opcionesTexto">
+          <button class="btn-opcion seleccionado" data-tamano="normal" onclick="seleccionarTamano(this)">Normal</button>
+          <button class="btn-opcion" data-tamano="grande" onclick="seleccionarTamano(this)">Grande</button>
+          <button class="btn-opcion" data-tamano="muy_grande" onclick="seleccionarTamano(this)">Muy Grande</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-contraste-footer">
+      <button class="btn-restablecer" onclick="limpiarTamanoTexto()">Restablecer</button>
+      <button class="acc-btn-primary" onclick="aplicarTamanoTexto()">Aplicar</button>
     </div>
   </div>
 </div>

@@ -178,5 +178,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+// ========================================== */
+// TAMAÑO DE TEXTO - MODAL                    */
+// ========================================== */
 
+let tamanoSeleccionado = 'normal';
+
+function abrirModalTexto() {
+    const modal = document.getElementById('modalTexto');
+    if (!modal) return;
+    
+    const clave = obtenerClave('tamano_texto');
+    const guardado = localStorage.getItem(clave) || 'normal';
+    tamanoSeleccionado = guardado;
+    
+    document.querySelectorAll('#opcionesTexto .btn-opcion').forEach(btn => {
+        btn.classList.toggle('seleccionado', btn.dataset.tamano === guardado);
+    });
+    
+    modal.classList.remove('modal-contraste-hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalTexto() {
+    const modal = document.getElementById('modalTexto');
+    if (modal) {
+        modal.classList.add('modal-contraste-hidden');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function seleccionarTamano(elemento) {
+    document.querySelectorAll('#opcionesTexto .btn-opcion').forEach(btn => {
+        btn.classList.remove('seleccionado');
+    });
+    elemento.classList.add('seleccionado');
+    tamanoSeleccionado = elemento.dataset.tamano;
+}
+
+function aplicarTamanoTexto() {
+    document.body.classList.remove('texto-pequeno', 'texto-normal', 'texto-grande', 'texto-muy-grande');
+    
+    const claseMap = {
+        'pequeno': 'texto-pequeno',
+        'normal': 'texto-normal',
+        'grande': 'texto-grande',
+        'muy-grande': 'texto-muy-grande'
+    };
+    
+    if (claseMap[tamanoSeleccionado]) {
+        document.body.classList.add(claseMap[tamanoSeleccionado]);
+    }
+    
+    guardarPreferencia('tamano_texto', tamanoSeleccionado);
+    cerrarModalTexto();
+}
+
+function limpiarTamanoTexto() {
+    document.body.classList.remove('texto-pequeno', 'texto-normal', 'texto-grande', 'texto-muy-grande');
+    tamanoSeleccionado = 'normal';
+    document.body.classList.add('texto-normal');
+    guardarPreferencia('tamano_texto', 'normal');
+    cerrarModalTexto();
+}
 });

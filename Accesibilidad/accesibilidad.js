@@ -77,11 +77,17 @@ function cargarTodasPreferencias() {
         console.log('✅ Modo oscuro aplicado');
     }
     
-    // Texto grande
-    const claveTexto = obtenerClave('texto_grande');
-    if (localStorage.getItem(claveTexto) === 'true' || localStorage.getItem(claveTexto) === '1') {
-        document.body.classList.add('texto-grande');
-        console.log('✅ Texto grande aplicado');
+    // Tamaño de texto (4 opciones)
+    const claveTexto = obtenerClave('tamano_texto');
+    const tamano = localStorage.getItem(claveTexto) || 'normal';
+    const claseMap = {
+    'normal': 'texto-normal',
+    'grande': 'texto-grande',
+    'muy_grande': 'texto-muy-grande'
+};
+    if (claseMap[tamano]) {
+        document.body.classList.add(claseMap[tamano]);
+        console.log('✅ Tamaño de texto aplicado:', tamano);
     }
 
     // Subtítulos
@@ -159,17 +165,10 @@ function toggleModoOscuro() {
     guardarPreferencia('modo_oscuro', activo ? 'true' : 'false');
 }
 
-function toggleTextoGrande() {
-    const activo = document.body.classList.toggle('texto-grande');
-    const valor = activo ? 'true' : 'false';
-    guardarPreferencia('texto_grande', valor);
-}
-
 function toggleSubtitulos() {
     const activo = document.body.classList.toggle('subtitulos');
     guardarPreferencia('subtitulos', activo ? 'true' : 'false');
     
-    // ✅ Si se desactivan, ocultar la caja de subtítulos
     if (!activo) {
         const caja = document.getElementById('subtitulosLectura');
         if (caja) {
@@ -223,7 +222,7 @@ class LectorPantalla {
         guardarPreferencia('lector_pantalla', 'false');
         this.removerEventos();
         this.sintesis.cancel();
-        this.ocultarSubtitulos();  // ✅ OCULTAR SUBTÍTULOS AL DESACTIVAR
+        this.ocultarSubtitulos();
         this.anunciar('🔇 Lector de pantalla desactivado');
         this.actualizarBotonLector();
     }
@@ -387,7 +386,6 @@ class LectorPantalla {
         }, 2000);
     }
 
-    // ✅ MOSTRAR SUBTÍTULOS SOLO SI ESTÁN ACTIVADOS
     mostrarSubtitulos(texto) {
         const subtitulosActivos = document.body.classList.contains('subtitulos');
         if (!subtitulosActivos) return;
@@ -587,6 +585,73 @@ function aplicarPersonalizacion() {
     }
     
     cerrarModalContraste();
+}
+
+// ========================================== */
+// TAMAÑO DE TEXTO - MODAL                    */
+// ========================================== */
+
+let tamanoSeleccionado = 'normal';
+
+function abrirModalTexto() {
+    const modal = document.getElementById('modalTexto');
+    if (!modal) return;
+    
+    const clave = obtenerClave('tamano_texto');
+    const guardado = localStorage.getItem(clave) || 'normal';
+    tamanoSeleccionado = guardado;
+    
+    document.querySelectorAll('#opcionesTexto .btn-opcion').forEach(btn => {
+        btn.classList.toggle('seleccionado', btn.dataset.tamano === guardado);
+    });
+    
+    modal.classList.remove('modal-contraste-hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalTexto() {
+    const modal = document.getElementById('modalTexto');
+    if (modal) {
+        modal.classList.add('modal-contraste-hidden');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function seleccionarTamano(elemento) {
+    document.querySelectorAll('#opcionesTexto .btn-opcion').forEach(btn => {
+        btn.classList.remove('seleccionado');
+    });
+    elemento.classList.add('seleccionado');
+    tamanoSeleccionado = elemento.dataset.tamano;
+}
+
+function aplicarTamanoTexto() {
+    // ✅ Remover todas las clases de tamaño
+    document.body.classList.remove('texto-normal', 'texto-grande', 'texto-muy-grande');
+    
+    const claseMap = {
+        'normal': 'texto-normal',
+        'grande': 'texto-grande',
+        'muy_grande': 'texto-muy-grande'
+    };
+    
+    const clase = claseMap[tamanoSeleccionado];
+    if (clase) {
+        document.body.classList.add(clase);
+        console.log('✅ Clase aplicada:', clase);
+        console.log('✅ Clases actuales del body:', document.body.className);
+    }
+    
+    guardarPreferencia('tamano_texto', tamanoSeleccionado);
+    cerrarModalTexto();
+}
+
+function limpiarTamanoTexto() {
+    document.body.classList.remove('texto-normal', 'texto-grande', 'texto-muy-grande');
+    tamanoSeleccionado = 'normal';
+    document.body.classList.add('texto-normal');
+    guardarPreferencia('tamano_texto', 'normal');
+    cerrarModalTexto();
 }
 
 // ========================================== */

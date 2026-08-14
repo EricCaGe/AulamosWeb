@@ -1999,3 +1999,175 @@ body.alto-contraste.navegacion-teclado *:focus {
     box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4) !important;
 }
 
+/* =========================================================
+   TAMAÑOS DE TEXTO - AJUSTADOS
+   ========================================================= */
+
+/* ----- Tamaño Normal (base) ----- */
+body.texto-normal {
+    font-size: 100% !important;
+}
+
+/* ----- Tamaño Grande ----- */
+body.texto-grande {
+    font-size: 150% !important;  /* 50% más grande */
+}
+
+/* ----- Tamaño Muy Grande ----- */
+body.texto-muy-grande {
+    font-size: 220% !important;  /* 120% más grande */
+}
+
+/* =========================================================
+   AJUSTES ESPECÍFICOS PARA MUY GRANDE
+   ========================================================= */
+
+body.texto-muy-grande h1 {
+    font-size: 4rem !important;
+}
+
+body.texto-muy-grande h2 {
+    font-size: 3.2rem !important;
+}
+
+body.texto-muy-grande h3 {
+    font-size: 2.6rem !important;
+}
+
+body.texto-muy-grande p {
+    font-size: 1.8rem !important;
+    line-height: 2.2 !important;
+}
+
+body.texto-muy-grande .menu-item {
+    font-size: 1.8rem !important;
+    padding: 20px 24px !important;
+}
+
+body.texto-muy-grande .stat-number {
+    font-size: 4rem !important;
+}
+
+body.texto-muy-grande .stat-label {
+    font-size: 1.8rem !important;
+}
+
+body.texto-muy-grande .btn {
+    font-size: 1.8rem !important;
+    padding: 18px 32px !important;
+}
+
+body.texto-muy-grande .acc-btn {
+    width: 140px !important;
+    height: 100px !important;
+    font-size: 1.4rem !important;
+}
+
+body.texto-muy-grande .acc-btn i {
+    font-size: 36px !important;
+}
+
+body.texto-muy-grande .welcome-text h1 {
+    font-size: 4rem !important;
+}
+
+body.texto-muy-grande .welcome-text p {
+    font-size: 1.8rem !important;
+}
+
+body.texto-muy-grande input,
+body.texto-muy-grande select,
+body.texto-muy-grande textarea {
+    font-size: 1.8rem !important;
+    padding: 18px !important;
+}
+
+body.texto-muy-grande .card-title {
+    font-size: 2rem !important;
+}
+
+body.texto-muy-grande .card-value {
+    font-size: 4rem !important;
+}
+
+body.texto-muy-grande .badge {
+    font-size: 1.4rem !important;
+    padding: 10px 22px !important;
+}
+
+/* =========================================================
+   AJUSTES ESPECÍFICOS PARA GRANDE
+   ========================================================= */
+
+body.texto-grande h1 {
+    font-size: 3rem !important;
+}
+
+body.texto-grande h2 {
+    font-size: 2.4rem !important;
+}
+
+body.texto-grande h3 {
+    font-size: 2rem !important;
+}
+
+body.texto-grande p {
+    font-size: 1.4rem !important;
+    line-height: 2 !important;
+}
+
+body.texto-grande .menu-item {
+    font-size: 1.4rem !important;
+    padding: 16px 20px !important;
+}
+
+body.texto-grande .stat-number {
+    font-size: 3rem !important;
+}
+
+body.texto-grande .stat-label {
+    font-size: 1.4rem !important;
+}
+
+body.texto-grande .btn {
+    font-size: 1.4rem !important;
+    padding: 14px 28px !important;
+}
+
+body.texto-grande .acc-btn {
+    width: 110px !important;
+    height: 85px !important;
+    font-size: 1.2rem !important;
+}
+
+body.texto-grande .acc-btn i {
+    font-size: 28px !important;
+}
+
+body.texto-grande .welcome-text h1 {
+    font-size: 3rem !important;
+}
+
+body.texto-grande .welcome-text p {
+    font-size: 1.4rem !important;
+}
+
+body.texto-grande input,
+body.texto-grande select,
+body.texto-grande textarea {
+    font-size: 1.4rem !important;
+    padding: 14px !important;
+}
+
+body.texto-grande .card-title {
+    font-size: 1.6rem !important;
+}
+
+body.texto-grande .card-value {
+    font-size: 3rem !important;
+}
+
+body.texto-grande .badge {
+    font-size: 1.2rem !important;
+    padding: 8px 18px !important;
+}

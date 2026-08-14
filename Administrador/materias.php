@@ -226,9 +226,15 @@ $tipo = $_GET['tipo'] ?? '';
                     </div>
 
                     <div class="form-group">
-                        <label for="modalCampo"><?php echo __('campo_formativo'); ?> <span class="text-danger">*</span></label>
-                        <input type="text" id="modalCampo" name="campo_formativo" placeholder="<?php echo __('ej_campo'); ?>" required>
-                    </div>
+    <label for="modalCampo"><?php echo __('campo_formativo'); ?> <span class="text-danger">*</span></label>
+    <select id="modalCampo" name="campo_formativo" required>
+        <option value=""><?php echo __('seleccionar_campo'); ?></option>
+        <option value="Lenguajes">Lenguajes</option>
+        <option value="Saberes y Pensamiento Científico">Saberes y Pensamiento Científico</option>
+        <option value="Naturaleza y Sociedades">Naturaleza y Sociedades</option>
+        <option value="De lo Humano y lo Comunitario">De lo Humano y lo Comunitario</option>
+    </select>
+</div>
 
                     <div class="form-group">
                         <label for="modalDescripcion"><?php echo __('descripcion'); ?></label>
