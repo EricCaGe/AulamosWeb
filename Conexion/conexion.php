@@ -9,8 +9,8 @@
 //$host = '10.2.0.234';
 
 
-$host = '10.2.0.125';
-$usuario = 'aulamos';
+$host = '';
+$usuario = '';
 
 
 $password = '';
