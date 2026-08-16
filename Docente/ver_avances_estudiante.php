@@ -27,7 +27,8 @@ $query_estudiante = "
         u.nombre,
         u.apellido_paterno,
         u.apellido_materno,
-        u.correo
+        u.correo,
+        u.foto_perfil
     FROM usuarios u
     WHERE u.id_usuario = ? AND u.estado = 'Activo'
 ";
@@ -44,6 +45,7 @@ if (!$estudiante) {
 }
 
 $nombre_completo = $estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno'];
+$foto_estudiante = !empty($estudiante['foto_perfil']) ? '../uploads/perfiles/' . $estudiante['foto_perfil'] : null;
 
 // Obtener cursos del estudiante con el docente actual
 $query_cursos = "
@@ -86,14 +88,21 @@ if ($id_curso_seleccionado) {
             a.puntaje_maximo,
             a.fecha_publicacion,
             a.fecha_limite,
+            a.permite_entrega_archivo,
             ae.id_actividad_estudiante,
             ae.estado,
             ae.porcentaje_avance,
             ae.fecha_inicio,
             ae.fecha_finalizacion,
+            e.id_entrega,
             e.calificacion,
             e.retroalimentacion,
             e.fecha_entrega,
+            e.estado AS entrega_estado,
+            adj.id_adjunto,
+            adj.nombre_archivo,
+            adj.url_archivo,
+            adj.tamano_bytes,
             CASE 
                 WHEN ae.estado = 'Pendiente' AND a.fecha_limite < NOW() THEN 'Atrasada'
                 ELSE ae.estado
@@ -101,6 +110,7 @@ if ($id_curso_seleccionado) {
         FROM actividades a
         JOIN actividad_estudiantes ae ON a.id_actividad = ae.id_actividad
         LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
+        LEFT JOIN adjuntos adj ON adj.entidad_tipo = 'Entrega' AND adj.entidad_id = e.id_entrega
         WHERE a.id_curso = ? 
         AND ae.id_alumno = ?
         AND a.estado != 'Borrador'
@@ -119,32 +129,14 @@ if ($id_curso_seleccionado) {
     
     foreach ($actividades_estudiante as $actividad) {
         if ($actividad['calificacion'] !== null) {
-            // Normalizar calificación a porcentaje
             $puntaje_maximo = $actividad['puntaje_maximo'] > 0 ? $actividad['puntaje_maximo'] : 100;
             $calificacion_porcentaje = ($actividad['calificacion'] / $puntaje_maximo) * 100;
-            
             $suma_calificaciones += $calificacion_porcentaje;
             $total_calificaciones++;
         }
     }
     
     $promedio_general = $total_calificaciones > 0 ? round($suma_calificaciones / $total_calificaciones, 1) : 0;
-}
-
-// Obtener estadísticas de asistencia del estudiante en el curso seleccionado
-$asistencia_stats = ['presentes' => 0, 'faltas' => 0, 'retardos' => 0];
-if ($id_curso_seleccionado) {
-    // Obtener asistencia de la sesión (simulada, ya que no hay tabla de asistencia)
-    // En una implementación real, aquí se consultaría la tabla de asistencias
-    $asistencia_guardada = isset($_SESSION['asistencia'][$id_curso_seleccionado]) ? 
-        $_SESSION['asistencia'][$id_curso_seleccionado] : [];
-    
-    if (isset($asistencia_guardada[$id_estudiante])) {
-        $estado_asistencia = $asistencia_guardada[$id_estudiante];
-        if ($estado_asistencia === 'Presente') $asistencia_stats['presentes']++;
-        elseif ($estado_asistencia === 'Falta') $asistencia_stats['faltas']++;
-        elseif ($estado_asistencia === 'Retardo') $asistencia_stats['retardos']++;
-    }
 }
 
 // Cerrar conexiones
@@ -159,7 +151,8 @@ $estados_texto = [
     'Atrasada' => 'Atrasada',
     'En_proceso' => 'En Proceso',
     'Completada' => 'Completada',
-    'Calificada' => 'Calificada'
+    'Calificada' => 'Calificada',
+    'Entregada' => 'Entregada'
 ];
 
 function getEstadoBadgeClass($estado) {
@@ -169,8 +162,31 @@ function getEstadoBadgeClass($estado) {
         case 'En_proceso': return 'estado-proceso';
         case 'Completada': return 'estado-completada';
         case 'Calificada': return 'estado-calificada';
+        case 'Entregada': return 'estado-entregada';
         default: return '';
     }
+}
+
+function getTipoBadgeClass($tipo) {
+    switch (strtolower($tipo)) {
+        case 'tarea': return 'tarea';
+        case 'ejercicio': return 'ejercicio';
+        case 'lectura': return 'lectura';
+        case 'proyecto': return 'proyecto';
+        case 'evaluacion': return 'evaluacion';
+        default: return '';
+    }
+}
+
+function formatearTamaño($bytes) {
+    if ($bytes === null) return '';
+    $unidades = ['B', 'KB', 'MB', 'GB'];
+    $i = 0;
+    while ($bytes >= 1024 && $i < count($unidades) - 1) {
+        $bytes /= 1024;
+        $i++;
+    }
+    return round($bytes, 1) . ' ' . $unidades[$i];
 }
 ?>
 <!DOCTYPE html>
@@ -205,6 +221,12 @@ function getEstadoBadgeClass($estado) {
             justify-content: center;
             font-size: 32px;
             color: #3b71f3;
+            overflow: hidden;
+        }
+        .student-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .student-info-detail {
             flex: 1;
@@ -244,6 +266,9 @@ function getEstadoBadgeClass($estado) {
             background: white;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            color: #1e293b;
+            font-size: 13px;
         }
         .course-btn.active {
             background: #3b71f3;
@@ -255,8 +280,8 @@ function getEstadoBadgeClass($estado) {
         }
         .summary-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
             margin-bottom: 20px;
         }
         .stat-card {
@@ -267,7 +292,7 @@ function getEstadoBadgeClass($estado) {
             text-align: center;
         }
         .stat-number {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
             color: #1e293b;
         }
@@ -284,7 +309,7 @@ function getEstadoBadgeClass($estado) {
             color: #d97706;
         }
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #64748b;
             margin-top: 4px;
         }
@@ -296,7 +321,7 @@ function getEstadoBadgeClass($estado) {
         }
         .activity-header {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
             padding: 12px 16px;
             background: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
@@ -306,10 +331,11 @@ function getEstadoBadgeClass($estado) {
         }
         .activity-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
             padding: 12px 16px;
             border-bottom: 1px solid #f1f5f9;
             align-items: center;
+            font-size: 13px;
         }
         .activity-row:last-child {
             border-bottom: none;
@@ -328,12 +354,20 @@ function getEstadoBadgeClass($estado) {
             background: #ff9f43;
             color: white;
         }
-        .tipo-badge.evaluacion {
-            background: #4f7cff;
+        .tipo-badge.ejercicio {
+            background: #00b894;
+            color: white;
+        }
+        .tipo-badge.lectura {
+            background: #0984e3;
             color: white;
         }
         .tipo-badge.proyecto {
             background: #9b59b6;
+            color: white;
+        }
+        .tipo-badge.evaluacion {
+            background: #4f7cff;
             color: white;
         }
         .activity-row .estado-badge {
@@ -341,12 +375,14 @@ function getEstadoBadgeClass($estado) {
             padding: 2px 10px;
             border-radius: 20px;
             font-weight: 600;
+            white-space: nowrap;
         }
         .estado-pendiente { background: #f39c12; color: white; }
         .estado-atrasada { background: #e74c3c; color: white; }
         .estado-proceso { background: #3498db; color: white; }
         .estado-completada { background: #2ecc71; color: white; }
         .estado-calificada { background: #9b59b6; color: white; }
+        .estado-entregada { background: #1abc9c; color: white; }
         .activity-row .calificacion {
             font-weight: 600;
         }
@@ -395,6 +431,95 @@ function getEstadoBadgeClass($estado) {
         .back-link:hover {
             text-decoration: underline;
         }
+        .btn-ver-archivo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #eff6ff;
+            color: #3b71f3;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid #dbeafe;
+        }
+        .btn-ver-archivo:hover {
+            background: #3b71f3;
+            color: white;
+            border-color: #3b71f3;
+        }
+        .btn-calificar {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid #fde68a;
+        }
+        .btn-calificar:hover {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+        .btn-calificar.ya-calificado {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+            cursor: default;
+        }
+        .sin-archivo {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+        .nombre-archivo {
+            font-size: 10px;
+            color: #64748b;
+            display: block;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        @media (max-width: 1024px) {
+            .activity-header, .activity-row {
+                grid-template-columns: 1fr 0.6fr 0.6fr 0.6fr 0.6fr 0.6fr 0.8fr;
+                font-size: 11px;
+            }
+            .summary-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .activity-header, .activity-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                padding: 12px;
+            }
+            .activity-header {
+                display: none;
+            }
+            .activity-row {
+                border-bottom: 2px solid #e2e8f0;
+            }
+            .activity-row .titulo {
+                font-weight: 700;
+            }
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .student-profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -424,7 +549,6 @@ function getEstadoBadgeClass($estado) {
             
             <!-- ENCABEZADO CON FOTO DE PERFIL -->
             <?php
-            // Obtener foto de perfil del docente
             $foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
             $ruta_foto_docente = !empty($foto_perfil_docente) ? '../uploads/perfiles/' . $foto_perfil_docente : 'https://placehold.co/40x40/ff7675/white?text=👨';
             ?>
@@ -462,7 +586,11 @@ function getEstadoBadgeClass($estado) {
                     <!-- Perfil del estudiante -->
                     <div class="student-profile-header">
                         <div class="student-avatar-large">
-                            <i class="fa-solid fa-user"></i>
+                            <?php if ($foto_estudiante && file_exists($foto_estudiante)): ?>
+                                <img src="<?= $foto_estudiante ?>" alt="Foto estudiante">
+                            <?php else: ?>
+                                <i class="fa-solid fa-user"></i>
+                            <?php endif; ?>
                         </div>
                         <div class="student-info-detail">
                             <h2><?php echo htmlspecialchars($nombre_completo); ?></h2>
@@ -489,20 +617,24 @@ function getEstadoBadgeClass($estado) {
                             <div class="stat-label">Promedio General</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number presente"><?= $asistencia_stats['presentes'] ?></div>
-                            <div class="stat-label">Presentes</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number falta"><?= $asistencia_stats['faltas'] ?></div>
-                            <div class="stat-label">Faltas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number retardo"><?= $asistencia_stats['retardos'] ?></div>
-                            <div class="stat-label">Retardos</div>
-                        </div>
-                        <div class="stat-card">
                             <div class="stat-number"><?= count($actividades_estudiante) ?></div>
                             <div class="stat-label">Total Actividades</div>
+                        </div>
+                        <?php
+                        $entregadas = 0;
+                        $calificadas = 0;
+                        foreach ($actividades_estudiante as $act) {
+                            if ($act['estado_mostrar'] === 'Entregada' || $act['estado_mostrar'] === 'Completada') $entregadas++;
+                            if ($act['estado_mostrar'] === 'Calificada') $calificadas++;
+                        }
+                        ?>
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #1abc9c;"><?= $entregadas ?></div>
+                            <div class="stat-label">Entregadas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" style="color: #9b59b6;"><?= $calificadas ?></div>
+                            <div class="stat-label">Calificadas</div>
                         </div>
                     </div>
 
@@ -514,6 +646,8 @@ function getEstadoBadgeClass($estado) {
                             <div>Estado</div>
                             <div>Calificación</div>
                             <div>Avance</div>
+                            <div>Archivo</div>
+                            <div>Acciones</div>
                         </div>
 
                         <?php if (!empty($actividades_estudiante)): ?>
@@ -522,8 +656,11 @@ function getEstadoBadgeClass($estado) {
                                 $estado_mostrar = $actividad['estado_mostrar'];
                                 $calificacion = $actividad['calificacion'];
                                 $puntaje_maximo = $actividad['puntaje_maximo'] > 0 ? $actividad['puntaje_maximo'] : 100;
+                                $tiene_archivo = !empty($actividad['id_adjunto']);
+                                $url_archivo = $actividad['url_archivo'] ?? '';
+                                $nombre_archivo = $actividad['nombre_archivo'] ?? '';
+                                $tamano_archivo = $actividad['tamano_bytes'] ?? null;
                                 
-                                // Determinar clase de calificación
                                 $calif_clase = 'pendiente';
                                 if ($calificacion !== null) {
                                     $porcentaje = ($calificacion / $puntaje_maximo) * 100;
@@ -531,11 +668,13 @@ function getEstadoBadgeClass($estado) {
                                 }
                                 
                                 $avance = $actividad['porcentaje_avance'] ?? 0;
+                                $puede_calificar = $tiene_archivo && in_array($estado_mostrar, ['Entregada', 'Completada', 'Pendiente', 'Atrasada']);
+                                $ya_calificado = $estado_mostrar === 'Calificada' || $calificacion !== null;
                                 ?>
                                 <div class="activity-row">
                                     <div class="titulo"><?= htmlspecialchars($actividad['titulo']) ?></div>
                                     <div>
-                                        <span class="tipo-badge <?= strtolower($actividad['tipo']) ?>">
+                                        <span class="tipo-badge <?= getTipoBadgeClass($actividad['tipo']) ?>">
                                             <?= htmlspecialchars($actividad['tipo']) ?>
                                         </span>
                                     </div>
@@ -547,7 +686,7 @@ function getEstadoBadgeClass($estado) {
                                     <div>
                                         <?php if ($calificacion !== null): ?>
                                             <span class="calificacion <?= $calif_clase ?>">
-                                                <?= number_format($calificacion, 1) ?> / <?= number_format($puntaje_maximo, 1) ?>
+                                                <?= number_format($calificacion, 1) ?>
                                             </span>
                                         <?php else: ?>
                                             <span class="calificacion pendiente">--</span>
@@ -558,6 +697,30 @@ function getEstadoBadgeClass($estado) {
                                         <div class="progress-bar-mini">
                                             <div class="fill" style="width: <?= $avance ?>%"></div>
                                         </div>
+                                    </div>
+                                    <div>
+                                        <?php if ($tiene_archivo): ?>
+                                            <a href="<?= $url_archivo ?>" target="_blank" class="btn-ver-archivo" title="Ver archivo">
+                                                <i class="fa-regular fa-file"></i> Ver
+                                            </a>
+                                            <span class="nombre-archivo"><?= htmlspecialchars($nombre_archivo) ?></span>
+                                        <?php else: ?>
+                                            <span class="sin-archivo">Sin archivo</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <?php if ($puede_calificar && !$ya_calificado): ?>
+                                            <a href="calificar_entrega.php?id_actividad=<?= $actividad['id_actividad'] ?>&id_estudiante=<?= $id_estudiante ?>&id_curso=<?= $id_curso_seleccionado ?>" 
+                                               class="btn-calificar">
+                                                <i class="fa-regular fa-star"></i> Calificar
+                                            </a>
+                                        <?php elseif ($ya_calificado): ?>
+                                            <span style="color: #22c55e; font-size: 11px;">
+                                                <i class="fa-regular fa-check-circle"></i> Calificada
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="color: #94a3b8; font-size: 11px;">--</span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

@@ -328,3 +328,156 @@
             color: #856404;
             border-color: #ffeeba;
         }
+
+        .btn-realizar {
+    background: #3b71f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.btn-realizar:hover {
+    background: #2a5bd6;
+    color: white;
+}
+.btn-ver-resultado {
+    background: #f1f5f9;
+    color: #3b71f3;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-ver-resultado:hover {
+    background: #e2e8f0;
+}
+
+/* Botón Entregar */
+.btn-entregar {
+    background: #3b71f3;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.btn-entregar:hover {
+    background: #2a5bd6;
+    color: white;
+}
+
+/* Botón Ver entrega */
+.btn-ver-entrega {
+    background: #f1f5f9;
+    color: #3b71f3;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.btn-ver-entrega:hover {
+    background: #e2e8f0;
+}
+
+/* Botón Realizar evaluación */
+.btn-realizar {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.btn-realizar:hover {
+    background: #7c3aed;
+    color: white;
+}
+
+/* Botón Ver resultado */
+.btn-ver-resultado {
+    background: #f1f5f9;
+    color: #8b5cf6;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.btn-ver-resultado:hover {
+    background: #e2e8f0;
+}
+
+/* Botón Extensión */
+.btn-ext {
+    background: #fef3c7;
+    color: #92400e;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-ext:hover {
+    background: #fde68a;
+}
+
+/* Badge de calificación */
+.badge-calificacion {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Card actions group */
+.card-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}

@@ -13,6 +13,11 @@ if (!isset($_SESSION['usuario'])) {
 }
 
 $id_usuario = $_SESSION['usuario']['id_usuario'];
+$nombre_usuario = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
+
+// Obtener foto de perfil del alumno
+$foto_perfil_alumno = $_SESSION['usuario']['foto_perfil'] ?? null;
+$ruta_foto_alumno = !empty($foto_perfil_alumno) ? '../uploads/perfiles/' . $foto_perfil_alumno : 'https://placehold.co/40x40/ff7675/white?text=👩';
 
 // Consulta para obtener las actividades del alumno (INCLUYENDO EVALUACIONES)
 $sql = "
@@ -20,24 +25,37 @@ $sql = "
         a.id_actividad,
         a.titulo,
         a.descripcion,
+        a.instrucciones,
         m.nombre AS asignatura,
         a.fecha_limite AS vencimiento,
         a.tipo,
         a.configuracion_evaluacion,
         a.puntaje_maximo,
+        a.permite_entrega_archivo,
         ae.id_actividad_estudiante,
         ae.estado,
         ae.porcentaje_avance,
+        e.id_entrega,
+        e.estado AS entrega_estado,
+        e.calificacion,
+        e.retroalimentacion,
+        adj.id_adjunto,
+        adj.nombre_archivo,
+        adj.url_archivo,
         CASE 
             WHEN ae.estado = 'Pendiente' AND a.fecha_limite < NOW() THEN 'atrasada'
+            WHEN ae.estado = 'Calificada' THEN 'calificada'
+            WHEN ae.estado = 'Completada' THEN 'completada'
             ELSE LOWER(ae.estado)
         END AS estado_mostrar,
-        (SELECT COUNT(*) FROM entregas e 
-         WHERE e.id_actividad_estudiante = ae.id_actividad_estudiante) AS tiene_entrega
+        (SELECT COUNT(*) FROM entregas e2 
+         WHERE e2.id_actividad_estudiante = ae.id_actividad_estudiante) AS tiene_entrega
     FROM actividad_estudiantes ae
     JOIN actividades a ON ae.id_actividad = a.id_actividad
     JOIN cursos c ON a.id_curso = c.id_curso
     JOIN materias m ON c.id_materia = m.id_materia
+    LEFT JOIN entregas e ON e.id_actividad_estudiante = ae.id_actividad_estudiante
+    LEFT JOIN adjuntos adj ON adj.entidad_tipo = 'Entrega' AND adj.entidad_id = e.id_entrega
     WHERE ae.id_alumno = ?
     ORDER BY a.fecha_limite ASC
 ";
@@ -200,6 +218,11 @@ $conexion->close();
                                          style="width: <?= $act['porcentaje_avance'] ?>%"></div>
                                 </div>
                             <?php endif; ?>
+                            <?php if ($act['tipo'] !== 'Evaluacion' && $act['id_adjunto']): ?>
+                                <div style="font-size: 12px; color: #22c55e; margin-top: 5px;">
+                                    <i class="fa-regular fa-file"></i> Archivo entregado
+                                </div>
+                            <?php endif; ?>
                         </div>
                         <div class="card-acciones">
                             <span class="estado-badge <?= getEstadoBadgeClass($act['estado_mostrar']) ?>">
@@ -219,10 +242,25 @@ $conexion->close();
                                         </a>
                                     <?php endif; ?>
                                 <?php else: ?>
-                                    <?php if (!in_array($act['estado_mostrar'], ['completada', 'calificada'])): ?>
+                                    <!-- Para Tarea, Ejercicio, Lectura, Proyecto -->
+                                    <?php if (in_array($act['estado_mostrar'], ['pendiente', 'atrasada', 'en_proceso'])): ?>
+                                        <a href="entregar_actividad.php?id=<?= $act['id_actividad'] ?>" 
+                                           class="btn-entregar">
+                                            <i class="fa-regular fa-paper-plane"></i> Entregar
+                                        </a>
                                         <button class="btn-ext" data-id="<?= $act['id_actividad'] ?>">
-                                            <i class="fa-regular fa-clock"></i> Solicitar extensión
+                                            <i class="fa-regular fa-clock"></i>
                                         </button>
+                                    <?php elseif ($act['estado_mostrar'] === 'completada' || $act['estado_mostrar'] === 'calificada'): ?>
+                                        <a href="entregar_actividad.php?id=<?= $act['id_actividad'] ?>" 
+                                           class="btn-ver-entrega">
+                                            <i class="fa-regular fa-eye"></i> Ver entrega
+                                        </a>
+                                        <?php if ($act['estado_mostrar'] === 'calificada' && $act['calificacion'] !== null): ?>
+                                            <span class="badge-calificacion" style="background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                                <?= $act['calificacion'] ?> pts
+                                            </span>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endif; ?>
                             </div>
@@ -276,13 +314,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Botones de solicitud de extensión
     document.querySelectorAll('.btn-ext').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             const idActividad = this.dataset.id;
             if (confirm('¿Deseas solicitar una extensión de plazo para esta actividad?')) {
-                alert('Solicitud de extensión enviada al docente.');
+                alert('✅ Solicitud de extensión enviada al docente.');
+                // Aquí se puede implementar el envío real
             }
         });
     });
+    
+    console.log('📋 Página de actividades cargada correctamente');
 });
 </script>
 
