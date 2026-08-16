@@ -101,7 +101,12 @@ $conexion->close();
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
 
-        <!-- ENCABEZADO -->
+        <!-- ENCABEZADO CON FOTO DE PERFIL -->
+        <?php
+        // Obtener foto de perfil del docente
+        $foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
+        $ruta_foto_docente = !empty($foto_perfil_docente) ? '../uploads/perfiles/' . $foto_perfil_docente : 'https://placehold.co/40x40/ff7675/white?text=👨';
+        ?>
         <header class="content-header">
             <div class="welcome-text">
                 <h1>Crear actividad</h1>
@@ -114,15 +119,15 @@ $conexion->close();
                 <div class="icon-bell-container">
                     <i class="fa-regular fa-bell"></i>
                 </div>
-                <div class="user-profile">
-                    <img src="https://placehold.co/40x40/ff7675/white?text=👨" alt="Avatar Docente" class="avatar">
-                    <div class="user-info">
-                        <span class="user-name"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                        <span class="user-role">Docente</span>
+                <a href="mi_perfil_d.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:5px 12px 5px 5px; border-radius:50px; background:#f1f5f9; transition:background 0.2s;">
+                    <img src="<?php echo $ruta_foto_docente; ?>" alt="Avatar Docente" class="avatar" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid white;">
+                    <div class="user-info" style="display:flex; flex-direction:column; line-height:1.2;">
+                        <span class="user-name" style="font-weight:600; font-size:14px; color:#1e293b;"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                        <span class="user-role" style="font-size:11px; color:#64748b;">Docente</span>
                     </div>
-                </div>
+                </a>
             </div>
-            </header>
+        </header>
 
             <!-- MENSAJES DE ÉXITO O ERROR -->
             <?php if (isset($_SESSION['mensaje'])): ?>
