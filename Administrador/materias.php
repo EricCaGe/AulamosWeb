@@ -188,9 +188,9 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
                         <i class="fa-solid fa-book"></i>
                         <h4>No hay materias registradas</h4>
                         <p>Comienza creando la primera materia</p>
-                        <button class="btn-agregar-empty" id="btnNuevaMateriaEmpty">
-                            <i class="fa-solid fa-plus"></i> Crear materia
-                        </button>
+                        <button class="btn-nueva-materia" id="btnNuevaMateriaEmpty">
+    <i class="fa-solid fa-plus"></i> Crear Nueva materia
+</button>
                     </div>
                 <?php else: ?>
                     <?php foreach ($materias as $materia): ?>

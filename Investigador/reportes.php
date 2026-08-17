@@ -87,6 +87,74 @@ $accesibilidad_data = [
     ['nombre' => 'Subtítulos', 'total' => $accesibilidad_stats['subtitulos'] ?? 0],
 ];
 $max_accesibilidad = !empty($accesibilidad_data) ? max(array_column($accesibilidad_data, 'total')) : 1;
+
+// =====================================================
+// EXPORTAR A CSV
+// =====================================================
+if (isset($_GET['exportar']) && $_GET['exportar'] === 'csv') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="reporte_investigacion_' . date('Y-m-d') . '.csv"');
+    
+    $output = fopen('php://output', 'w');
+    
+    fputcsv($output, ['Métrica', 'Valor', 'Descripción', 'Fecha']);
+    
+    $data = [
+        ['Estudiantes con accesibilidad', $usan_accesibilidad . ' de ' . $total_estudiantes, 'Estudiantes que usan funciones de accesibilidad', date('Y-m-d')],
+        ['Tiempo promedio', $tiempo_promedio, 'Tiempo promedio en actividades', date('Y-m-d')],
+        ['Errores registrados', $total_errores, 'Total de errores de navegación', date('Y-m-d')],
+        ['Interacciones chatbot', $total_chatbot, 'Total de mensajes con el chatbot', date('Y-m-d')],
+        ['Progreso académico', $progreso_promedio . '%', 'Porcentaje promedio de avance', date('Y-m-d')],
+    ];
+    
+    foreach ($accesibilidad_data as $item) {
+        $data[] = ['Accesibilidad: ' . $item['nombre'], $item['total'] . ' estudiantes', 'Estudiantes con ' . $item['nombre'] . ' activado', date('Y-m-d')];
+    }
+    
+    foreach ($data as $row) {
+        fputcsv($output, $row);
+    }
+    
+    fclose($output);
+    exit;
+}
+
+// =====================================================
+// EXPORTAR A EXCEL (HTML)
+// =====================================================
+if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
+    header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+    header('Content-Disposition: attachment; filename="reporte_investigacion_' . date('Y-m-d') . '.xls"');
+    
+    echo '<html><head><meta charset="utf-8"></head><body>';
+    echo '<h2>Reporte de Investigación - AULAMOS</h2>';
+    echo '<p>Fecha: ' . date('d/m/Y H:i') . '</p>';
+    echo '<table border="1" cellpadding="5">';
+    echo '<tr style="background:#3b71f3; color:white;"><th>Métrica</th><th>Valor</th><th>Descripción</th><th>Fecha</th></tr>';
+    
+    $rows = [
+        ['Estudiantes con accesibilidad', $usan_accesibilidad . ' de ' . $total_estudiantes, 'Estudiantes que usan funciones de accesibilidad', date('Y-m-d')],
+        ['Tiempo promedio', $tiempo_promedio, 'Tiempo promedio en actividades', date('Y-m-d')],
+        ['Errores registrados', $total_errores, 'Total de errores de navegación', date('Y-m-d')],
+        ['Interacciones chatbot', $total_chatbot, 'Total de mensajes con el chatbot', date('Y-m-d')],
+        ['Progreso académico', $progreso_promedio . '%', 'Porcentaje promedio de avance', date('Y-m-d')],
+    ];
+    
+    foreach ($accesibilidad_data as $item) {
+        $rows[] = ['Accesibilidad: ' . $item['nombre'], $item['total'] . ' estudiantes', 'Estudiantes con ' . $item['nombre'] . ' activado', date('Y-m-d')];
+    }
+    
+    foreach ($rows as $row) {
+        echo '<tr>';
+        foreach ($row as $cell) {
+            echo '<td>' . htmlspecialchars($cell) . '</td>';
+        }
+        echo '</tr>';
+    }
+    
+    echo '</table></body></html>';
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -207,7 +275,7 @@ $max_accesibilidad = !empty($accesibilidad_data) ? max(array_column($accesibilid
         <section class="exportar-reporte">
             <h3><i class="fa-solid fa-download"></i> Exportar reporte</h3>
             <p class="exportar-descripcion">Selecciona el formato en el que deseas obtener la información recopilada.</p>
-            <div class="boton-exportar" onclick="alert('La exportación a CSV estará disponible próximamente.')">
+            <div class="boton-exportar" onclick="window.location.href='?exportar=csv'">
                 <div class="exportar-icono"><i class="fa-solid fa-file-csv"></i></div>
                 <div class="exportar-contenido">
                     <span class="exportar-titulo">Exportar CSV</span>
@@ -215,7 +283,7 @@ $max_accesibilidad = !empty($accesibilidad_data) ? max(array_column($accesibilid
                 </div>
                 <i class="fa-solid fa-download"></i>
             </div>
-            <div class="boton-exportar principal" onclick="alert('La exportación a Excel estará disponible próximamente.')">
+            <div class="boton-exportar principal" onclick="window.location.href='?exportar=excel'">
                 <div class="exportar-icono"><i class="fa-solid fa-file-excel"></i></div>
                 <div class="exportar-contenido">
                     <span class="exportar-titulo">Exportar Excel</span>
@@ -224,7 +292,7 @@ $max_accesibilidad = !empty($accesibilidad_data) ? max(array_column($accesibilid
                 <i class="fa-solid fa-download"></i>
             </div>
         </section>
-        <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Los resultados mostrados son datos reales registrados por AULAMOS. La generación de archivos CSV y Excel se implementará próximamente.</p></div>
+        <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Los resultados mostrados son datos reales registrados por AULAMOS.</p></div>
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
     </main>
 </div>
