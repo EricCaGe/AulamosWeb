@@ -24,7 +24,8 @@ $stmt = $conexion->prepare("
         nombre,
         apellido_paterno,
         apellido_materno,
-        correo
+        correo,
+        foto_perfil
     FROM usuarios
     WHERE id_usuario = ?
 ");
@@ -34,6 +35,13 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 $usuario = $result->fetch_assoc();
+$foto_perfil = $usuario['foto_perfil'] ?? null;
+
+if (!empty($foto_perfil)) {
+    $ruta_foto = '../uploads/perfiles/' . $foto_perfil;
+} else {
+    $ruta_foto = 'https://placehold.co/120x120/ffffff/111827?text=👤';
+}
 
 if (!$usuario) {
     die("No se encontraron los datos del usuario.");
@@ -146,11 +154,12 @@ $correo = $usuario['correo'] ?? 'Correo no disponible';
 
         <!-- Avatar -->
 
-        <div class="usuario-avatar">
-
-            <i class="fa-regular fa-user"></i>
-
-        </div>
+        <div class="avatar">
+    <img
+        src="<?php echo htmlspecialchars($ruta_foto); ?>"
+        alt="Foto de perfil"
+    >
+</div>
 
 
         <!-- Información -->

@@ -14,13 +14,19 @@ require_once '../Conexion/conexion.php';
 $id_usuario = $_SESSION['usuario']['id_usuario'];
 
 // 1. Datos del usuario
-$stmt = $conexion->prepare("SELECT nombre, apellido_paterno FROM usuarios WHERE id_usuario = ?");
+$stmt = $conexion->prepare("SELECT nombre, apellido_paterno, foto_perfil FROM usuarios WHERE id_usuario = ?");
 $stmt->bind_param("i", $id_usuario);
-$stmt->execute();
+$stmt->execute();   
 $result = $stmt->get_result();
 $usuario_data = $result->fetch_assoc();
 $nombre_completo = $usuario_data['nombre'] . ' ' . $usuario_data['apellido_paterno'];
+$foto_perfil = $usuario_data['foto_perfil'] ?? null;
 
+if (!empty($foto_perfil)) {
+    $ruta_foto = '../uploads/perfiles/' . $foto_perfil;
+} else {
+    $ruta_foto = 'https://placehold.co/40x40/ffffff/111827?text=👤';
+}
 // 2. Continúa donde lo dejaste (última actividad en proceso)
 $stmt = $conexion->prepare("
     SELECT a.titulo, m.nombre AS materia, ae.porcentaje_avance
@@ -175,12 +181,25 @@ $racha_dias = $row['dias_activos'] ?? 0;
                 <p>Qué bueno verte hoy. Continúa aprendiendo a tu ritmo.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-assistant" id="btn-asistente" onclick="window.open('chatbot.php', '_blank')">
-                    Asistente Virtual <span class="robot-icon">🤖</span>
-                </button>
-                <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
-                <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar Estudiante" class="avatar">
-            </div>
+    <button class="btn-assistant" id="btn-asistente"
+            onclick="window.open('chatbot.php', '_blank')">
+        Asistente Virtual <span class="robot-icon">🤖</span>
+    </button>
+    <div class="icon-bell">
+        <i class="fa-regular fa-bell"></i>
+    </div>
+    <?php if (!empty($foto_perfil)): ?>
+        <img
+            src="<?php echo htmlspecialchars($ruta_foto); ?>"
+            alt="Foto de perfil"
+            class="avatar"
+        >
+    <?php else: ?>
+        <div class="avatar avatar-sin-foto">
+            <i class="fa-regular fa-user"></i>
+        </div>
+    <?php endif; ?>
+</div>
         </header>
         
         <section class="cards-grid">

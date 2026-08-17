@@ -457,3 +457,13 @@ body {
     }
 
 }
+.avatar {
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 30%;
+    height: 30%;
+    object-fit: cover;
+    display: block;
+}

@@ -171,4 +171,74 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     }
 
-});
+})
+// ==========================================
+// FOTO DE PERFIL
+// ==========================================
+
+const inputFotoPerfil =
+    document.getElementById('inputFotoPerfil');
+
+const formFotoPerfil =
+    document.getElementById('formFotoPerfil');
+
+if (inputFotoPerfil && formFotoPerfil) {
+
+    inputFotoPerfil.addEventListener('change', function () {
+
+        if (
+            this.files &&
+            this.files.length > 0
+        ) {
+
+            const archivo = this.files[0];
+
+            const tiposPermitidos = [
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/webp'
+            ];
+
+            // Validar tipo
+            if (!tiposPermitidos.includes(archivo.type)) {
+
+                alert(
+                    'Solo se permiten imágenes JPG, PNG, GIF o WEBP.'
+                );
+
+                this.value = '';
+
+                return;
+            }
+
+            // Validar tamaño
+            if (archivo.size > 2097152) {
+
+                alert(
+                    'La imagen no debe superar los 2 MB.'
+                );
+
+                this.value = '';
+
+                return;
+            }
+
+            // Confirmar
+            const confirmar = confirm(
+                '¿Deseas actualizar tu foto de perfil?'
+            );
+
+            if (confirmar) {
+
+                formFotoPerfil.submit();
+
+            } else {
+
+                this.value = '';
+
+            }
+        }
+    });
+}
+

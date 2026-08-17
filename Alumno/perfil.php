@@ -43,7 +43,8 @@ $stmt = $conexion->prepare("
         apellido_materno,
         correo,
         fecha_registro,
-        ultimo_acceso
+        ultimo_acceso,
+        foto_perfil
     FROM usuarios
     WHERE id_usuario = ?
 ");
@@ -85,6 +86,8 @@ $nombre_completo = trim(
 $fecha_registro = $usuario['fecha_registro'] ?? null;
 
 $ultimo_acceso = $usuario['ultimo_acceso'] ?? null;
+
+$foto_perfil = $usuario['foto_perfil'] ?? null;
 
 
 /* =========================================================
@@ -354,6 +357,168 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+/* =====================================================
+   SUBIR FOTO DE PERFIL
+   ===================================================== */
+
+if (
+    isset($_POST['accion']) &&
+    $_POST['accion'] === 'subir_foto'
+) {
+
+    if (
+        isset($_FILES['foto_perfil']) &&
+        $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK
+    ) {
+
+        $archivo = $_FILES['foto_perfil'];
+
+        $nombre_original = $archivo['name'];
+        $tamano = $archivo['size'];
+        $temporal = $archivo['tmp_name'];
+
+        // Extensiones permitidas
+        $extensiones_permitidas = [
+            'jpg',
+            'jpeg',
+            'png',
+            'gif',
+            'webp'
+        ];
+
+        $extension = strtolower(
+            pathinfo(
+                $nombre_original,
+                PATHINFO_EXTENSION
+            )
+        );
+
+        // Validar extensión
+        if (!in_array($extension, $extensiones_permitidas)) {
+
+            $mensaje =
+                'Solo se permiten imágenes JPG, PNG, GIF o WEBP.';
+
+            $tipo_mensaje = 'error';
+
+        // Validar tamaño máximo: 2 MB
+        } elseif ($tamano > 2097152) {
+
+            $mensaje =
+                'La imagen no debe superar los 2 MB.';
+
+            $tipo_mensaje = 'error';
+
+        } else {
+
+            // Carpeta donde se guardarán las imágenes
+            $carpeta_destino = '../uploads/perfiles/';
+
+            // Crear carpeta si no existe
+            if (!is_dir($carpeta_destino)) {
+
+                mkdir(
+                    $carpeta_destino,
+                    0777,
+                    true
+                );
+            }
+
+            // Nombre único
+            $nombre_archivo =
+                'perfil_' .
+                $id_usuario .
+                '_' .
+                time() .
+                '.' .
+                $extension;
+
+            $ruta_completa =
+                $carpeta_destino .
+                $nombre_archivo;
+
+            // Mover imagen
+            if (
+                move_uploaded_file(
+                    $temporal,
+                    $ruta_completa
+                )
+            ) {
+
+                // Eliminar foto anterior
+                if (
+                    !empty($foto_perfil) &&
+                    file_exists(
+                        $carpeta_destino .
+                        $foto_perfil
+                    )
+                ) {
+
+                    unlink(
+                        $carpeta_destino .
+                        $foto_perfil
+                    );
+                }
+
+                // Guardar nombre de imagen en BD
+                $stmt = $conexion->prepare("
+                    UPDATE usuarios
+                    SET foto_perfil = ?
+                    WHERE id_usuario = ?
+                ");
+
+                $stmt->bind_param(
+                    "si",
+                    $nombre_archivo,
+                    $id_usuario
+                );
+
+                if ($stmt->execute()) {
+
+                    // Actualizar sesión
+                    $_SESSION['usuario']['foto_perfil'] =
+                        $nombre_archivo;
+
+                    // Actualizar variable
+                    $foto_perfil =
+                        $nombre_archivo;
+
+                    $mensaje =
+                        'Foto de perfil actualizada correctamente.';
+
+                    $tipo_mensaje =
+                        'exito';
+
+                } else {
+
+                    $mensaje =
+                        'Error al guardar la foto en la base de datos.';
+
+                    $tipo_mensaje =
+                        'error';
+                }
+
+                $stmt->close();
+
+            } else {
+
+                $mensaje =
+                    'Error al subir la imagen.';
+
+                $tipo_mensaje =
+                    'error';
+            }
+        }
+
+    } else {
+
+        $mensaje =
+            'No se seleccionó ninguna imagen.';
+
+        $tipo_mensaje =
+            'error';
+    }
+}
 
 /* =========================================================
    DATOS PARA MOSTRAR
@@ -491,31 +656,93 @@ if (!empty($ultimo_acceso)) {
          TARJETA PRINCIPAL
          ===================================================== -->
 
-    <section class="perfil-card">
-        <!-- AVATAR -->
-        <div class="perfil-avatar">
-            <div class="avatar">
+   <section class="perfil-card">
+
+    <!-- AVATAR -->
+    <div class="perfil-avatar">
+
+        <div class="avatar">
+
+            <?php if (!empty($foto_perfil)): ?>
+
+                <img
+                    src="../uploads/perfiles/<?php echo htmlspecialchars($foto_perfil); ?>"
+                    alt="Foto de perfil"
+                    class="foto-perfil"
+                >
+
+            <?php else: ?>
+
                 <i class="fa-regular fa-user"></i>
-            </div>
+
+            <?php endif; ?>
+
         </div>
-        <!-- INFORMACIÓN -->
-        <div class="perfil-datos">
-            <h2>
-                <?php
-                echo htmlspecialchars($nombre_completo);
-                ?>
-            </h2>
-            <p class="correo">
-                <?php
-                echo htmlspecialchars($correo);
-                ?>
-            </p>
-            <span class="rol">
-                <i class="fa-solid fa-graduation-cap"></i>
-                Alumno
-            </span>
-        </div>
-    </section>
+
+        <!-- FORMULARIO PARA SUBIR FOTO -->
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            id="formFotoPerfil"
+        >
+
+            <input
+                type="hidden"
+                name="accion"
+                value="subir_foto"
+            >
+
+            <label
+                for="inputFotoPerfil"
+                class="btn-cambiar-foto"
+            >
+
+                <i class="fa-solid fa-camera"></i>
+
+                Cambiar foto
+
+            </label>
+
+            <input
+                type="file"
+                name="foto_perfil"
+                id="inputFotoPerfil"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                style="display:none;"
+            >
+
+        </form>
+
+    </div>
+
+    <!-- INFORMACIÓN -->
+
+    <div class="perfil-datos">
+
+        <h2>
+            <?php
+            echo htmlspecialchars($nombre_completo);
+            ?>
+        </h2>
+
+        <p class="correo">
+            <?php
+            echo htmlspecialchars($correo);
+            ?>
+        </p>
+
+        <span class="rol">
+
+            <i class="fa-solid fa-graduation-cap"></i>
+
+            Alumno
+
+        </span>
+
+    </div>
+
+</section>
     <!-- =====================================================
          INFORMACIÓN PERSONAL
          ===================================================== -->
