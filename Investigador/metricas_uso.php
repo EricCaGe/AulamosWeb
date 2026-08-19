@@ -14,23 +14,57 @@ $titulo_pagina = 'Métricas de uso';
 $descripcion_pagina = 'Consulta cómo utilizan los estudiantes la plataforma durante las pruebas de uso.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
+// =====================================================
+
+$stmt = $conexion->prepare("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$prueba_activa = $resultado->fetch_assoc();
+$stmt->close();
+
+$id_prueba_activa = $prueba_activa['id_prueba'] ?? null;
+$prueba_activa_nombre = $prueba_activa['nombre'] ?? 'Ninguna';
+
+// =====================================================
+// CONSULTAS A LA BD (con filtro por prueba activa)
 // =====================================================
 
 // Total de accesos
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'InicioSesion'");
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total 
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'InicioSesion' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'InicioSesion'");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $total_accesos = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
 // Total de estudiantes
-$stmt = $conexion->prepare("
-    SELECT COUNT(DISTINCT u.id_usuario) AS total
-    FROM usuarios u
-    INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
-    WHERE ur.id_rol = 1 AND u.estado = 'Activo'
-");
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        INNER JOIN participantes_prueba pp ON u.id_usuario = pp.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $total_estudiantes = $resultado->fetch_assoc()['total'] ?? 0;
@@ -40,14 +74,27 @@ $stmt->close();
 $promedio_accesos = $total_estudiantes > 0 ? round($total_accesos / $total_estudiantes, 1) : 0;
 
 // Módulos más visitados
-$stmt = $conexion->prepare("
-    SELECT modulo, COUNT(*) AS visitas
-    FROM eventos_investigacion
-    WHERE modulo IS NOT NULL
-    GROUP BY modulo
-    ORDER BY visitas DESC
-    LIMIT 5
-");
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT e.modulo, COUNT(*) AS visitas
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.modulo IS NOT NULL AND pp.id_prueba = ?
+        GROUP BY e.modulo
+        ORDER BY visitas DESC
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT modulo, COUNT(*) AS visitas
+        FROM eventos_investigacion
+        WHERE modulo IS NOT NULL
+        GROUP BY modulo
+        ORDER BY visitas DESC
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $modulos_visitados = $resultado->fetch_all(MYSQLI_ASSOC);
@@ -57,13 +104,26 @@ $max_visitas = !empty($modulos_visitados) ? max(array_column($modulos_visitados,
 $modulo_mas_visitado = !empty($modulos_visitados) ? $modulos_visitados[0]['modulo'] : 'Sin datos';
 
 // Actividad reciente
-$stmt = $conexion->prepare("
-    SELECT u.nombre, u.apellido_paterno, e.modulo, e.accion, e.fecha_hora
-    FROM eventos_investigacion e
-    INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
-    ORDER BY e.fecha_hora DESC
-    LIMIT 5
-");
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT u.nombre, u.apellido_paterno, e.modulo, e.accion, e.fecha_hora
+        FROM eventos_investigacion e
+        INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE pp.id_prueba = ?
+        ORDER BY e.fecha_hora DESC
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT u.nombre, u.apellido_paterno, e.modulo, e.accion, e.fecha_hora
+        FROM eventos_investigacion e
+        INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
+        ORDER BY e.fecha_hora DESC
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $actividad_reciente = $resultado->fetch_all(MYSQLI_ASSOC);
@@ -84,6 +144,25 @@ $stmt->close();
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+
+        <!-- ===== AVISO DE PRUEBA ACTIVA ===== -->
+        <?php if ($id_prueba_activa): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <div class="periodo-selector">
             <div class="periodo-info">
                 <i class="fa-solid fa-calendar"></i>
@@ -94,6 +173,7 @@ $stmt->close();
             </div>
             <button class="btn-periodo"><i class="fa-solid fa-chevron-down"></i></button>
         </div>
+
         <section class="resumen-investigador">
             <div class="stats-row">
                 <div class="stat-card">
@@ -107,7 +187,7 @@ $stmt->close();
                     <div class="stat-icon" style="background:#e6f7e6;"><i class="fa-solid fa-users" style="color:#2e7d32;"></i></div>
                     <div class="stat-info">
                         <span class="stat-number"><?php echo $total_estudiantes; ?></span>
-                        <span class="stat-label">Estudiantes</span>
+                        <span class="stat-label">Estudiantes <?php echo $id_prueba_activa ? 'seleccionados' : 'activos'; ?></span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -126,6 +206,7 @@ $stmt->close();
                 </div>
             </div>
         </section>
+
         <section class="modulos-detalle">
             <div class="modulos-header">
                 <h3><i class="fa-solid fa-chart-simple"></i> Módulos más visitados</h3>
@@ -155,6 +236,7 @@ $stmt->close();
                 <span>El módulo con mayor frecuencia de uso es <strong><?php echo htmlspecialchars($modulo_mas_visitado); ?></strong>.</span>
             </div>
         </section>
+
         <section class="actividad-reciente">
             <h3><i class="fa-regular fa-clock"></i> Actividad reciente</h3>
             <div class="actividad-lista">
@@ -174,6 +256,7 @@ $stmt->close();
                 <?php endif; ?>
             </div>
         </section>
+
         <section class="info-registrada">
             <h3><i class="fa-solid fa-list-check"></i> Información registrada</h3>
             <div class="info-grid">
@@ -183,6 +266,7 @@ $stmt->close();
                 <div class="info-item"><i class="fa-solid fa-check-circle" style="color:#2e7d32;"></i><span>Fecha y hora de acceso</span></div>
             </div>
         </section>
+
         <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Los datos mostrados en esta pantalla son reales registrados por AULAMOS.</p></div>
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
     </main>

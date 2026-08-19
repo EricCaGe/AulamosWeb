@@ -14,20 +14,56 @@ $titulo_pagina = 'Progreso académico';
 $descripcion_pagina = 'Consulta el avance de los estudiantes en actividades, evaluaciones y recursos durante el periodo de prueba.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
 // =====================================================
 
-$stmt = $conexion->prepare("SELECT AVG(porcentaje_avance) AS promedio FROM actividad_estudiantes");
+$stmt = $conexion->prepare("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$prueba_activa = $resultado->fetch_assoc();
+$stmt->close();
+
+$id_prueba_activa = $prueba_activa['id_prueba'] ?? null;
+$prueba_activa_nombre = $prueba_activa['nombre'] ?? 'Ninguna';
+
+// =====================================================
+// CONSULTAS A LA BD (con filtro por prueba activa)
+// =====================================================
+
+// Progreso promedio
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT AVG(ae.porcentaje_avance) AS promedio 
+        FROM actividad_estudiantes ae
+        INNER JOIN participantes_prueba pp ON ae.id_alumno = pp.id_usuario
+        WHERE pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT AVG(porcentaje_avance) AS promedio FROM actividad_estudiantes");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $progreso_promedio = round($resultado->fetch_assoc()['promedio'] ?? 0, 1);
 $stmt->close();
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN estado IN ('Completada', 'Calificada') THEN 1 ELSE 0 END) AS completadas
-    FROM actividad_estudiantes
-");
+// Actividades completadas
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total,
+               SUM(CASE WHEN ae.estado IN ('Completada', 'Calificada') THEN 1 ELSE 0 END) AS completadas
+        FROM actividad_estudiantes ae
+        INNER JOIN participantes_prueba pp ON ae.id_alumno = pp.id_usuario
+        WHERE pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total,
+               SUM(CASE WHEN estado IN ('Completada', 'Calificada') THEN 1 ELSE 0 END) AS completadas
+        FROM actividad_estudiantes
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $act_data = $resultado->fetch_assoc();
@@ -35,11 +71,24 @@ $stmt->close();
 $actividades_completadas = $act_data['completadas'] ?? 0;
 $total_actividades = $act_data['total'] ?? 1;
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN estado = 'Calificada' THEN 1 ELSE 0 END) AS realizadas
-    FROM entregas
-");
+// Evaluaciones realizadas
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total,
+               SUM(CASE WHEN e.estado = 'Calificada' THEN 1 ELSE 0 END) AS realizadas
+        FROM entregas e
+        INNER JOIN actividad_estudiantes ae ON e.id_actividad_estudiante = ae.id_actividad_estudiante
+        INNER JOIN participantes_prueba pp ON ae.id_alumno = pp.id_usuario
+        WHERE pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total,
+               SUM(CASE WHEN estado = 'Calificada' THEN 1 ELSE 0 END) AS realizadas
+        FROM entregas
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $eval_data = $resultado->fetch_assoc();
@@ -47,35 +96,71 @@ $stmt->close();
 $evaluaciones_realizadas = $eval_data['realizadas'] ?? 0;
 $total_evaluaciones = $eval_data['total'] ?? 1;
 
-$stmt = $conexion->prepare("
-    SELECT u.id_usuario, u.nombre, u.apellido_paterno,
-           AVG(ae.porcentaje_avance) AS porcentaje,
-           SUM(CASE WHEN ae.estado IN ('Completada', 'Calificada') THEN 1 ELSE 0 END) AS completadas,
-           COUNT(ae.id_actividad_estudiante) AS total_actividades,
-           SUM(CASE WHEN e.estado = 'Calificada' THEN 1 ELSE 0 END) AS evaluaciones_realizadas,
-           COUNT(DISTINCT e.id_entrega) AS total_evaluaciones
-    FROM usuarios u
-    INNER JOIN actividad_estudiantes ae ON u.id_usuario = ae.id_alumno
-    LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
-    INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
-    WHERE ur.id_rol = 1 AND u.estado = 'Activo'
-    GROUP BY u.id_usuario
-    ORDER BY porcentaje DESC
-    LIMIT 5
-");
+// Progreso por estudiante (top 5)
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT u.id_usuario, u.nombre, u.apellido_paterno,
+               AVG(ae.porcentaje_avance) AS porcentaje,
+               SUM(CASE WHEN ae.estado IN ('Completada', 'Calificada') THEN 1 ELSE 0 END) AS completadas,
+               COUNT(ae.id_actividad_estudiante) AS total_actividades,
+               SUM(CASE WHEN e.estado = 'Calificada' THEN 1 ELSE 0 END) AS evaluaciones_realizadas,
+               COUNT(DISTINCT e.id_entrega) AS total_evaluaciones
+        FROM usuarios u
+        INNER JOIN actividad_estudiantes ae ON u.id_usuario = ae.id_alumno
+        LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        INNER JOIN participantes_prueba pp ON u.id_usuario = pp.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo' AND pp.id_prueba = ?
+        GROUP BY u.id_usuario
+        ORDER BY porcentaje DESC
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT u.id_usuario, u.nombre, u.apellido_paterno,
+               AVG(ae.porcentaje_avance) AS porcentaje,
+               SUM(CASE WHEN ae.estado IN ('Completada', 'Calificada') THEN 1 ELSE 0 END) AS completadas,
+               COUNT(ae.id_actividad_estudiante) AS total_actividades,
+               SUM(CASE WHEN e.estado = 'Calificada' THEN 1 ELSE 0 END) AS evaluaciones_realizadas,
+               COUNT(DISTINCT e.id_entrega) AS total_evaluaciones
+        FROM usuarios u
+        INNER JOIN actividad_estudiantes ae ON u.id_usuario = ae.id_alumno
+        LEFT JOIN entregas e ON ae.id_actividad_estudiante = e.id_actividad_estudiante
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+        GROUP BY u.id_usuario
+        ORDER BY porcentaje DESC
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $estudiantes = $resultado->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-$stmt = $conexion->prepare("
-    SELECT DATE(fecha_inicio) AS fecha, AVG(porcentaje_avance) AS promedio
-    FROM actividad_estudiantes
-    WHERE fecha_inicio IS NOT NULL
-    GROUP BY DATE(fecha_inicio)
-    ORDER BY fecha DESC
-    LIMIT 5
-");
+// Historial de progreso
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT DATE(ae.fecha_inicio) AS fecha, AVG(ae.porcentaje_avance) AS promedio
+        FROM actividad_estudiantes ae
+        INNER JOIN participantes_prueba pp ON ae.id_alumno = pp.id_usuario
+        WHERE ae.fecha_inicio IS NOT NULL AND pp.id_prueba = ?
+        GROUP BY DATE(ae.fecha_inicio)
+        ORDER BY fecha DESC
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT DATE(fecha_inicio) AS fecha, AVG(porcentaje_avance) AS promedio
+        FROM actividad_estudiantes
+        WHERE fecha_inicio IS NOT NULL
+        GROUP BY DATE(fecha_inicio)
+        ORDER BY fecha DESC
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $historial = array_reverse($resultado->fetch_all(MYSQLI_ASSOC));
@@ -96,6 +181,25 @@ $stmt->close();
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+
+        <!-- ===== AVISO DE PRUEBA ACTIVA ===== -->
+        <?php if ($id_prueba_activa): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <div class="periodo-selector">
             <div class="periodo-info">
                 <i class="fa-solid fa-calendar"></i>
@@ -106,6 +210,7 @@ $stmt->close();
             </div>
             <button class="btn-periodo"><i class="fa-solid fa-chevron-down"></i></button>
         </div>
+
         <section class="progreso-general">
             <div class="tarjeta-progreso-general">
                 <div class="progreso-encabezado">
@@ -120,6 +225,7 @@ $stmt->close();
                 </div>
             </div>
         </section>
+
         <section class="resumen-progreso">
             <div class="stats-row">
                 <div class="stat-card">
@@ -138,6 +244,7 @@ $stmt->close();
                 </div>
             </div>
         </section>
+
         <section class="evolucion-progreso">
             <h3><i class="fa-solid fa-chart-simple"></i> Evolución del progreso</h3>
             <div class="tarjeta-historial">
@@ -160,6 +267,7 @@ $stmt->close();
                 <?php endif; ?>
             </div>
         </section>
+
         <section class="progreso-estudiantes">
             <h3><i class="fa-solid fa-user-graduate"></i> Progreso por estudiante</h3>
             <?php if (empty($estudiantes)): ?>
@@ -204,6 +312,7 @@ $stmt->close();
                 <?php endforeach; ?>
             <?php endif; ?>
         </section>
+
         <section class="info-registrada">
             <h3><i class="fa-solid fa-list-check"></i> Información registrada</h3>
             <div class="info-grid">
@@ -214,6 +323,7 @@ $stmt->close();
                 <div class="info-item"><i class="fa-solid fa-check-circle" style="color:#2e7d32;"></i><span>Fecha de cada registro</span></div>
             </div>
         </section>
+
         <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Los avances mostrados son obtenidos automáticamente a partir del desempeño académico registrado en AULAMOS.</p></div>
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
     </main>

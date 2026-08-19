@@ -3,7 +3,6 @@ session_start();
 // Pasar el ID del usuario al JavaScript para accesibilidad por usuario
 echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
 
-
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Investigador') {
     header('Location: ../InicioSesion/login.php');
     exit;
@@ -15,54 +14,128 @@ $titulo_pagina = 'Uso del chatbot';
 $descripcion_pagina = 'Consulta las interacciones realizadas por los estudiantes con el chatbot educativo durante las pruebas de uso.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
 // =====================================================
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM mensajes_chatbot");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_interacciones = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+$prueba_activa = null;
+$id_prueba_activa = null;
+$prueba_activa_nombre = 'Ninguna';
+$tiene_participantes = false;
 
-$stmt = $conexion->prepare("SELECT COUNT(DISTINCT s.id_usuario) AS total FROM sesiones_chatbot s");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$estudiantes_usuarios = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+$resultado = $conexion->query("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+if ($resultado) {
+    $prueba_activa = $resultado->fetch_assoc();
+    if ($prueba_activa) {
+        $id_prueba_activa = $prueba_activa['id_prueba'];
+        $prueba_activa_nombre = $prueba_activa['nombre'];
+        
+        $check = $conexion->query("SELECT COUNT(*) as total FROM participantes_prueba WHERE id_prueba = $id_prueba_activa");
+        if ($check) {
+            $row = $check->fetch_assoc();
+            $tiene_participantes = ($row['total'] ?? 0) > 0;
+        }
+    }
+}
 
-$stmt = $conexion->prepare("SELECT AVG(TIMESTAMPDIFF(SECOND, fecha_inicio, fecha_fin)) AS promedio FROM sesiones_chatbot WHERE fecha_fin IS NOT NULL");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$promedio_segundos = round($resultado->fetch_assoc()['promedio'] ?? 0);
-$stmt->close();
+// =====================================================
+// CONSULTAS A LA BD (usando query() en lugar de prepare())
+// =====================================================
+
+// Total de interacciones
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total 
+        FROM mensajes_chatbot
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot";
+}
+$resultado = $conexion->query($sql);
+$total_interacciones = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+
+// Estudiantes usuarios
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(DISTINCT s.id_usuario) AS total 
+        FROM sesiones_chatbot s
+        WHERE s.id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(DISTINCT s.id_usuario) AS total FROM sesiones_chatbot s";
+}
+$resultado = $conexion->query($sql);
+$estudiantes_usuarios = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+
+// Duración promedio
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT AVG(TIMESTAMPDIFF(SECOND, s.fecha_inicio, s.fecha_fin)) AS promedio 
+        FROM sesiones_chatbot s
+        WHERE s.fecha_fin IS NOT NULL 
+        AND s.id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT AVG(TIMESTAMPDIFF(SECOND, fecha_inicio, fecha_fin)) AS promedio FROM sesiones_chatbot WHERE fecha_fin IS NOT NULL";
+}
+$resultado = $conexion->query($sql);
+$promedio_segundos = $resultado ? round($resultado->fetch_assoc()['promedio'] ?? 0) : 0;
 $promedio_minutos = floor($promedio_segundos / 60);
 $promedio_segundos_resto = $promedio_segundos % 60;
 $promedio_duracion = $promedio_minutos . ' min ' . $promedio_segundos_resto . ' s';
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM mensajes_chatbot WHERE DATE(fecha_mensaje) = CURDATE()");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$preguntas_hoy = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+// Preguntas hoy
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total 
+        FROM mensajes_chatbot
+        WHERE DATE(fecha_mensaje) = CURDATE() 
+        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot WHERE DATE(fecha_mensaje) = CURDATE()";
+}
+$resultado = $conexion->query($sql);
+$preguntas_hoy = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
-$stmt = $conexion->prepare("SELECT tipo_consulta, COUNT(*) AS total FROM mensajes_chatbot GROUP BY tipo_consulta ORDER BY total DESC LIMIT 5");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$tipos_consulta = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// Tipos de consulta
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT tipo_consulta, COUNT(*) AS total 
+        FROM mensajes_chatbot
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        GROUP BY tipo_consulta 
+        ORDER BY total DESC 
+        LIMIT 5
+    ";
+} else {
+    $sql = "SELECT tipo_consulta, COUNT(*) AS total FROM mensajes_chatbot GROUP BY tipo_consulta ORDER BY total DESC LIMIT 5";
+}
+$resultado = $conexion->query($sql);
+$tipos_consulta = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 $max_consultas = !empty($tipos_consulta) ? max(array_column($tipos_consulta, 'total')) : 1;
 
-$stmt = $conexion->prepare("
-    SELECT DATE(fecha_mensaje) AS fecha, COUNT(*) AS total
-    FROM mensajes_chatbot
-    WHERE fecha_mensaje >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-    GROUP BY DATE(fecha_mensaje)
-    ORDER BY fecha ASC
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$interacciones_semana = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// Interacciones por día (última semana)
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT DATE(fecha_mensaje) AS fecha, COUNT(*) AS total
+        FROM mensajes_chatbot
+        WHERE fecha_mensaje >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
+        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        GROUP BY DATE(fecha_mensaje)
+        ORDER BY fecha ASC
+    ";
+} else {
+    $sql = "
+        SELECT DATE(fecha_mensaje) AS fecha, COUNT(*) AS total
+        FROM mensajes_chatbot
+        WHERE fecha_mensaje >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY DATE(fecha_mensaje)
+        ORDER BY fecha ASC
+    ";
+}
+$resultado = $conexion->query($sql);
+$interacciones_semana = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 
 $dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 $interacciones_por_dia = array_fill(0, 7, 0);
@@ -73,19 +146,31 @@ foreach ($interacciones_semana as $row) {
 }
 $max_dia = !empty($interacciones_por_dia) ? max($interacciones_por_dia) : 1;
 
-$stmt = $conexion->prepare("
-    SELECT u.nombre, u.apellido_paterno, m.pregunta, m.respuesta, m.tipo_consulta, m.fecha_mensaje,
-           TIMESTAMPDIFF(SECOND, s.fecha_inicio, s.fecha_fin) AS duracion
-    FROM mensajes_chatbot m
-    INNER JOIN sesiones_chatbot s ON m.id_sesion = s.id_sesion
-    INNER JOIN usuarios u ON s.id_usuario = u.id_usuario
-    ORDER BY m.fecha_mensaje DESC
-    LIMIT 5
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$interacciones_recientes = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// Interacciones recientes
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT u.nombre, u.apellido_paterno, m.pregunta, m.respuesta, m.tipo_consulta, m.fecha_mensaje,
+               TIMESTAMPDIFF(SECOND, s.fecha_inicio, s.fecha_fin) AS duracion
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s ON m.id_sesion = s.id_sesion
+        INNER JOIN usuarios u ON s.id_usuario = u.id_usuario
+        WHERE s.id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        ORDER BY m.fecha_mensaje DESC
+        LIMIT 5
+    ";
+} else {
+    $sql = "
+        SELECT u.nombre, u.apellido_paterno, m.pregunta, m.respuesta, m.tipo_consulta, m.fecha_mensaje,
+               TIMESTAMPDIFF(SECOND, s.fecha_inicio, s.fecha_fin) AS duracion
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s ON m.id_sesion = s.id_sesion
+        INNER JOIN usuarios u ON s.id_usuario = u.id_usuario
+        ORDER BY m.fecha_mensaje DESC
+        LIMIT 5
+    ";
+}
+$resultado = $conexion->query($sql);
+$interacciones_recientes = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -102,6 +187,32 @@ $stmt->close();
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+
+        <?php if ($id_prueba_activa && $tiene_participantes): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php elseif ($id_prueba_activa && !$tiene_participantes): ?>
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; font-size: 18px;"></i>
+                <span style="color: #92400e; font-weight: 500;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #92400e;">— Aún no tiene participantes seleccionados. Los datos muestran <strong>todos los estudiantes</strong>.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <div class="periodo-selector">
             <div class="periodo-info">
                 <i class="fa-solid fa-calendar"></i>
@@ -112,6 +223,7 @@ $stmt->close();
             </div>
             <button class="btn-periodo"><i class="fa-solid fa-chevron-down"></i></button>
         </div>
+
         <section class="resumen-chatbot">
             <div class="stats-row">
                 <div class="stat-card">
@@ -144,6 +256,7 @@ $stmt->close();
                 </div>
             </div>
         </section>
+
         <section class="interacciones-semana">
             <h3><i class="fa-solid fa-chart-bar"></i> Interacciones durante la semana</h3>
             <div class="tarjeta-grafica">
@@ -160,6 +273,7 @@ $stmt->close();
                 <?php endfor; ?>
             </div>
         </section>
+
         <section class="tipos-consulta">
             <h3><i class="fa-solid fa-chart-pie"></i> Tipos de consulta</h3>
             <div class="tarjeta-tipos">
@@ -182,6 +296,7 @@ $stmt->close();
                 <?php endif; ?>
             </div>
         </section>
+
         <section class="interacciones-recientes">
             <h3><i class="fa-regular fa-clock"></i> Interacciones recientes</h3>
             <?php if (empty($interacciones_recientes)): ?>
@@ -223,6 +338,7 @@ $stmt->close();
                 <?php endforeach; ?>
             <?php endif; ?>
         </section>
+
         <section class="info-registrada">
             <h3><i class="fa-solid fa-list-check"></i> Información registrada</h3>
             <div class="info-grid">
@@ -233,6 +349,7 @@ $stmt->close();
                 <div class="info-item"><i class="fa-solid fa-check-circle" style="color:#2e7d32;"></i><span>Duración aproximada</span></div>
             </div>
         </section>
+
         <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Las conversaciones mostradas son registradas automáticamente por el chatbot de AULAMOS.</p></div>
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
     </main>
