@@ -70,6 +70,10 @@ $ruta_foto_alumno = !empty($foto_perfil_alumno) ? '../uploads/perfiles/' . $foto
 $nombre_alumno = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
 
 $conexion->close();
+
+// Determinar si la entrega ya fue realizada
+$entrega_realizada = ($actividad['entrega_estado'] === 'Entregada' || $actividad['entrega_estado'] === 'Calificada' || $actividad['estado'] === 'Completada');
+$entrega_calificada = ($actividad['entrega_estado'] === 'Calificada');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -84,72 +88,321 @@ $conexion->close();
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
     
     <style>
-        /* Estilos principales */
+        /* ==========================================
+           ESTILOS MODIFICADOS PARA OCUPAR TODO EL ESPACIO
+           ========================================== */
+        
+        /* Contenedor principal - OCUPA TODO EL ANCHO */
         .entrega-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            padding: 20px 30px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
         }
+        
+        /* Cards - OCUPAN TODO EL ANCHO */
         .card-actividad-detalle {
             background: white;
             border-radius: 12px;
-            padding: 25px;
+            padding: 25px 30px;
             margin-bottom: 25px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 100%;
         }
+        
+        .form-entrega {
+            background: white;
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+        
+        /* Grid de información - 4 columnas en lugar de 2 */
+        .card-actividad-detalle .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        /* Descripción e instrucciones ocupan todo el ancho */
+        .card-actividad-detalle .descripcion,
+        .card-actividad-detalle .instrucciones {
+            width: 100%;
+        }
+        
+        /* Drop zone más grande */
+        .file-drop-zone {
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        /* Drop zone DESHABILITADA (cuando ya entregó) */
+        .file-drop-zone.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+        
+        .file-drop-zone.disabled:hover {
+            border-color: #e2e8f0;
+            background: #f8fafc;
+        }
+        
+        .file-drop-zone.disabled input[type="file"] {
+            cursor: not-allowed;
+        }
+        
+        .file-drop-zone .icono {
+            font-size: 64px;
+            color: #94a3b8;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        /* Archivo adjunto - SIN BOTÓN ELIMINAR */
+        .archivo-adjunto {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .archivo-adjunto i {
+            font-size: 28px;
+            color: #3b71f3;
+        }
+        
+        .archivo-adjunto .info {
+            flex: 1;
+        }
+        
+        .archivo-adjunto .info .nombre {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1e293b;
+        }
+        
+        .archivo-adjunto .info .tamano {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        .archivo-adjunto .badge-entregado {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .archivo-adjunto .badge-calificado {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* Botones */
+        .btn-acciones {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 12px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .btn-primary {
+            background: #3b71f3;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #2a5bd6;
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        
+        .btn-success:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Mensaje de entrega ya realizada */
+        .mensaje-ya-entregado {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .mensaje-ya-entregado i {
+            font-size: 24px;
+        }
+        
+        .mensaje-ya-entregado p {
+            margin: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .card-actividad-detalle .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .entrega-container {
+                padding: 15px;
+            }
+            
+            .card-actividad-detalle .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .card-actividad-detalle,
+            .form-entrega {
+                padding: 20px 15px;
+            }
+            
+            .file-drop-zone {
+                padding: 25px 15px;
+            }
+            
+            .file-drop-zone .icono {
+                font-size: 40px;
+            }
+            
+            .btn-acciones {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+        }
+        
+        /* ==========================================
+           ESTILOS ORIGINALES (MANTENIDOS)
+           ========================================== */
+        
         .card-actividad-detalle h2 {
             margin: 0 0 10px 0;
             color: #1e293b;
         }
+        
         .card-actividad-detalle .asignatura {
             color: #64748b;
             font-size: 14px;
             margin-bottom: 15px;
         }
-        .card-actividad-detalle .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
+        
         .card-actividad-detalle .info-item {
             display: flex;
             flex-direction: column;
         }
+        
         .card-actividad-detalle .info-item .label {
             font-size: 12px;
             color: #94a3b8;
             text-transform: uppercase;
             font-weight: 600;
         }
+        
         .card-actividad-detalle .info-item .value {
             font-size: 16px;
             font-weight: 600;
             color: #1e293b;
         }
+        
         .card-actividad-detalle .descripcion {
             margin: 15px 0;
             color: #475569;
         }
+        
+        .card-actividad-detalle .descripcion p {
+            margin: 5px 0 0 0;
+        }
+        
         .card-actividad-detalle .instrucciones {
             background: #f1f5f9;
-            padding: 15px;
+            padding: 15px 20px;
             border-radius: 10px;
             margin: 15px 0;
             border-left: 4px solid #3b71f3;
         }
-        .form-entrega {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        
+        .card-actividad-detalle .instrucciones p {
+            margin: 5px 0 0 0;
         }
+        
         .form-entrega .form-group {
             margin-bottom: 20px;
         }
+        
         .form-entrega label {
             font-weight: 600;
             font-size: 14px;
@@ -157,6 +410,7 @@ $conexion->close();
             display: block;
             margin-bottom: 5px;
         }
+        
         .form-entrega textarea {
             width: 100%;
             padding: 12px 16px;
@@ -168,52 +422,53 @@ $conexion->close();
             min-height: 80px;
             transition: border-color 0.2s;
         }
+        
         .form-entrega textarea:focus {
             border-color: #3b71f3;
             outline: none;
         }
-        .file-drop-zone {
-            border: 2px dashed #e2e8f0;
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
+        
+        /* Textarea deshabilitada */
+        .form-entrega textarea:disabled {
+            background: #f8fafc;
+            color: #64748b;
+            cursor: not-allowed;
         }
-        .file-drop-zone:hover {
+        
+        .file-drop-zone:hover:not(.disabled) {
             border-color: #3b71f3;
             background: #f8fafc;
         }
+        
         .file-drop-zone.dragover {
             border-color: #3b71f3;
             background: #eff6ff;
         }
-        .file-drop-zone .icono {
-            font-size: 48px;
-            color: #94a3b8;
-            display: block;
-            margin-bottom: 10px;
-        }
+        
         .file-drop-zone .icono.uploading {
             color: #3b71f3;
             animation: pulse 1.5s infinite;
         }
+        
         .file-drop-zone .icono.success {
             color: #22c55e;
         }
+        
         .file-drop-zone .icono.error {
             color: #dc2626;
         }
+        
         .file-drop-zone p {
             color: #64748b;
             margin: 0;
         }
+        
         .file-drop-zone .formato {
             font-size: 12px;
             color: #94a3b8;
             margin-top: 5px;
         }
+        
         .file-drop-zone input[type="file"] {
             position: absolute;
             top: 0;
@@ -223,13 +478,20 @@ $conexion->close();
             opacity: 0;
             cursor: pointer;
         }
+        
+        .file-drop-zone.disabled input[type="file"] {
+            cursor: not-allowed;
+        }
+        
         .progress-container {
             display: none;
             margin-top: 15px;
         }
+        
         .progress-container.active {
             display: block;
         }
+        
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -237,6 +499,7 @@ $conexion->close();
             border-radius: 4px;
             overflow: hidden;
         }
+        
         .progress-bar .fill {
             height: 100%;
             background: #3b71f3;
@@ -244,6 +507,7 @@ $conexion->close();
             transition: width 0.3s ease;
             width: 0%;
         }
+        
         .progress-text {
             display: flex;
             justify-content: space-between;
@@ -251,92 +515,12 @@ $conexion->close();
             color: #64748b;
             margin-top: 5px;
         }
+        
         .progress-text .porcentaje {
             font-weight: 600;
             color: #1e293b;
         }
-        .archivo-adjunto {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 10px;
-        }
-        .archivo-adjunto i {
-            font-size: 24px;
-            color: #3b71f3;
-        }
-        .archivo-adjunto .info {
-            flex: 1;
-        }
-        .archivo-adjunto .info .nombre {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .archivo-adjunto .info .tamano {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        .archivo-adjunto .btn-eliminar {
-            background: none;
-            border: none;
-            color: #dc2626;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 5px;
-        }
-        .btn-acciones {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background: #3b71f3;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #2a5bd6;
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-        }
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-        .btn-success {
-            background: #22c55e;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #16a34a;
-        }
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #b91c1c;
-        }
+        
         .alert {
             padding: 15px 20px;
             border-radius: 8px;
@@ -344,24 +528,29 @@ $conexion->close();
             font-weight: 500;
             display: none;
         }
+        
         .alert.show {
             display: block;
         }
+        
         .alert-success {
             background: #dcfce7;
             color: #166534;
             border-left: 4px solid #22c55e;
         }
+        
         .alert-error {
             background: #fee2e2;
             color: #991b1b;
             border-left: 4px solid #dc2626;
         }
+        
         .alert-info {
             background: #dbeafe;
             color: #1e40af;
             border-left: 4px solid #3b71f3;
         }
+        
         .badge-entregado {
             background: #dcfce7;
             color: #166534;
@@ -370,6 +559,7 @@ $conexion->close();
             font-size: 12px;
             font-weight: 600;
         }
+        
         .badge-calificado {
             background: #dbeafe;
             color: #1e40af;
@@ -378,20 +568,27 @@ $conexion->close();
             font-size: 12px;
             font-weight: 600;
         }
+        
         .calificacion-final {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: #3b71f3;
             text-align: center;
             padding: 20px;
         }
+        
         .retroalimentacion {
             background: #f8fafc;
-            padding: 15px;
+            padding: 15px 20px;
             border-radius: 10px;
             margin-top: 10px;
             border-left: 4px solid #3b71f3;
         }
+        
+        .retroalimentacion p {
+            margin: 5px 0 0 0;
+        }
+        
         .spinner {
             display: inline-block;
             width: 20px;
@@ -401,13 +598,16 @@ $conexion->close();
             border-top-color: #3b71f3;
             animation: spin 0.8s linear infinite;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        
         .mensaje-exito {
             background: #dcfce7;
             color: #166534;
@@ -419,9 +619,16 @@ $conexion->close();
             align-items: center;
             gap: 10px;
         }
+        
         .mensaje-exito i {
             font-size: 20px;
         }
+        
+        .mensaje-exito p {
+            margin: 0;
+        }
+        
+        /* Estilos del encabezado */
         .user-profile {
             text-decoration: none;
             cursor: pointer;
@@ -433,9 +640,11 @@ $conexion->close();
             background: #f1f5f9;
             transition: background 0.2s;
         }
+        
         .user-profile:hover {
             background: #e2e8f0;
         }
+        
         .user-profile .avatar {
             width: 36px;
             height: 36px;
@@ -443,25 +652,30 @@ $conexion->close();
             object-fit: cover;
             border: 2px solid white;
         }
+        
         .user-info {
             display: flex;
             flex-direction: column;
             line-height: 1.2;
         }
+        
         .user-name {
             font-weight: 600;
             font-size: 14px;
             color: #1e293b;
         }
+        
         .user-role {
             font-size: 11px;
             color: #64748b;
         }
+        
         .header-actions {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+        
         .btn-assistant {
             background: #3b71f3;
             color: white;
@@ -476,38 +690,47 @@ $conexion->close();
             gap: 8px;
             transition: background 0.2s;
         }
+        
         .btn-assistant:hover {
             background: #2a5bd6;
         }
+        
         .robot-icon {
             font-size: 18px;
         }
+        
         .icon-bell {
             font-size: 20px;
             color: #64748b;
             cursor: pointer;
         }
+        
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 20px 30px;
             margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 15px;
+            width: 100%;
         }
+        
         .welcome-text h1 {
             margin: 0;
             font-size: 22px;
         }
+        
         .welcome-text p {
             margin: 5px 0 0 0;
             color: #64748b;
         }
+        
         .menu-spacer {
             flex: 1;
             height: 20px;
         }
+        
         .btn-accessibility-main {
             width: 100%;
             background: #5a189a;
@@ -520,14 +743,29 @@ $conexion->close();
             margin: 10px 0;
             text-align: center;
         }
+        
         .btn-accessibility-main:hover {
             background: #7b2cbf;
         }
+        
         .menu-item.btn-logout {
             color: #dc2626 !important;
         }
+        
         .menu-item.btn-logout:hover {
             background: #fee2e2 !important;
+        }
+        
+        /* Main content ocupa todo */
+        .main-content {
+            padding: 0 !important;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .dashboard-container {
+            width: 100%;
+            max-width: 100%;
         }
     </style>
 </head>
@@ -581,6 +819,27 @@ $conexion->close();
             <!-- ALERTA DE MENSAJE -->
             <div id="alertMessage" class="alert"></div>
 
+            <!-- MENSAJE DE ENTREGA YA REALIZADA -->
+            <?php if ($entrega_realizada && !$entrega_calificada): ?>
+                <div class="mensaje-ya-entregado">
+                    <i class="fa-regular fa-check-circle"></i>
+                    <div>
+                        <strong>¡Entrega realizada!</strong>
+                        <p>Tu trabajo ha sido entregado correctamente. No puedes modificar la entrega.</p>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($entrega_calificada): ?>
+                <div class="mensaje-ya-entregado" style="background: #dbeafe; border-left-color: #3b71f3; color: #1e40af;">
+                    <i class="fa-regular fa-star"></i>
+                    <div>
+                        <strong>¡Actividad calificada!</strong>
+                        <p>Tu trabajo ha sido revisado y calificado por el docente.</p>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- DETALLES DE LA ACTIVIDAD -->
             <div class="card-actividad-detalle">
                 <h2><?php echo htmlspecialchars($actividad['titulo']); ?></h2>
@@ -631,7 +890,7 @@ $conexion->close();
             </div>
 
             <!-- FORMULARIO DE ENTREGA -->
-            <?php if ($actividad['entrega_estado'] !== 'Calificada'): ?>
+            <?php if (!$entrega_realizada): ?>
                 
                 <form class="form-entrega" id="formEntrega" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="id_actividad" value="<?php echo $id_actividad; ?>">
@@ -643,12 +902,12 @@ $conexion->close();
                     
                     <?php if ($actividad['permite_entrega_archivo']): ?>
                         <div class="form-group">
-                            <label>Adjuntar archivo</label>
+                            <label>Adjuntar archivo <span style="color: #dc2626;">*</span></label>
                             <div class="file-drop-zone" id="dropZone">
                                 <span class="icono" id="dropIcon"><i class="fa-regular fa-file-arrow-up"></i></span>
                                 <p id="dropText">Arrastra o haz clic para subir tu archivo</p>
                                 <div class="formato">PDF, Word, Excel, Imagen, ZIP · Máximo 10 MB</div>
-                                <input type="file" name="archivo_entrega" id="archivoInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.rar">
+                                <input type="file" name="archivo_entrega" id="archivoInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.rar" required>
                             </div>
                             
                             <!-- Barra de progreso -->
@@ -662,17 +921,18 @@ $conexion->close();
                                 </div>
                             </div>
                             
-                            <!-- Archivo adjunto actual -->
+                            <!-- Archivo adjunto actual - SIN BOTÓN ELIMINAR -->
                             <?php if ($actividad['id_adjunto']): ?>
                                 <div class="archivo-adjunto" id="archivoActual">
                                     <i class="fa-regular fa-file-pdf"></i>
                                     <div class="info">
                                         <div class="nombre"><?php echo htmlspecialchars($actividad['nombre_archivo']); ?></div>
-                                        <div class="tamano">Archivo adjunto actual</div>
+                                        <div class="tamano">
+                                            <span class="badge-entregado">
+                                                <i class="fa-regular fa-check-circle"></i> Ya entregado
+                                            </span>
+                                        </div>
                                     </div>
-                                    <button type="button" class="btn-eliminar" onclick="eliminarArchivo(<?php echo $actividad['id_entrega']; ?>, <?php echo $id_actividad; ?>)">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -688,17 +948,9 @@ $conexion->close();
                     </div>
                 </form>
                 
-            <?php else: ?>
+            <?php elseif ($entrega_calificada): ?>
                 
                 <!-- ENTREGA CALIFICADA -->
-                <div class="mensaje-exito">
-                    <i class="fa-regular fa-check-circle"></i>
-                    <div>
-                        <strong>¡Actividad calificada!</strong>
-                        <p style="margin: 0; color: #166534;">Tu trabajo ha sido revisado por el docente.</p>
-                    </div>
-                </div>
-                
                 <div class="form-entrega">
                     <div class="calificacion-final">
                         <?php echo $actividad['calificacion']; ?> / <?php echo $actividad['puntaje_maximo']; ?>
@@ -721,6 +973,53 @@ $conexion->close();
                     <?php endif; ?>
                     
                     <div class="btn-acciones" style="justify-content: center;">
+                        <a href="actividades.php" class="btn btn-secondary">
+                            <i class="fa-solid fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                
+            <?php else: ?>
+                
+                <!-- ENTREGA YA REALIZADA (NO CALIFICADA) - SOLO LECTURA -->
+                <div class="form-entrega">
+                    <div style="background: #f8fafc; border-radius: 10px; padding: 20px; margin-bottom: 15px;">
+                        <p style="margin: 0; color: #64748b;">
+                            <i class="fa-regular fa-clock"></i> Entregaste esta actividad el 
+                            <strong><?php echo date('d M, Y H:i', strtotime($actividad['fecha_entrega'] ?? 'now')); ?></strong>
+                        </p>
+                    </div>
+                    
+                    <?php if ($actividad['texto_entrega']): ?>
+                        <div style="margin-top: 15px;">
+                            <strong style="display: block; margin-bottom: 5px; color: #1e293b;">Tu comentario:</strong>
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 10px;">
+                                <?php echo nl2br(htmlspecialchars($actividad['texto_entrega'])); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($actividad['id_adjunto']): ?>
+                        <div style="margin-top: 15px;">
+                            <strong style="display: block; margin-bottom: 5px; color: #1e293b;">Archivo entregado:</strong>
+                            <div class="archivo-adjunto">
+                                <i class="fa-regular fa-file-pdf"></i>
+                                <div class="info">
+                                    <div class="nombre"><?php echo htmlspecialchars($actividad['nombre_archivo']); ?></div>
+                                    <div class="tamano">
+                                        <span class="badge-entregado">
+                                            <i class="fa-regular fa-check-circle"></i> Entregado
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="<?php echo $actividad['url_archivo']; ?>" target="_blank" class="btn btn-primary" style="padding: 6px 16px; font-size: 13px; text-decoration: none;">
+                                    <i class="fa-regular fa-eye"></i> Ver
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="btn-acciones" style="justify-content: center; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                         <a href="actividades.php" class="btn btn-secondary">
                             <i class="fa-solid fa-arrow-left"></i> Volver
                         </a>
@@ -845,17 +1144,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const tieneArchivoActual = <?php echo $actividad['id_adjunto'] ? 1 : 0; ?>;
         
         // Validar que tenga al menos comentario o archivo
-        if (!texto && !tieneArchivo && !tieneArchivoActual) {
-            mostrarAlerta('Debes escribir un comentario o adjuntar un archivo.', 'error');
+        if (!tieneArchivo && !tieneArchivoActual) {
+            mostrarAlerta('Debes adjuntar un archivo para entregar la actividad.', 'error');
+            fileInput.focus();
             return;
         }
         
         // Si tiene archivo seleccionado, subirlo primero
         if (tieneArchivo) {
             subirArchivoConAJAX();
-        } else {
-            // Solo guardar comentario
-            guardarEntrega(texto);
         }
     });
 
@@ -954,72 +1251,6 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.open('POST', 'upload_ajax.php', true);
         xhr.send(formData);
     }
-
-    function guardarEntrega(texto) {
-        const formData = new FormData();
-        formData.append('id_actividad', '<?php echo $id_actividad; ?>');
-        formData.append('texto_entrega', texto);
-        formData.append('accion', 'guardar_texto');
-        
-        btnEntregar.disabled = true;
-        btnEntregar.innerHTML = '<span class="spinner"></span> Guardando...';
-        
-        fetch('upload_ajax.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            btnEntregar.disabled = false;
-            btnEntregar.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Entregar';
-            
-            if (data.success) {
-                mostrarAlerta(data.message || '¡Entrega guardada correctamente!', 'success');
-                setTimeout(function() {
-                    window.location.href = 'entregar_actividad.php?id=<?php echo $id_actividad; ?>&success=1';
-                }, 2000);
-            } else {
-                mostrarAlerta(data.message || 'Error al guardar la entrega.', 'error');
-            }
-        })
-        .catch(error => {
-            btnEntregar.disabled = false;
-            btnEntregar.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Entregar';
-            mostrarAlerta('Error de conexión. Intenta nuevamente.', 'error');
-        });
-    }
-
-    // =============================================
-    // ELIMINAR ARCHIVO
-    // =============================================
-    
-    window.eliminarArchivo = function(idEntrega, idActividad) {
-        if (!confirm('¿Estás seguro de que deseas eliminar este archivo?')) return;
-        
-        fetch('upload_ajax.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'accion=eliminar_archivo&id_entrega=' + idEntrega + '&id_actividad=' + idActividad
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const archivoActual = document.getElementById('archivoActual');
-                if (archivoActual) archivoActual.remove();
-                mostrarAlerta('Archivo eliminado correctamente.', 'success');
-                setTimeout(function() {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                mostrarAlerta(data.message || 'Error al eliminar el archivo.', 'error');
-            }
-        })
-        .catch(error => {
-            mostrarAlerta('Error de conexión.', 'error');
-        });
-    };
 
     // =============================================
     // FUNCIONES DE UTILIDAD

@@ -333,6 +333,8 @@ $tiposMap = [
                 <i class="fa-solid fa-cubes"></i>
                 Mis actividades
             </a>
+            
+    <a href="juegos_alumno.php" class="menu-item"><i class="fa-solid fa-gamepad"></i> Conecta y Aprende</a>
 
             <a
                 href="Biblioteca.php"
