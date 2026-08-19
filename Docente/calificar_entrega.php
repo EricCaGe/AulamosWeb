@@ -191,10 +191,15 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
     <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
     
     <style>
+        /* ==========================================
+           ESTILOS MODIFICADOS PARA OCUPAR TODO EL ESPACIO
+           ========================================== */
+        
         .calificar-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            padding: 20px 30px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
         }
         
         .back-link {
@@ -213,16 +218,17 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         .card-info {
             background: white;
             border-radius: 12px;
-            padding: 25px;
+            padding: 25px 30px;
             margin-bottom: 25px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid #e2e8f0;
+            width: 100%;
         }
         
         .card-info .header-info {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
             flex-wrap: wrap;
         }
         
@@ -258,10 +264,10 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         
         .grid-info {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
-            padding-top: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
             border-top: 1px solid #e2e8f0;
         }
         
@@ -278,7 +284,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         }
         
         .grid-info .item .value {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #1e293b;
         }
@@ -292,6 +298,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
             gap: 15px;
             margin-top: 15px;
             border: 1px solid #e2e8f0;
+            flex-wrap: wrap;
         }
         
         .card-archivo .icono {
@@ -357,9 +364,10 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         .form-calificar {
             background: white;
             border-radius: 12px;
-            padding: 25px;
+            padding: 25px 30px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid #e2e8f0;
+            width: 100%;
         }
         
         .form-calificar .form-group {
@@ -378,14 +386,15 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .form-calificar input[type="number"] {
-            width: 120px;
-            padding: 10px 14px;
+            width: 150px;
+            padding: 12px 16px;
             border: 2px solid #e2e8f0;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             text-align: center;
             transition: border-color 0.2s;
@@ -404,8 +413,9 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         }
         
         .form-calificar .input-group .max-label {
-            font-size: 14px;
+            font-size: 16px;
             color: #64748b;
+            font-weight: 600;
         }
         
         .form-calificar textarea {
@@ -437,14 +447,15 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         .form-calificar .btn-acciones {
             display: flex;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 25px;
             padding-top: 20px;
             border-top: 1px solid #e2e8f0;
             flex-wrap: wrap;
+            justify-content: flex-end;
         }
         
         .btn {
-            padding: 12px 28px;
+            padding: 12px 32px;
             border-radius: 10px;
             font-weight: 600;
             font-size: 15px;
@@ -534,11 +545,11 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         }
         
         .calificacion-mostrada {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: #3b71f3;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             background: #f8fafc;
             border-radius: 10px;
         }
@@ -553,7 +564,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
         
         .ya-calificado-msg {
             background: #dcfce7;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             text-align: center;
             margin-bottom: 20px;
@@ -576,20 +587,201 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
             margin: 0;
         }
         
-        @media (max-width: 768px) {
+        /* Main content ocupa todo */
+        .main-content {
+            padding: 0 !important;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .dashboard-container {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Estilos del encabezado */
+        .user-profile {
+            text-decoration: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 12px 5px 5px;
+            border-radius: 50px;
+            background: #f1f5f9;
+            transition: background 0.2s;
+        }
+        
+        .user-profile:hover {
+            background: #e2e8f0;
+        }
+        
+        .user-profile .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e293b;
+        }
+        
+        .user-role {
+            font-size: 11px;
+            color: #64748b;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .btn-assistant {
+            background: #3b71f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        
+        .btn-assistant:hover {
+            background: #2a5bd6;
+        }
+        
+        .robot-icon {
+            font-size: 18px;
+        }
+        
+        .icon-bell-container {
+            font-size: 20px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .welcome-text h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        
+        .welcome-text p {
+            margin: 5px 0 0 0;
+            color: #64748b;
+        }
+        
+        .menu-spacer {
+            flex: 1;
+            height: 20px;
+        }
+        
+        .btn-accessibility-main {
+            width: 100%;
+            background: #5a189a;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .btn-accessibility-main:hover {
+            background: #7b2cbf;
+        }
+        
+        .menu-item.btn-logout {
+            color: #dc2626 !important;
+        }
+        
+        .menu-item.btn-logout:hover {
+            background: #fee2e2 !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
             .grid-info {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
+        }
+        
+        @media (max-width: 768px) {
+            .calificar-container {
+                padding: 15px;
+            }
+            
+            .card-info {
+                padding: 20px 15px;
+            }
+            
+            .form-calificar {
+                padding: 20px 15px;
+            }
+            
+            .grid-info {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
             .card-info .header-info {
                 flex-direction: column;
                 text-align: center;
             }
+            
             .form-calificar .input-group {
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: stretch;
             }
+            
+            .form-calificar input[type="number"] {
+                width: 100%;
+            }
+            
+            .form-calificar .btn-acciones {
+                flex-direction: column;
+            }
+            
             .btn {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .content-header {
+                padding: 15px;
+            }
+            
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
         }
     </style>
@@ -621,6 +813,11 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
     <div class="main-content">
         
         <!-- ENCABEZADO -->
+        <?php
+        // Recargar foto de perfil del docente
+        $foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
+        $ruta_foto_docente = !empty($foto_perfil_docente) ? '../uploads/perfiles/' . $foto_perfil_docente : 'https://placehold.co/40x40/ff7675/white?text=👨';
+        ?>
         <div class="content-header">
             <div class="welcome-text">
                 <h1>Calificar Entrega</h1>
@@ -681,6 +878,10 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                         <span class="value"><?php echo htmlspecialchars($datos['tipo']); ?></span>
                     </div>
                     <div class="item">
+                        <span class="label">Puntaje máximo</span>
+                        <span class="value"><?php echo $datos['puntaje_maximo']; ?> pts</span>
+                    </div>
+                    <div class="item">
                         <span class="label">Fecha límite</span>
                         <span class="value"><?php echo date('d M, Y H:i', strtotime($datos['fecha_limite'])); ?></span>
                     </div>
@@ -708,8 +909,8 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                 </div>
             <?php else: ?>
                 <div class="card-info">
-                    <div style="text-align: center; padding: 15px; color: #94a3b8;">
-                        <i class="fa-regular fa-file" style="font-size: 32px; display: block; margin-bottom: 10px;"></i>
+                    <div style="text-align: center; padding: 20px; color: #94a3b8;">
+                        <i class="fa-regular fa-file" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
                         <p>El estudiante no adjuntó ningún archivo.</p>
                     </div>
                 </div>

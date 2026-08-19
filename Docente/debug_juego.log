@@ -1,0 +1,66 @@
+=== 2026-08-19 00:53:42 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Equipos' (largo: 7)
+titulo: 'Prueba-eva'
+----------------------------------------
+=== 2026-08-19 00:54:04 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'Prueba-eva'
+----------------------------------------
+=== 2026-08-19 00:56:34 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'Prueba-eva'
+id_curso: 6
+----------------------------------------
+=== 2026-08-19 00:57:16 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'kml;l'
+id_curso: 6
+----------------------------------------
+=== 2026-08-19 00:59:20 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'kml;l'
+descripcion: 'hola'
+tema: 'Historia'
+tiempo_limite: 120
+puntos_por_acierto: 50
+intentos_maximos: 3
+mostrar_retroalimentacion: 1
+----------------------------------------
+=== 2026-08-19 01:17:00 ===
+modo: 'Secuencia' (largo: 9)
+modalidad: 'Individual' (largo: 10)
+titulo: 'kml;l'
+descripcion: ',';.'
+tema: 'Historia'
+tiempo_limite: 120
+puntos_por_acierto: 50
+intentos_maximos: 3
+mostrar_retroalimentacion: 1
+----------------------------------------
+=== 2026-08-19 01:19:52 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: ';l,';'
+descripcion: ';l,';'
+tema: '';.''
+tiempo_limite: 120
+puntos_por_acierto: 50
+intentos_maximos: 3
+mostrar_retroalimentacion: 1
+----------------------------------------
+=== 2026-08-19 01:41:53 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'Resuelve el juego'
+descripcion: 'Buena suerte'
+tema: 'Comprension'
+tiempo_limite: 150
+puntos_por_acierto: 50
+intentos_maximos: 2
+mostrar_retroalimentacion: 1
+----------------------------------------

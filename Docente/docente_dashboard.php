@@ -12,8 +12,38 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
 
 require_once '../Conexion/conexion.php';
 
+// ==========================================
+// RECARGAR DATOS DEL USUARIO PARA ACTUALIZAR FOTO
+// ==========================================
+function recargarDatosUsuario($conexion) {
+    if (isset($_SESSION['usuario']['id_usuario'])) {
+        $id_usuario = $_SESSION['usuario']['id_usuario'];
+        
+        $stmt = $conexion->prepare("SELECT nombre, apellido_paterno, foto_perfil FROM usuarios WHERE id_usuario = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id_usuario);
+            $stmt->execute();
+            $resultado = $stmt->get_result();
+            $row = $resultado->fetch_assoc();
+            if ($row) {
+                $_SESSION['usuario']['nombre'] = $row['nombre'];
+                $_SESSION['usuario']['apellido_paterno'] = $row['apellido_paterno'];
+                $_SESSION['usuario']['foto_perfil'] = $row['foto_perfil'];
+            }
+            $stmt->close();
+        }
+    }
+}
+
+// Recargar datos del usuario
+recargarDatosUsuario($conexion);
+
 $id_docente = $_SESSION['usuario']['id_usuario'];
 $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
+
+// Obtener foto de perfil del docente
+$foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
+$ruta_foto_docente = !empty($foto_perfil_docente) ? '../uploads/perfiles/' . $foto_perfil_docente : 'https://placehold.co/40x40/ff7675/white?text=👨';
 
 // ========================================== */
 // 1. CONTAR CLASES ACTIVAS DEL DOCENTE      */
@@ -171,6 +201,8 @@ function formatearFecha($fecha) {
     if ($dias < 7) return "Hace $dias días";
     return date('d M, Y', strtotime($fecha));
 }
+
+$conexion->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -198,11 +230,14 @@ function formatearFecha($fecha) {
         <nav class="menu">
             <a href="docente_dashboard.php" class="menu-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
+            <a href="mis_recursos.php" class="menu-item"><i class="fa-solid fa-folder-open"></i> Mis Recursos</a>
             <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
             <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
+            <a href="crear_juego.php" class="menu-item"><i class="fa-solid fa-gamepad"></i> Crear Juego</a>
             <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
             <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
             <a href="pasarlista.php" class="menu-item"><i class="fa-solid fa-bars"></i> Pasar Lista</a>
+            <a href="juegos_docente.php" class="menu-item"><i class="fa-solid fa-gamepad"></i> Conecta y Aprende</a>
             
             <div class="menu-spacer"></div>
             <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
@@ -213,12 +248,7 @@ function formatearFecha($fecha) {
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
         
-       <!-- ENCABEZADO CON FOTO DE PERFIL -->
-        <?php
-        // Obtener foto de perfil del docente
-        $foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
-        $ruta_foto_docente = !empty($foto_perfil_docente) ? '../uploads/perfiles/' . $foto_perfil_docente : 'https://placehold.co/40x40/ff7675/white?text=👨';
-        ?>
+        <!-- ENCABEZADO CON FOTO DE PERFIL -->
         <header class="content-header">
             <div class="welcome-text">
                 <h1>¡Hola Prof. <?php echo htmlspecialchars($nombre_docente); ?>! 👋</h1>
@@ -232,12 +262,12 @@ function formatearFecha($fecha) {
                     <i class="fa-regular fa-bell"></i>
                 </div>
                 <a href="mi_perfil_d.php" class="user-profile" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:5px 12px 5px 5px; border-radius:50px; background:#f1f5f9; transition:background 0.2s;">
-                        <img src="<?php echo $ruta_foto_docente; ?>" alt="Avatar Docente" class="avatar" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid white;">
-                        <div class="user-info" style="display:flex; flex-direction:column; line-height:1.2;">
-                            <span class="user-name" style="font-weight:600; font-size:14px; color:#1e293b;"><?php echo htmlspecialchars($nombre_docente); ?></span>
-                            <span class="user-role" style="font-size:11px; color:#64748b;">Docente</span>
-                        </div>
-                    </a>
+                    <img src="<?php echo $ruta_foto_docente; ?>" alt="Avatar Docente" class="avatar" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid white;">
+                    <div class="user-info" style="display:flex; flex-direction:column; line-height:1.2;">
+                        <span class="user-name" style="font-weight:600; font-size:14px; color:#1e293b;"><?php echo htmlspecialchars($nombre_docente); ?></span>
+                        <span class="user-role" style="font-size:11px; color:#64748b;">Docente</span>
+                    </div>
+                </a>
             </div>
         </header>
 
