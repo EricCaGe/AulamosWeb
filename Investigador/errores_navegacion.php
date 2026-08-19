@@ -14,48 +14,140 @@ $titulo_pagina = 'Errores de navegación';
 $descripcion_pagina = 'Consulta los errores de navegación, accesos fallidos y acciones que dificultaron el uso de la plataforma.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
 // =====================================================
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'");
+$stmt = $conexion->prepare("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$prueba_activa = $resultado->fetch_assoc();
+$stmt->close();
+
+$id_prueba_activa = $prueba_activa['id_prueba'] ?? null;
+$prueba_activa_nombre = $prueba_activa['nombre'] ?? 'Ninguna';
+
+// =====================================================
+// CONSULTAS A LA BD (con filtro por prueba activa)
+// =====================================================
+
+// Total de errores
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total 
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'Error' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $total_errores = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conexion->prepare("SELECT COUNT(DISTINCT id_usuario) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'");
+// Estudiantes con errores
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(DISTINCT e.id_usuario) AS total 
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'Error' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT COUNT(DISTINCT id_usuario) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $estudiantes_con_errores = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error' AND accion LIKE '%acceso%'");
+// Accesos fallidos
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total 
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'Error' AND e.accion LIKE '%acceso%' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error' AND accion LIKE '%acceso%'");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $accesos_fallidos = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error' AND accion LIKE '%navegacion%'");
+// Errores de navegación
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total 
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'Error' AND e.accion LIKE '%navegacion%' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error' AND accion LIKE '%navegacion%'");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $errores_navegacion = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conexion->prepare("SELECT accion, COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error' GROUP BY accion ORDER BY total DESC LIMIT 5");
+// Tipos de error (top 5)
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT e.accion, COUNT(*) AS total 
+        FROM eventos_investigacion e
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'Error' AND pp.id_prueba = ?
+        GROUP BY e.accion 
+        ORDER BY total DESC 
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT accion, COUNT(*) AS total 
+        FROM eventos_investigacion 
+        WHERE tipo_evento = 'Error' 
+        GROUP BY accion 
+        ORDER BY total DESC 
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $tipos_error = $resultado->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 $max_error = !empty($tipos_error) ? $tipos_error[0]['total'] : 1;
 
-$stmt = $conexion->prepare("
-    SELECT u.nombre, u.apellido_paterno, e.accion, e.modulo, e.pantalla, e.descripcion, e.fecha_hora
-    FROM eventos_investigacion e
-    INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
-    WHERE e.tipo_evento = 'Error'
-    ORDER BY e.fecha_hora DESC
-    LIMIT 5
-");
+// Errores recientes
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT u.nombre, u.apellido_paterno, e.accion, e.modulo, e.pantalla, e.descripcion, e.fecha_hora
+        FROM eventos_investigacion e
+        INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
+        INNER JOIN participantes_prueba pp ON e.id_usuario = pp.id_usuario
+        WHERE e.tipo_evento = 'Error' AND pp.id_prueba = ?
+        ORDER BY e.fecha_hora DESC
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT u.nombre, u.apellido_paterno, e.accion, e.modulo, e.pantalla, e.descripcion, e.fecha_hora
+        FROM eventos_investigacion e
+        INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
+        WHERE e.tipo_evento = 'Error'
+        ORDER BY e.fecha_hora DESC
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $errores_recientes = $resultado->fetch_all(MYSQLI_ASSOC);
@@ -76,6 +168,25 @@ $stmt->close();
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+
+        <!-- ===== AVISO DE PRUEBA ACTIVA ===== -->
+        <?php if ($id_prueba_activa): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <div class="periodo-selector">
             <div class="periodo-info">
                 <i class="fa-solid fa-calendar"></i>

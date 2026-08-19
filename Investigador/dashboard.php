@@ -1,8 +1,10 @@
 <?php
 session_start();
+
 // Pasar el ID del usuario al JavaScript para accesibilidad por usuario
 echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
 
+// Verificar sesión y rol
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Investigador') {
     header('Location: ../InicioSesion/login.php');
     exit;
@@ -14,138 +16,187 @@ $titulo_pagina = 'Panel de investigación';
 $descripcion_pagina = 'Consulta las métricas registradas durante las pruebas de uso de la plataforma.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
+// =====================================================
+
+$prueba_activa = null;
+$id_prueba_activa = null;
+$prueba_activa_nombre = 'Ninguna';
+$tiene_participantes = false;
+
+$resultado = $conexion->query("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+if ($resultado) {
+    $prueba_activa = $resultado->fetch_assoc();
+    if ($prueba_activa) {
+        $id_prueba_activa = $prueba_activa['id_prueba'];
+        $prueba_activa_nombre = $prueba_activa['nombre'];
+        
+        // Verificar si tiene participantes
+        $check = $conexion->query("SELECT COUNT(*) as total FROM participantes_prueba WHERE id_prueba = $id_prueba_activa");
+        if ($check) {
+            $row = $check->fetch_assoc();
+            $tiene_participantes = ($row['total'] ?? 0) > 0;
+        }
+    }
+}
+
+// =====================================================
+// CONSULTAS A LA BD (usando query() en lugar de prepare())
 // =====================================================
 
 // Total de estudiantes
-$stmt = $conexion->prepare("
-    SELECT COUNT(DISTINCT u.id_usuario) AS total
-    FROM usuarios u
-    INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
-    WHERE ur.id_rol = 1 AND u.estado = 'Activo'
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_estudiantes = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+        AND u.id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+    ";
+}
+$resultado = $conexion->query($sql);
+$total_estudiantes = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
 // Total de accesos
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total
-    FROM eventos_investigacion
-    WHERE tipo_evento = 'InicioSesion'
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_accesos = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM eventos_investigacion
+        WHERE tipo_evento = 'InicioSesion'
+        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'InicioSesion'";
+}
+$resultado = $conexion->query($sql);
+$total_accesos = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
 // Total de errores
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total
-    FROM eventos_investigacion
-    WHERE tipo_evento = 'Error'
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_errores = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM eventos_investigacion
+        WHERE tipo_evento = 'Error'
+        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'";
+}
+$resultado = $conexion->query($sql);
+$total_errores = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
 // Total de interacciones chatbot
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total
-    FROM mensajes_chatbot
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_chatbot = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM mensajes_chatbot
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot";
+}
+$resultado = $conexion->query($sql);
+$total_chatbot = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
 // =====================================================
-// PRUEBAS DE INVESTIGACIÓN
+// PRUEBAS DE INVESTIGACIÓN (globales)
 // =====================================================
 
-// Total de pruebas
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM pruebas_investigacion");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_pruebas = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+$resultado = $conexion->query("SELECT COUNT(*) AS total FROM pruebas_investigacion");
+$total_pruebas = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
-// Pruebas activas
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM pruebas_investigacion WHERE estado = 'Activa'");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$pruebas_activas = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+$resultado = $conexion->query("SELECT COUNT(*) AS total FROM pruebas_investigacion WHERE estado = 'Activa'");
+$pruebas_activas = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
-// Total de participantes en pruebas
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM participantes_prueba");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_participantes = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
-
-// Prueba activa actual
-$stmt = $conexion->prepare("SELECT nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$prueba_activa_nombre = $resultado->fetch_assoc()['nombre'] ?? 'Ninguna';
-$stmt->close();
+$resultado = $conexion->query("SELECT COUNT(*) AS total FROM participantes_prueba");
+$total_participantes = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
 // Módulos más visitados
-$stmt = $conexion->prepare("
-    SELECT modulo, COUNT(*) AS visitas
-    FROM eventos_investigacion
-    WHERE modulo IS NOT NULL
-    GROUP BY modulo
-    ORDER BY visitas DESC
-    LIMIT 5
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$modulos_visitados = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT modulo, COUNT(*) AS visitas
+        FROM eventos_investigacion
+        WHERE modulo IS NOT NULL
+        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        GROUP BY modulo
+        ORDER BY visitas DESC
+        LIMIT 5
+    ";
+} else {
+    $sql = "
+        SELECT modulo, COUNT(*) AS visitas
+        FROM eventos_investigacion
+        WHERE modulo IS NOT NULL
+        GROUP BY modulo
+        ORDER BY visitas DESC
+        LIMIT 5
+    ";
+}
+$resultado = $conexion->query($sql);
+$modulos_visitados = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 $max_visitas = !empty($modulos_visitados) ? max(array_column($modulos_visitados, 'visitas')) : 1;
 
 // Actividad reciente
-$stmt = $conexion->prepare("
-    SELECT u.nombre, u.apellido_paterno, e.modulo, e.accion, e.fecha_hora
-    FROM eventos_investigacion e
-    INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
-    ORDER BY e.fecha_hora DESC
-    LIMIT 5
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$actividad_reciente = $resultado->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT u.nombre, u.apellido_paterno, e.modulo, e.accion, e.fecha_hora
+        FROM eventos_investigacion e
+        INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
+        WHERE e.id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        ORDER BY e.fecha_hora DESC
+        LIMIT 5
+    ";
+} else {
+    $sql = "
+        SELECT u.nombre, u.apellido_paterno, e.modulo, e.accion, e.fecha_hora
+        FROM eventos_investigacion e
+        INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
+        ORDER BY e.fecha_hora DESC
+        LIMIT 5
+    ";
+}
+$resultado = $conexion->query($sql);
+$actividad_reciente = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 
 // Progreso promedio
-$stmt = $conexion->prepare("
-    SELECT AVG(porcentaje_avance) AS promedio
-    FROM actividad_estudiantes
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$progreso_promedio = round($resultado->fetch_assoc()['promedio'] ?? 0, 1);
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT AVG(porcentaje_avance) AS promedio
+        FROM actividad_estudiantes
+        WHERE id_alumno IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT AVG(porcentaje_avance) AS promedio FROM actividad_estudiantes";
+}
+$resultado = $conexion->query($sql);
+$progreso_promedio = $resultado ? round($resultado->fetch_assoc()['promedio'] ?? 0, 1) : 0;
 
 // Usan accesibilidad
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total
-    FROM preferencias_accesibilidad
-    WHERE alto_contraste = 1 
-       OR modo_oscuro = 1 
-       OR lector_pantalla = 1 
-       OR subtitulos = 1 
-       OR tamano_texto != 'Normal' 
-       OR fuente_dislexia = 1
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$usan_accesibilidad = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        AND (alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
+             OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1)
+    ";
+} else {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad
+        WHERE alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
+           OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1
+    ";
+}
+$resultado = $conexion->query($sql);
+$usan_accesibilidad = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -171,6 +222,32 @@ $stmt->close();
         <!-- ===== HEADER ===== -->
         <?php include 'includes/header.php'; ?>
 
+        <!-- ===== AVISO DE PRUEBA ACTIVA ===== -->
+        <?php if ($id_prueba_activa && $tiene_participantes): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php elseif ($id_prueba_activa && !$tiene_participantes): ?>
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; font-size: 18px;"></i>
+                <span style="color: #92400e; font-weight: 500;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #92400e;">— Aún no tiene participantes seleccionados. Los datos muestran <strong>todos los estudiantes</strong>.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <!-- ===== TARJETAS DE RESUMEN ===== -->
         <section class="resumen-investigador">
             <div class="stats-row">
@@ -180,7 +257,7 @@ $stmt->close();
                     </div>
                     <div class="stat-info">
                         <span class="stat-number"><?php echo $total_estudiantes; ?></span>
-                        <span class="stat-label">Estudiantes</span>
+                        <span class="stat-label">Estudiantes <?php echo ($id_prueba_activa && $tiene_participantes) ? 'seleccionados' : 'totales'; ?></span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -210,7 +287,6 @@ $stmt->close();
                         <span class="stat-label">Chatbot</span>
                     </div>
                 </div>
-                <!-- ===== NUEVA TARJETA: PRUEBAS ===== -->
                 <div class="stat-card">
                     <div class="stat-icon" style="background: #f3e8fd;">
                         <i class="fa-solid fa-flask" style="color: #7b1fa2;"></i>

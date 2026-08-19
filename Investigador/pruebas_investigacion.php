@@ -13,7 +13,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Investigado
 require_once '../Conexion/conexion.php';
 
 $titulo_pagina = 'Pruebas de investigación';
-$descripcion_pagina = 'Crea y administra las pruebas utilizadas para analizar el uso de AULAMOS.';
+$descripcion_pagina = 'Selecciona una prueba para gestionar sus participantes.';
 
 // =====================================================
 // OBTENER PRUEBAS
@@ -31,63 +31,6 @@ $stmt->execute();
 $resultado = $stmt->get_result();
 $pruebas = $resultado->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-
-// =====================================================
-// PROCESAR FORMULARIOS
-// =====================================================
-
-$mensaje = '';
-$tipo_mensaje = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // =====================================================
-    // CREAR PRUEBA
-    // =====================================================
-    if (isset($_POST['accion']) && $_POST['accion'] === 'crear') {
-        $nombre = trim($_POST['nombre'] ?? '');
-        $descripcion = trim($_POST['descripcion'] ?? '');
-        $hipotesis = trim($_POST['hipotesis'] ?? '');
-        $objetivo = trim($_POST['objetivo'] ?? '');
-        $version_wcag = trim($_POST['version_wcag'] ?? 'WCAG 2.1');
-        $fecha_inicio = trim($_POST['fecha_inicio'] ?? '');
-        $fecha_fin = trim($_POST['fecha_fin'] ?? '');
-        $estado = 'Planeada';
-
-        if (empty($nombre) || empty($hipotesis) || empty($fecha_inicio)) {
-            $mensaje = 'El nombre, la hipótesis y la fecha de inicio son obligatorios.';
-            $tipo_mensaje = 'error';
-        } else {
-            $stmt = $conexion->prepare("
-                INSERT INTO pruebas_investigacion (
-                    nombre, descripcion, hipotesis, objetivo, version_wcag,
-                    fecha_inicio, fecha_fin, estado
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->bind_param("ssssssss", $nombre, $descripcion, $hipotesis, $objetivo, $version_wcag, $fecha_inicio, $fecha_fin, $estado);
-            
-            if ($stmt->execute()) {
-                $mensaje = 'Prueba creada correctamente.';
-                $tipo_mensaje = 'exito';
-                // Recargar pruebas después de crear
-                header('Location: pruebas_investigacion.php');
-                exit;
-            } else {
-                $mensaje = 'Error al crear la prueba: ' . $stmt->error;
-                $tipo_mensaje = 'error';
-            }
-            $stmt->close();
-        }
-    }
-}
-
-function colorEstado($estado) {
-    switch ($estado) {
-        case 'Activa': return '#15803D';
-        case 'Finalizada': return '#475569';
-        default: return '#D97706';
-    }
-}
 
 function badgeEstado($estado) {
     switch ($estado) {
@@ -127,22 +70,12 @@ function formatoFecha($fecha) {
         <!-- ===== HEADER ===== -->
         <?php include 'includes/header.php'; ?>
 
-        <!-- ===== MENSAJES ===== -->
-        <?php if ($mensaje): ?>
-            <div class="mensaje <?php echo $tipo_mensaje; ?>">
-                <?php echo htmlspecialchars($mensaje); ?>
-            </div>
-        <?php endif; ?>
-
         <!-- ===== ENCABEZADO ===== -->
         <div class="pruebas-header">
             <div class="header-info">
-                <span class="cantidad"><?php echo count($pruebas); ?> <?php echo count($pruebas) === 1 ? 'prueba registrada' : 'pruebas registradas'; ?></span>
-                <p class="subtitulo">Administra los estudios realizados con los estudiantes.</p>
+                <span class="cantidad"><?php echo count($pruebas); ?> <?php echo count($pruebas) === 1 ? 'prueba disponible' : 'pruebas disponibles'; ?></span>
+                <p class="subtitulo">Selecciona una prueba para gestionar sus participantes.</p>
             </div>
-            <button class="btn-nueva" id="btnNuevaPrueba">
-                <i class="fa-solid fa-plus"></i> Nueva prueba
-            </button>
         </div>
 
         <!-- ===== LISTA DE PRUEBAS ===== -->
@@ -199,22 +132,30 @@ function formatoFecha($fecha) {
                             <?php endif; ?>
                         </div>
 
-                        <div class="prueba-acciones">
-                            <?php if ($prueba['estado'] === 'Activa'): ?>
-                                <button class="btn-cambiar-estado btn-finalizar js-cambiar-estado" 
-                                        data-id="<?php echo $prueba['id_prueba']; ?>" 
-                                        data-estado="Finalizada"
-                                        data-nombre="<?php echo htmlspecialchars($prueba['nombre']); ?>">
-                                    <i class="fa-solid fa-stop-circle"></i> Finalizar prueba
-                                </button>
-                            <?php else: ?>
-                                <button class="btn-cambiar-estado btn-activar js-cambiar-estado" 
-                                        data-id="<?php echo $prueba['id_prueba']; ?>" 
-                                        data-estado="Activa"
-                                        data-nombre="<?php echo htmlspecialchars($prueba['nombre']); ?>">
-                                    <i class="fa-solid fa-play-circle"></i> Activar prueba
-                                </button>
-                            <?php endif; ?>
+                       <div class="prueba-acciones">
+    <?php if ($prueba['estado'] === 'Activa'): ?>
+        <form method="POST" action="logica/cambiar_estado_prueba.php" style="display:inline;">
+            <input type="hidden" name="id_prueba" value="<?php echo $prueba['id_prueba']; ?>">
+            <input type="hidden" name="estado" value="Finalizada">
+            <button type="submit" class="btn-cambiar-estado btn-finalizar" onclick="return confirm('¿Finalizar esta prueba?')">
+                <i class="fa-solid fa-stop-circle"></i> Finalizar prueba
+            </button>
+        </form>
+    <?php else: ?>
+        <form method="POST" action="logica/cambiar_estado_prueba.php" style="display:inline;">
+            <input type="hidden" name="id_prueba" value="<?php echo $prueba['id_prueba']; ?>">
+            <input type="hidden" name="estado" value="Activa">
+            <button type="submit" class="btn-cambiar-estado btn-activar" onclick="return confirm('¿Activar esta prueba?')">
+                <i class="fa-solid fa-play-circle"></i> Activar prueba
+            </button>
+        </form>
+    <?php endif; ?>
+</div>
+                            
+                            <!-- BOTÓN VER PARTICIPANTES -->
+                            <a href="ver_prueba.php?id=<?php echo $prueba['id_prueba']; ?>" class="btn-ver-participantes" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; background:#f1f5f9; border-radius:10px; color:#475569; text-decoration:none; font-weight:600; font-size:14px; margin-top:8px; transition:background 0.2s;">
+                                <i class="fa-solid fa-users"></i> Ver participantes
+                            </a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -231,71 +172,6 @@ function formatoFecha($fecha) {
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
-
-<!-- ========================================== -->
-<!-- MODAL CREAR PRUEBA                        -->
-<!-- ========================================== -->
-<div id="modalPrueba" class="modal-overlay modal-hidden">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h2><i class="fa-solid fa-flask"></i> Nueva prueba</h2>
-            <button class="modal-cerrar" id="modalCerrar">&times;</button>
-        </div>
-        <form method="POST" action="" class="modal-form">
-            <input type="hidden" name="accion" value="crear">
-
-            <div class="form-group">
-                <label for="nombre">Nombre <span class="text-danger">*</span></label>
-                <input type="text" id="nombre" name="nombre" placeholder="Ej. Evaluación de accesibilidad 2026" required>
-            </div>
-
-            <div class="form-group">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="2" placeholder="Describe brevemente la prueba"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="hipotesis">Hipótesis <span class="text-danger">*</span></label>
-                <textarea id="hipotesis" name="hipotesis" rows="2" placeholder="Escribe la hipótesis de investigación" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="objetivo">Objetivo</label>
-                <textarea id="objetivo" name="objetivo" rows="2" placeholder="Escribe el objetivo de la prueba"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="version_wcag">Versión WCAG</label>
-                <input type="text" id="version_wcag" name="version_wcag" value="WCAG 2.1">
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="fecha_inicio">Fecha de inicio <span class="text-danger">*</span></label>
-                    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
-                </div>
-                <div class="form-group">
-                    <label for="fecha_fin">Fecha de fin</label>
-                    <input type="date" id="fecha_fin" name="fecha_fin">
-                </div>
-            </div>
-
-            <div class="form-group estado-inicial">
-                <label>Estado inicial</label>
-                <div class="estado-badge-planeada">
-                    <span class="punto-planeada"></span>
-                    <span>Planeada</span>
-                </div>
-                <p class="ayuda-texto">Cuando la prueba esté lista, podrás activarla desde la lista.</p>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn-cancelar" id="modalCancelar">Cancelar</button>
-                <button type="submit" class="btn-guardar">Crear prueba</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- ===== SCRIPTS ===== -->
 <script src="js/pruebas_investigacion.js"></script>

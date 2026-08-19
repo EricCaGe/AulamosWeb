@@ -14,72 +14,158 @@ $titulo_pagina = 'Reportes de investigación';
 $descripcion_pagina = 'Consulta un resumen de las métricas recopiladas durante las pruebas de uso de la plataforma.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
 // =====================================================
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(DISTINCT u.id_usuario) AS total
-    FROM usuarios u
-    INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
-    WHERE ur.id_rol = 1 AND u.estado = 'Activo'
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_estudiantes = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+$prueba_activa = null;
+$id_prueba_activa = null;
+$prueba_activa_nombre = 'Ninguna';
+$tiene_participantes = false;
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total
-    FROM preferencias_accesibilidad
-    WHERE alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
-       OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$usan_accesibilidad = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+$resultado = $conexion->query("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+if ($resultado) {
+    $prueba_activa = $resultado->fetch_assoc();
+    if ($prueba_activa) {
+        $id_prueba_activa = $prueba_activa['id_prueba'];
+        $prueba_activa_nombre = $prueba_activa['nombre'];
+        
+        $check = $conexion->query("SELECT COUNT(*) as total FROM participantes_prueba WHERE id_prueba = $id_prueba_activa");
+        if ($check) {
+            $row = $check->fetch_assoc();
+            $tiene_participantes = ($row['total'] ?? 0) > 0;
+        }
+    }
+}
 
-$stmt = $conexion->prepare("SELECT AVG(tiempo_realizacion) AS promedio FROM entregas WHERE tiempo_realizacion IS NOT NULL");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$promedio_segundos = round($resultado->fetch_assoc()['promedio'] ?? 0);
-$stmt->close();
+// =====================================================
+// CONSULTAS A LA BD (usando query())
+// =====================================================
+
+// Total de estudiantes
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+        AND u.id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+    ";
+}
+$resultado = $conexion->query($sql);
+$total_estudiantes = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+
+// Usan accesibilidad
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        AND (alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
+             OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1)
+    ";
+} else {
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad
+        WHERE alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
+           OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1
+    ";
+}
+$resultado = $conexion->query($sql);
+$usan_accesibilidad = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+
+// Tiempo promedio en actividades
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT AVG(e.tiempo_realizacion) AS promedio 
+        FROM entregas e
+        INNER JOIN actividad_estudiantes ae ON e.id_actividad_estudiante = ae.id_actividad_estudiante
+        WHERE ae.id_alumno IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+        AND e.tiempo_realizacion IS NOT NULL
+    ";
+} else {
+    $sql = "SELECT AVG(tiempo_realizacion) AS promedio FROM entregas WHERE tiempo_realizacion IS NOT NULL";
+}
+$resultado = $conexion->query($sql);
+$promedio_segundos = $resultado ? round($resultado->fetch_assoc()['promedio'] ?? 0) : 0;
 $promedio_minutos = floor($promedio_segundos / 60);
 $promedio_segundos_resto = $promedio_segundos % 60;
 $tiempo_promedio = $promedio_minutos . ' min ' . $promedio_segundos_resto . ' s';
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_errores = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+// Total de errores
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total 
+        FROM eventos_investigacion
+        WHERE tipo_evento = 'Error'
+        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM eventos_investigacion WHERE tipo_evento = 'Error'";
+}
+$resultado = $conexion->query($sql);
+$total_errores = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM mensajes_chatbot");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$total_chatbot = $resultado->fetch_assoc()['total'] ?? 0;
-$stmt->close();
+// Total de interacciones chatbot
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT COUNT(*) AS total 
+        FROM mensajes_chatbot
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot";
+}
+$resultado = $conexion->query($sql);
+$total_chatbot = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
-$stmt = $conexion->prepare("SELECT AVG(porcentaje_avance) AS promedio FROM actividad_estudiantes");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$progreso_promedio = round($resultado->fetch_assoc()['promedio'] ?? 0, 1);
-$stmt->close();
+// Progreso promedio
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT AVG(porcentaje_avance) AS promedio 
+        FROM actividad_estudiantes
+        WHERE id_alumno IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "SELECT AVG(porcentaje_avance) AS promedio FROM actividad_estudiantes";
+}
+$resultado = $conexion->query($sql);
+$progreso_promedio = $resultado ? round($resultado->fetch_assoc()['promedio'] ?? 0, 1) : 0;
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN alto_contraste = 1 THEN 1 ELSE 0 END) AS alto_contraste,
-           SUM(CASE WHEN modo_oscuro = 1 THEN 1 ELSE 0 END) AS modo_oscuro,
-           SUM(CASE WHEN lector_pantalla = 1 THEN 1 ELSE 0 END) AS lector_pantalla,
-           SUM(CASE WHEN subtitulos = 1 THEN 1 ELSE 0 END) AS subtitulos,
-           SUM(CASE WHEN tamano_texto != 'Normal' THEN 1 ELSE 0 END) AS tamano_texto
-    FROM preferencias_accesibilidad
-");
-$stmt->execute();
-$resultado = $stmt->get_result();
-$accesibilidad_stats = $resultado->fetch_assoc();
-$stmt->close();
-
+// Estadísticas de accesibilidad (detalle)
+if ($id_prueba_activa && $tiene_participantes) {
+    $sql = "
+        SELECT 
+            COUNT(*) AS total,
+            SUM(CASE WHEN alto_contraste = 1 THEN 1 ELSE 0 END) AS alto_contraste,
+            SUM(CASE WHEN modo_oscuro = 1 THEN 1 ELSE 0 END) AS modo_oscuro,
+            SUM(CASE WHEN lector_pantalla = 1 THEN 1 ELSE 0 END) AS lector_pantalla,
+            SUM(CASE WHEN subtitulos = 1 THEN 1 ELSE 0 END) AS subtitulos,
+            SUM(CASE WHEN tamano_texto != 'Normal' THEN 1 ELSE 0 END) AS tamano_texto
+        FROM preferencias_accesibilidad
+        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
+    ";
+} else {
+    $sql = "
+        SELECT 
+            COUNT(*) AS total,
+            SUM(CASE WHEN alto_contraste = 1 THEN 1 ELSE 0 END) AS alto_contraste,
+            SUM(CASE WHEN modo_oscuro = 1 THEN 1 ELSE 0 END) AS modo_oscuro,
+            SUM(CASE WHEN lector_pantalla = 1 THEN 1 ELSE 0 END) AS lector_pantalla,
+            SUM(CASE WHEN subtitulos = 1 THEN 1 ELSE 0 END) AS subtitulos,
+            SUM(CASE WHEN tamano_texto != 'Normal' THEN 1 ELSE 0 END) AS tamano_texto
+        FROM preferencias_accesibilidad
+    ";
+}
+$resultado = $conexion->query($sql);
+$accesibilidad_stats = $resultado ? $resultado->fetch_assoc() : [];
 $accesibilidad_data = [
     ['nombre' => 'Alto contraste', 'total' => $accesibilidad_stats['alto_contraste'] ?? 0],
     ['nombre' => 'Tamaño de texto', 'total' => $accesibilidad_stats['tamano_texto'] ?? 0],
@@ -171,6 +257,32 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+
+        <?php if ($id_prueba_activa && $tiene_participantes): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php elseif ($id_prueba_activa && !$tiene_participantes): ?>
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; font-size: 18px;"></i>
+                <span style="color: #92400e; font-weight: 500;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #92400e;">— Aún no tiene participantes seleccionados. Los datos muestran <strong>todos los estudiantes</strong>.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <div class="periodo-selector">
             <div class="periodo-info">
                 <i class="fa-solid fa-calendar"></i>
@@ -181,6 +293,7 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
             </div>
             <button class="btn-periodo"><i class="fa-solid fa-chevron-down"></i></button>
         </div>
+
         <section class="resumen-general">
             <h3><i class="fa-solid fa-chart-simple"></i> Resumen general</h3>
             <div class="reporte-item">
@@ -224,6 +337,7 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
                 </div>
             </div>
         </section>
+
         <section class="estadisticas-accesibilidad">
             <h3><i class="fa-solid fa-universal-access"></i> Estadísticas de accesibilidad</h3>
             <div class="tarjeta-estadisticas">
@@ -242,6 +356,7 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
                 <?php endforeach; ?>
             </div>
         </section>
+
         <section class="metricas-incluidas">
             <h3><i class="fa-solid fa-list-check"></i> Métricas incluidas</h3>
             <div class="tarjeta-incluidas">
@@ -272,6 +387,7 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
                 </div>
             </div>
         </section>
+
         <section class="exportar-reporte">
             <h3><i class="fa-solid fa-download"></i> Exportar reporte</h3>
             <p class="exportar-descripcion">Selecciona el formato en el que deseas obtener la información recopilada.</p>
@@ -292,6 +408,7 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
                 <i class="fa-solid fa-download"></i>
             </div>
         </section>
+
         <div class="aviso-investigador"><i class="fa-solid fa-circle-info"></i><p>Los resultados mostrados son datos reales registrados por AULAMOS.</p></div>
         <?php include '../Accesibilidad/accesibilidad.php'; ?>
     </main>

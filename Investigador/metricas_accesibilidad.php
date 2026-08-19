@@ -14,37 +14,87 @@ $titulo_pagina = 'Métricas de accesibilidad';
 $descripcion_pagina = 'Consulta las herramientas y preferencias de accesibilidad utilizadas por los estudiantes durante las pruebas de AULAMOS.';
 
 // =====================================================
-// CONSULTAS A LA BD
+// DETECTAR PRUEBA ACTIVA
 // =====================================================
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(DISTINCT u.id_usuario) AS total
-    FROM usuarios u
-    INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
-    WHERE ur.id_rol = 1 AND u.estado = 'Activo'
-");
+$stmt = $conexion->prepare("SELECT id_prueba, nombre FROM pruebas_investigacion WHERE estado = 'Activa' LIMIT 1");
+$stmt->execute();
+$resultado = $stmt->get_result();
+$prueba_activa = $resultado->fetch_assoc();
+$stmt->close();
+
+$id_prueba_activa = $prueba_activa['id_prueba'] ?? null;
+$prueba_activa_nombre = $prueba_activa['nombre'] ?? 'Ninguna';
+
+// =====================================================
+// CONSULTAS A LA BD (con filtro por prueba activa)
+// =====================================================
+
+// Total de estudiantes (solo participantes de prueba activa si existe)
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        INNER JOIN participantes_prueba pp ON u.id_usuario = pp.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo' AND pp.id_prueba = ?
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(DISTINCT u.id_usuario) AS total
+        FROM usuarios u
+        INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
+        WHERE ur.id_rol = 1 AND u.estado = 'Activo'
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $total_estudiantes = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conexion->prepare("
-    SELECT COUNT(*) AS total
-    FROM preferencias_accesibilidad
-    WHERE alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
-       OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1
-");
+// Usan accesibilidad (solo participantes de prueba activa si existe)
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad pa
+        INNER JOIN participantes_prueba pp ON pa.id_usuario = pp.id_usuario
+        WHERE pp.id_prueba = ?
+          AND (pa.alto_contraste = 1 OR pa.modo_oscuro = 1 OR pa.lector_pantalla = 1 
+               OR pa.subtitulos = 1 OR pa.tamano_texto != 'Normal' OR pa.fuente_dislexia = 1)
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad
+        WHERE alto_contraste = 1 OR modo_oscuro = 1 OR lector_pantalla = 1 
+           OR subtitulos = 1 OR tamano_texto != 'Normal' OR fuente_dislexia = 1
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $usan_accesibilidad = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM preferencias_accesibilidad WHERE alto_contraste = 1");
+// Usan alto contraste (solo participantes de prueba activa si existe)
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT COUNT(*) AS total
+        FROM preferencias_accesibilidad pa
+        INNER JOIN participantes_prueba pp ON pa.id_usuario = pp.id_usuario
+        WHERE pp.id_prueba = ? AND pa.alto_contraste = 1
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM preferencias_accesibilidad WHERE alto_contraste = 1");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $usan_alto_contraste = $resultado->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
+// Herramientas de accesibilidad (con filtro de prueba activa)
 $herramientas = [
     ['nombre' => 'Alto contraste', 'icono' => 'fa-solid fa-circle-half-stroke', 'condicion' => 'alto_contraste = 1'],
     ['nombre' => 'Tamaño de texto', 'icono' => 'fa-solid fa-text-height', 'condicion' => "tamano_texto != 'Normal'"],
@@ -57,7 +107,17 @@ $herramientas = [
 
 $herramientas_uso = [];
 foreach ($herramientas as $h) {
-    $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM preferencias_accesibilidad WHERE " . $h['condicion']);
+    if ($id_prueba_activa) {
+        $stmt = $conexion->prepare("
+            SELECT COUNT(*) AS total
+            FROM preferencias_accesibilidad pa
+            INNER JOIN participantes_prueba pp ON pa.id_usuario = pp.id_usuario
+            WHERE pp.id_prueba = ? AND " . $h['condicion']
+        );
+        $stmt->bind_param("i", $id_prueba_activa);
+    } else {
+        $stmt = $conexion->prepare("SELECT COUNT(*) AS total FROM preferencias_accesibilidad WHERE " . $h['condicion']);
+    }
     $stmt->execute();
     $resultado = $stmt->get_result();
     $total = $resultado->fetch_assoc()['total'] ?? 0;
@@ -75,16 +135,33 @@ usort($herramientas_uso, function($a, $b) {
 });
 $herramienta_principal = !empty($herramientas_uso) ? $herramientas_uso[0]['nombre'] : 'Sin datos';
 
-$stmt = $conexion->prepare("
-    SELECT u.id_usuario, u.nombre, u.apellido_paterno,
-           p.alto_contraste, p.modo_oscuro, p.tamano_texto, p.fuente_dislexia,
-           p.lector_pantalla, p.velocidad_lectura, p.subtitulos,
-           p.idioma, p.animaciones, p.navegacion_teclado, p.fecha_actualizacion
-    FROM preferencias_accesibilidad p
-    INNER JOIN usuarios u ON p.id_usuario = u.id_usuario
-    ORDER BY p.fecha_actualizacion DESC
-    LIMIT 5
-");
+// Preferencias de estudiantes (solo participantes de prueba activa si existe)
+if ($id_prueba_activa) {
+    $stmt = $conexion->prepare("
+        SELECT u.id_usuario, u.nombre, u.apellido_paterno,
+               p.alto_contraste, p.modo_oscuro, p.tamano_texto, p.fuente_dislexia,
+               p.lector_pantalla, p.velocidad_lectura, p.subtitulos,
+               p.idioma, p.animaciones, p.navegacion_teclado, p.fecha_actualizacion
+        FROM preferencias_accesibilidad p
+        INNER JOIN usuarios u ON p.id_usuario = u.id_usuario
+        INNER JOIN participantes_prueba pp ON p.id_usuario = pp.id_usuario
+        WHERE pp.id_prueba = ?
+        ORDER BY p.fecha_actualizacion DESC
+        LIMIT 5
+    ");
+    $stmt->bind_param("i", $id_prueba_activa);
+} else {
+    $stmt = $conexion->prepare("
+        SELECT u.id_usuario, u.nombre, u.apellido_paterno,
+               p.alto_contraste, p.modo_oscuro, p.tamano_texto, p.fuente_dislexia,
+               p.lector_pantalla, p.velocidad_lectura, p.subtitulos,
+               p.idioma, p.animaciones, p.navegacion_teclado, p.fecha_actualizacion
+        FROM preferencias_accesibilidad p
+        INNER JOIN usuarios u ON p.id_usuario = u.id_usuario
+        ORDER BY p.fecha_actualizacion DESC
+        LIMIT 5
+    ");
+}
 $stmt->execute();
 $resultado = $stmt->get_result();
 $preferencias_estudiantes = $resultado->fetch_all(MYSQLI_ASSOC);
@@ -105,6 +182,24 @@ $stmt->close();
     <?php include 'includes/sidebar.php'; ?>
     <main class="main-content">
         <?php include 'includes/header.php'; ?>
+
+        <!-- ===== AVISO DE PRUEBA ACTIVA ===== -->
+        <?php if ($id_prueba_activa): ?>
+            <div style="background: #f3e8fd; border: 1px solid #7C3AED; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-flask" style="color: #7C3AED; font-size: 18px;"></i>
+                <span style="color: #5a189a; font-weight: 600;">
+                    Prueba activa: <strong><?php echo htmlspecialchars($prueba_activa_nombre); ?></strong>
+                    <span style="font-weight: 400; color: #7C3AED;">— Los datos mostrados corresponden SOLO a los participantes de esta prueba.</span>
+                </span>
+            </div>
+        <?php else: ?>
+            <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info" style="color: #64748b; font-size: 18px;"></i>
+                <span style="color: #475569; font-weight: 500;">
+                    No hay prueba activa. Los datos muestran <strong>todos los estudiantes</strong> del sistema.
+                </span>
+            </div>
+        <?php endif; ?>
         
         <div class="periodo-selector">
             <div class="periodo-info">
@@ -123,7 +218,7 @@ $stmt->close();
                     <div class="stat-icon" style="background:#e8f0fe;"><i class="fa-solid fa-users" style="color:#3b71f3;"></i></div>
                     <div class="stat-info">
                         <span class="stat-number"><?php echo $total_estudiantes; ?></span>
-                        <span class="stat-label">Estudiantes analizados</span>
+                        <span class="stat-label">Estudiantes <?php echo $id_prueba_activa ? 'seleccionados' : 'analizados'; ?></span>
                     </div>
                 </div>
                 <div class="stat-card">
