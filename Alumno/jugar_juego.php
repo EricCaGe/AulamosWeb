@@ -87,7 +87,7 @@ if (!$juego) {
     exit;
 }
 
-// Obtener parejas del juego
+// Obtener parejas del juego (CON IMÁGENES)
 $query_parejas = "
     SELECT 
         id_pareja,
@@ -134,20 +134,37 @@ function getIconoModo($modo) {
         default: return 'fa-solid fa-gamepad';
     }
 }
+
+// Función para obtener URL de imagen (CORREGIDA)
+function getUrlImagen($ruta) {
+    if (empty($ruta)) return null;
+    if (strpos($ruta, 'http://') === 0 || strpos($ruta, 'https://') === 0) {
+        return $ruta;
+    }
+    return '../' . ltrim($ruta, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 🔥 FORZAR RECARGA DE CSS - SIN CACHÉ -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Jugar - <?php echo htmlspecialchars($juego['titulo']); ?></title>
     
-    <link rel="stylesheet" href="Style/Inicio.css">
-    <link rel="stylesheet" href="Style/actividades.css">
+    <link rel="stylesheet" href="Style/Inicio.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="Style/actividades.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css?v=<?php echo time(); ?>">
     
     <style>
+        /* ==========================================
+           ESTILOS ACTUALIZADOS PARA IMÁGENES
+           ========================================== */
+        
         .jugar-container {
             padding: 20px 30px;
             width: 100%;
@@ -238,7 +255,7 @@ function getIconoModo($modo) {
         }
         
         /* ==========================================
-           ESTILOS PARA MODO RELACIONAR
+           ESTILOS PARA MODO RELACIONAR (CON IMÁGENES)
            ========================================== */
         .game-relacionar {
             display: grid;
@@ -269,6 +286,18 @@ function getIconoModo($modo) {
             transition: all 0.2s;
             font-weight: 500;
             color: #1e293b;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .game-relacionar .item .item-imagen {
+            max-width: 60px;
+            max-height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
         }
         
         .game-relacionar .item:hover:not(.seleccionado):not(.correcto):not(.incorrecto) {
@@ -314,7 +343,7 @@ function getIconoModo($modo) {
         }
         
         /* ==========================================
-           ESTILOS PARA MODO MEMORIA
+           ESTILOS PARA MODO MEMORIA (CON IMÁGENES)
            ========================================== */
         .game-memoria {
             display: grid;
@@ -338,6 +367,24 @@ function getIconoModo($modo) {
             font-weight: 700;
             user-select: none;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .game-memoria .carta .carta-imagen {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .game-memoria .carta .carta-icono {
+            font-size: 40px;
+        }
+        
+        .game-memoria .carta .carta-texto {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            padding: 4px;
         }
         
         .game-memoria .carta:hover:not(.volteada):not(.encontrada) {
@@ -357,7 +404,7 @@ function getIconoModo($modo) {
             cursor: default;
         }
         
-        .game-memoria .carta.encontrada i {
+        .game-memoria .carta.encontrada .carta-icono {
             color: #22c55e;
         }
         
@@ -365,27 +412,20 @@ function getIconoModo($modo) {
             display: none;
             text-align: center;
             padding: 8px;
-            font-size: 14px;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .game-memoria .carta.volteada .contenido,
         .game-memoria .carta.encontrada .contenido {
-            display: block;
-        }
-        
-        .game-memoria .carta .contenido .icono {
-            font-size: 28px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .game-memoria .carta .contenido .texto {
-            font-size: 12px;
-            font-weight: 600;
+            display: flex;
         }
         
         /* ==========================================
-           ESTILOS PARA MODO SECUENCIA
+           ESTILOS PARA MODO SECUENCIA (CON IMÁGENES)
            ========================================== */
         .game-secuencia {
             display: flex;
@@ -407,6 +447,13 @@ function getIconoModo($modo) {
             transition: all 0.2s;
             color: #1e293b;
             font-weight: 500;
+        }
+        
+        .game-secuencia .item-secuencia .secuencia-imagen {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
         }
         
         .game-secuencia .item-secuencia:hover:not(.correcto):not(.incorrecto) {
@@ -455,7 +502,7 @@ function getIconoModo($modo) {
         }
         
         /* ==========================================
-           ESTILOS PARA MODO CLASIFICAR
+           ESTILOS PARA MODO CLASIFICAR (CON IMÁGENES)
            ========================================== */
         .game-clasificar {
             display: grid;
@@ -493,6 +540,17 @@ function getIconoModo($modo) {
             text-align: center;
             transition: all 0.2s;
             font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .game-clasificar .categoria .item-clasificar .clasificar-imagen {
+            max-width: 40px;
+            max-height: 30px;
+            border-radius: 4px;
+            object-fit: cover;
         }
         
         .game-clasificar .categoria .item-clasificar:hover {
@@ -577,29 +635,6 @@ function getIconoModo($modo) {
             background: #16a34a;
         }
         
-        .game-controls .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-        
-        .game-controls .btn-danger:hover {
-            background: #b91c1c;
-        }
-        
-        .game-controls .btn .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid white;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
         .feedback-message {
             padding: 12px 16px;
             border-radius: 8px;
@@ -630,9 +665,23 @@ function getIconoModo($modo) {
             border-left: 4px solid #3b71f3;
         }
         
-        /* ==========================================
-           RESPONSIVE
-           ========================================== */
+        /* Estilos para el spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b71f3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
             .jugar-container {
                 padding: 15px;
@@ -815,6 +864,18 @@ function getIconoModo($modo) {
             width: 100%;
             max-width: 100%;
         }
+        
+        /* Base */
+        .carta .contenido .carta-texto {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .carta .contenido .carta-imagen {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -830,7 +891,7 @@ function getIconoModo($modo) {
         <nav class="menu">
             <a href="alumno.php" class="menu-item"><i class="fa-solid fa-house"></i> Inicio</a>
             <a href="actividades.php" class="menu-item"><i class="fa-solid fa-cubes"></i> Mis actividades</a>
-            <a href="juegos_alumno.php" class="menu-item active"><i class="fa-solid fa-gamepad"></i> Conecta y Aprende</a>
+            <a href="juegos_alumno.php" class="menu-item"><i class="fa-solid fa-gamepad"></i> Conecta y Aprende</a>
             <a href="biblioteca.php" class="menu-item"><i class="fa-solid fa-book-open"></i> Biblioteca digital</a>
             <a href="avances.php" class="menu-item"><i class="fa-solid fa-pen-to-square"></i> Mis avances</a>
             <a href="ayuda.php" class="menu-item"><i class="fa-solid fa-circle-question"></i> Ayuda</a>
@@ -962,6 +1023,18 @@ const idAsignacion = <?php echo $id_asignacion; ?>;
 const modo = '<?php echo $juego['modo']; ?>';
 const puntosPorAcierto = <?php echo $juego['puntos_por_acierto']; ?>;
 const totalParejas = <?php echo $total_parejas; ?>;
+const intentosMaximos = <?php echo $juego['intentos_maximos'] ?? 0; ?>;
+// 🔥 CORREGIDO: Obtener el número de intento actual de la base de datos
+const intentoActual = <?php echo $juego['numero_intento'] ?? 0; ?>;
+
+// Función para obtener URL de imagen (CORREGIDA)
+function getUrlImagen(ruta) {
+    if (!ruta) return null;
+    if (ruta.startsWith('http://') || ruta.startsWith('https://')) {
+        return ruta;
+    }
+    return '../' + ruta.replace(/^\//, '');
+}
 
 let puntos = 0;
 let aciertos = 0;
@@ -976,9 +1049,53 @@ let parejasCompletadas = 0;
 // =============================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si hay un parámetro para nuevo intento
+    const urlParams = new URLSearchParams(window.location.search);
+    const nuevoIntento = urlParams.get('nuevo_intento');
+    const reiniciar = urlParams.get('reiniciar');
+    
+    // 🔥 FORZAR RECARGA DE CSS
+    document.querySelectorAll('link[rel="stylesheet"]').forEach(function(link) {
+        const href = link.getAttribute('href');
+        if (href && href.includes('?v=')) {
+            // Ya tiene versión, no hacer nada
+        } else if (href && !href.includes('?v=')) {
+            link.setAttribute('href', href + '?v=' + Date.now());
+        }
+    });
+    
+    if (nuevoIntento || reiniciar) {
+        console.log('🔄 Iniciando nuevo intento');
+        mostrarFeedback('🔄 Nuevo intento iniciado', 'info');
+    }
+    
     iniciarJuego();
     iniciarTimer();
+    
+    // Actualizar información del intento
+    actualizarInfoIntento();
 });
+
+// =============================================
+// FUNCIÓN PARA ACTUALIZAR INFORMACIÓN DEL INTENTO
+// =============================================
+
+function actualizarInfoIntento() {
+    fetch('obtener_info_intento.php?id_asignacion=' + idAsignacion)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('📊 Intento actual:', data.numero_intento);
+                // Actualizar el título del juego con el número de intento
+                const titleElement = document.querySelector('.game-title h3');
+                if (titleElement && data.numero_intento) {
+                    const modoTexto = titleElement.textContent.replace(/\(Intento \d+\)/, '').trim();
+                    titleElement.textContent = modoTexto + ' (Intento ' + data.numero_intento + ')';
+                }
+            }
+        })
+        .catch(error => console.error('Error al obtener intento:', error));
+}
 
 function iniciarJuego() {
     const gameArea = document.getElementById('gameArea');
@@ -1004,7 +1121,7 @@ function iniciarJuego() {
 }
 
 // =============================================
-// MODO RELACIONAR
+// MODO RELACIONAR (CON IMÁGENES)
 // =============================================
 
 function generarRelacionar() {
@@ -1021,8 +1138,10 @@ function generarRelacionar() {
     // Columna A
     html += '<div class="columna"><h4>Elementos A</h4>';
     elementosA.forEach((item, index) => {
+        const imagenUrl = getUrlImagen(item.elemento_a_imagen);
         html += `
             <div class="item" data-id="${item.id_pareja}" data-lado="A" data-index="${index}" onclick="seleccionarRelacionar(this, '${item.id_pareja}', 'A')">
+                ${imagenUrl ? `<img src="${imagenUrl}" class="item-imagen" alt="Imagen">` : ''}
                 ${item.elemento_a_texto || 'Elemento ' + (index + 1)}
             </div>
         `;
@@ -1032,8 +1151,10 @@ function generarRelacionar() {
     // Columna B
     html += '<div class="columna"><h4>Elementos B</h4>';
     elementosB.forEach((item, index) => {
+        const imagenUrl = getUrlImagen(item.elemento_b_imagen);
         html += `
             <div class="item" data-id="${item.id_pareja}" data-lado="B" data-index="${index}" onclick="seleccionarRelacionar(this, '${item.id_pareja}', 'B')">
+                ${imagenUrl ? `<img src="${imagenUrl}" class="item-imagen" alt="Imagen">` : ''}
                 ${item.elemento_b_texto || 'Elemento ' + (index + 1)}
             </div>
         `;
@@ -1053,26 +1174,22 @@ function seleccionarRelacionar(elemento, idPareja, lado) {
     if (elemento.classList.contains('incorrecto')) return;
     
     if (lado === 'A') {
-        // Deseleccionar A anterior
         if (seleccionA) {
             seleccionA.classList.remove('seleccionado');
         }
         seleccionA = elemento;
         elemento.classList.add('seleccionado');
         
-        // Si ya hay selección B, verificar
         if (seleccionB) {
             verificarRelacionar();
         }
     } else {
-        // Deseleccionar B anterior
         if (seleccionB) {
             seleccionB.classList.remove('seleccionado');
         }
         seleccionB = elemento;
         elemento.classList.add('seleccionado');
         
-        // Si ya hay selección A, verificar
         if (seleccionA) {
             verificarRelacionar();
         }
@@ -1093,7 +1210,6 @@ function verificarRelacionar() {
         seleccionA.classList.add('deshabilitado');
         seleccionB.classList.add('deshabilitado');
         
-        // Agregar icono de check
         if (!seleccionA.querySelector('i')) {
             seleccionA.innerHTML += ' <i class="fa-regular fa-check-circle"></i>';
         }
@@ -1133,7 +1249,7 @@ function verificarRelacionar() {
 }
 
 // =============================================
-// MODO MEMORIA
+// MODO MEMORIA (CON IMÁGENES)
 // =============================================
 
 let cartasVolteadas = [];
@@ -1144,8 +1260,22 @@ function generarMemoria() {
     // Crear pares de cartas
     let cartas = [];
     parejasData.forEach((p, index) => {
-        cartas.push({ id: p.id_pareja, tipo: 'A', texto: p.elemento_a_texto || 'A' + (index + 1), icono: 'fa-regular fa-file' });
-        cartas.push({ id: p.id_pareja, tipo: 'B', texto: p.elemento_b_texto || 'B' + (index + 1), icono: 'fa-regular fa-file-lines' });
+        const imagenUrlA = getUrlImagen(p.elemento_a_imagen);
+        const imagenUrlB = getUrlImagen(p.elemento_b_imagen);
+        cartas.push({ 
+            id: p.id_pareja, 
+            tipo: 'A', 
+            texto: p.elemento_a_texto || 'A' + (index + 1),
+            imagen: imagenUrlA,
+            icono: 'fa-regular fa-file'
+        });
+        cartas.push({ 
+            id: p.id_pareja, 
+            tipo: 'B', 
+            texto: p.elemento_b_texto || 'B' + (index + 1),
+            imagen: imagenUrlB,
+            icono: 'fa-regular fa-file-lines'
+        });
     });
     
     // Mezclar
@@ -1156,8 +1286,7 @@ function generarMemoria() {
         html += `
             <div class="carta" data-id="${carta.id}" data-tipo="${carta.tipo}" data-index="${index}" onclick="voltearCarta(this)">
                 <div class="contenido">
-                    <span class="icono"><i class="${carta.icono}"></i></span>
-                    <span class="texto">${carta.texto}</span>
+                    ${carta.imagen ? `<img src="${carta.imagen}" class="carta-imagen" alt="Imagen">` : `<span class="carta-texto">${carta.texto}</span>`}
                 </div>
             </div>
         `;
@@ -1218,18 +1347,17 @@ function verificarMemoria() {
 }
 
 // =============================================
-// MODO SECUENCIA
+// MODO SECUENCIA (CON IMÁGENES)
 // =============================================
 
 function generarSecuencia() {
-    // Orden correcto
     let items = parejasData.map((p, index) => ({
         id: p.id_pareja,
         texto: p.elemento_a_texto || 'Elemento ' + (index + 1),
+        imagen: getUrlImagen(p.elemento_a_imagen),
         ordenCorrecto: index
     }));
     
-    // Mezclar
     items.sort(() => Math.random() - 0.5);
     
     let html = '<div class="game-secuencia">';
@@ -1237,6 +1365,7 @@ function generarSecuencia() {
         html += `
             <div class="item-secuencia" data-id="${item.id}" data-orden="${index}" onclick="seleccionarSecuencia(this)">
                 <span class="posicion">${index + 1}</span>
+                ${item.imagen ? `<img src="${item.imagen}" class="secuencia-imagen" alt="Imagen">` : ''}
                 <span>${item.texto}</span>
             </div>
         `;
@@ -1256,12 +1385,10 @@ function seleccionarSecuencia(elemento) {
     const itemActual = Array.from(items).indexOf(elemento);
     const idActual = parseInt(elemento.dataset.id);
     
-    // Buscar el orden correcto para este id
     const parejaCorrecta = parejasData.find(p => p.id_pareja === idActual);
     const ordenCorrecto = parejasData.indexOf(parejaCorrecta);
     
     if (ordenSeleccionado === ordenCorrecto) {
-        // Correcto
         elemento.classList.add('correcto');
         aciertos++;
         puntos += puntosPorAcierto;
@@ -1270,7 +1397,6 @@ function seleccionarSecuencia(elemento) {
         
         mostrarFeedback('¡Correcto! +' + puntosPorAcierto + ' puntos', 'success');
     } else {
-        // Incorrecto
         elemento.classList.add('incorrecto');
         errores++;
         
@@ -1289,11 +1415,10 @@ function seleccionarSecuencia(elemento) {
 }
 
 // =============================================
-// MODO CLASIFICAR
+// MODO CLASIFICAR (CON IMÁGENES)
 // =============================================
 
 function generarClasificar() {
-    // Obtener categorías únicas
     const categorias = [...new Set(parejasData.map(p => p.categoria || 'Sin categoría'))];
     
     let html = '<div class="game-clasificar">';
@@ -1304,11 +1429,15 @@ function generarClasificar() {
             <div class="categoria" data-categoria="${categoria}">
                 <h4>${categoria}</h4>
                 <div class="items">
-                    ${items.map((item, index) => `
-                        <div class="item-clasificar" data-id="${item.id_pareja}" onclick="seleccionarClasificar(this, '${categoria}')">
-                            ${item.elemento_a_texto || 'Elemento ' + (index + 1)}
-                        </div>
-                    `).join('')}
+                    ${items.map((item, index) => {
+                        const imagenUrl = getUrlImagen(item.elemento_a_imagen);
+                        return `
+                            <div class="item-clasificar" data-id="${item.id_pareja}" onclick="seleccionarClasificar(this, '${categoria}')">
+                                ${imagenUrl ? `<img src="${imagenUrl}" class="clasificar-imagen" alt="Imagen">` : ''}
+                                ${item.elemento_a_texto || 'Elemento ' + (index + 1)}
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -1390,30 +1519,155 @@ function detenerTimer() {
     }
 }
 
+// =============================================
+// FUNCIÓN PARA VERIFICAR SI PUEDE JUGAR OTRA VEZ (CORREGIDA)
+// =============================================
+
+function puedeJugarOtraVez() {
+    // Si no hay límite de intentos, siempre puede jugar
+    if (intentosMaximos === 0 || intentosMaximos === null) return true;
+    
+    // 🔥 USAR EL NÚMERO DE INTENTO ACTUAL DE LA BD
+    return intentoActual < intentosMaximos;
+}
+
+// =============================================
+// FUNCIÓN PARA CREAR NUEVO INTENTO (NUEVA)
+// =============================================
+
+function crearNuevoIntento(callback) {
+    const formData = new FormData();
+    formData.append('id_asignacion', idAsignacion);
+    formData.append('id_juego', idJuego);
+    formData.append('accion', 'crear_intento');
+    
+    const feedback = document.getElementById('feedbackMessage');
+    if (feedback) {
+        feedback.textContent = '⏳ Creando nuevo intento...';
+        feedback.className = 'feedback-message info show';
+    }
+    
+    fetch('guardar_resultado_juego.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('✅ Nuevo intento creado:', data.numero_intento);
+            if (feedback) {
+                feedback.className = 'feedback-message';
+                feedback.textContent = '✅ Nuevo intento creado';
+                feedback.className = 'feedback-message success show';
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                }, 2000);
+            }
+            if (callback) callback();
+        } else {
+            alert('❌ No se pudo crear un nuevo intento: ' + (data.message || 'Error desconocido'));
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        alert('❌ Error de conexión al crear nuevo intento');
+    });
+}
+
+// =============================================
+// FUNCIÓN PARA GUARDAR RESULTADO (CORREGIDA)
+// =============================================
+
+function guardarResultado(porcentaje, callback) {
+    const formData = new FormData();
+    formData.append('id_asignacion', idAsignacion);
+    formData.append('id_juego', idJuego);
+    formData.append('puntos', puntos);
+    formData.append('aciertos', aciertos);
+    formData.append('errores', errores);
+    formData.append('porcentaje', porcentaje);
+    formData.append('tiempo', tiempoSegundos);
+    formData.append('total_parejas', totalParejas);
+    formData.append('parejas_completadas', parejasCompletadas);
+    formData.append('accion', 'guardar_resultado');
+    
+    // Mostrar indicador de carga
+    const feedback = document.getElementById('feedbackMessage');
+    if (feedback) {
+        feedback.textContent = '⏳ Guardando resultado...';
+        feedback.className = 'feedback-message info show';
+    }
+    
+    fetch('guardar_resultado_juego.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('✅ Resultado guardado:', data);
+            if (feedback) {
+                feedback.className = 'feedback-message';
+            }
+            if (callback) callback();
+        } else {
+            console.error('❌ Error al guardar resultado:', data.message);
+            if (feedback) {
+                feedback.textContent = '❌ Error al guardar: ' + data.message;
+                feedback.className = 'feedback-message error show';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        if (feedback) {
+            feedback.textContent = '❌ Error de conexión al guardar';
+            feedback.className = 'feedback-message error show';
+        }
+    });
+}
+
+// =============================================
+// FUNCIÓN REINICIAR CON NUEVO INTENTO (CORREGIDA)
+// =============================================
+
+function reiniciarConNuevoIntento() {
+    if (!confirm('¿Seguro que quieres iniciar un nuevo intento? Se guardará tu progreso actual.')) return;
+    
+    const porcentaje = totalParejas > 0 ? Math.round((parejasCompletadas / totalParejas) * 100) : 0;
+    
+    // Mostrar loading
+    document.getElementById('gameArea').innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <div class="spinner"></div>
+            <p style="color: #64748b; margin-top: 15px;">Creando nuevo intento...</p>
+        </div>
+    `;
+    
+    // Guardar resultado actual y luego reiniciar
+    guardarResultado(porcentaje, function() {
+        // 🔥 Crear nuevo intento en el servidor
+        crearNuevoIntento(function() {
+            // Después de crear el nuevo intento, recargar la página
+            window.location.href = 'jugar_juego.php?id_juego=' + idJuego + '&id_asignacion=' + idAsignacion + '&nuevo_intento=1';
+        });
+    });
+}
+
+// =============================================
+// FUNCIÓN REINICIAR JUEGO (CORREGIDA)
+// =============================================
+
 function reiniciarJuego() {
     if (!confirm('¿Seguro que quieres reiniciar el juego? Perderás todo tu progreso.')) return;
     
-    puntos = 0;
-    aciertos = 0;
-    errores = 0;
-    parejasCompletadas = 0;
-    cartasVolteadas = [];
-    cartasEncontradas = 0;
-    movimientosMemoria = 0;
-    ordenSeleccionado = 0;
-    juegoTerminado = false;
-    
-    detenerTimer();
-    tiempoSegundos = 0;
-    document.getElementById('tiempoDisplay').textContent = '00:00';
-    iniciarTimer();
-    
-    document.getElementById('btnTerminar').style.display = 'none';
-    document.getElementById('feedbackMessage').className = 'feedback-message';
-    
-    iniciarJuego();
-    actualizarEstadisticas();
+    // Si ya hay un intento guardado, recargar la página
+    window.location.href = 'jugar_juego.php?id_juego=' + idJuego + '&id_asignacion=' + idAsignacion + '&reiniciar=1';
 }
+
+// =============================================
+// FUNCIÓN TERMINAR JUEGO (CORREGIDA)
+// =============================================
 
 function terminarJuego() {
     if (juegoTerminado) return;
@@ -1424,18 +1678,34 @@ function terminarJuego() {
     juegoTerminado = true;
     detenerTimer();
     
-    // Calcular porcentaje
     const porcentaje = totalParejas > 0 ? Math.round((parejasCompletadas / totalParejas) * 100) : 0;
     
-    // Mostrar resumen
+    // Guardar el resultado en el servidor
+    guardarResultado(porcentaje, function() {
+        // Después de guardar, mostrar el resultado
+        mostrarResultadoFinal(porcentaje);
+    });
+}
+
+// =============================================
+// FUNCIÓN MOSTRAR RESULTADO FINAL (CORREGIDA)
+// =============================================
+
+function mostrarResultadoFinal(porcentaje) {
     const gameArea = document.getElementById('gameArea');
+    const puedeReintentar = puedeJugarOtraVez();
+    const intentosRestantes = intentosMaximos > 0 ? intentosMaximos - intentoActual : '∞';
+    
     gameArea.innerHTML = `
         <div style="text-align: center; padding: 40px 20px;">
             <div style="font-size: 64px; margin-bottom: 20px;">
                 ${porcentaje >= 80 ? '🏆' : porcentaje >= 50 ? '⭐' : '💪'}
             </div>
             <h3 style="margin: 0; color: #1e293b;">¡Juego terminado!</h3>
-            <p style="color: #64748b; margin: 5px 0 20px 0;">Has completado ${parejasCompletadas} de ${totalParejas} parejas</p>
+            <p style="color: #64748b; margin: 5px 0 20px 0;">
+                Has completado ${parejasCompletadas} de ${totalParejas} parejas
+                ${intentosMaximos > 0 ? ` · Intento ${intentoActual} de ${intentosMaximos}` : ''}
+            </p>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; max-width: 500px; margin: 0 auto 20px auto;">
                 <div style="background: #f8fafc; padding: 12px; border-radius: 10px;">
@@ -1456,11 +1726,24 @@ function terminarJuego() {
                 </div>
             </div>
             
+            ${intentosMaximos > 0 ? `
+                <div style="background: #f1f5f9; padding: 8px 16px; border-radius: 8px; display: inline-block; margin-bottom: 15px; font-size: 13px; color: #64748b;">
+                    <i class="fa-regular fa-circle-info"></i> 
+                    Intentos restantes: ${intentosRestantes === '∞' ? '∞' : intentosRestantes}
+                </div>
+            ` : ''}
+            
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="reiniciarJuego()" class="btn btn-secondary">
-                    <i class="fa-solid fa-rotate-right"></i> Jugar de nuevo
-                </button>
-                <a href="juegos_alumno.php" class="btn btn-primary">
+                ${puedeReintentar ? `
+                    <button onclick="reiniciarConNuevoIntento()" class="btn btn-primary">
+                        <i class="fa-solid fa-rotate-right"></i> Jugar de nuevo
+                    </button>
+                ` : `
+                    <div style="background: #fef2f2; padding: 10px 20px; border-radius: 8px; color: #991b1b; font-size: 14px; border: 1px solid #fca5a5;">
+                        <i class="fa-regular fa-circle-xmark"></i> Sin intentos disponibles
+                    </div>
+                `}
+                <a href="juegos_alumno.php" class="btn btn-secondary">
                     <i class="fa-solid fa-arrow-left"></i> Volver a juegos
                 </a>
             </div>
@@ -1468,38 +1751,11 @@ function terminarJuego() {
     `;
     
     document.getElementById('btnTerminar').style.display = 'none';
-    
-    // Guardar resultado en la base de datos
-    guardarResultado(porcentaje);
+    document.getElementById('btnReiniciar').style.display = 'none';
 }
 
-function guardarResultado(porcentaje) {
-    const formData = new FormData();
-    formData.append('id_asignacion', idAsignacion);
-    formData.append('id_juego', idJuego);
-    formData.append('puntos', puntos);
-    formData.append('aciertos', aciertos);
-    formData.append('errores', errores);
-    formData.append('porcentaje', porcentaje);
-    formData.append('tiempo', tiempoSegundos);
-    formData.append('total_parejas', totalParejas);
-    formData.append('parejas_completadas', parejasCompletadas);
-    formData.append('accion', 'guardar_resultado');
-    
-    fetch('guardar_resultado_juego.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            console.error('Error al guardar resultado:', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
+console.log('🎮 Página de juego con imágenes y gestión de intentos cargada correctamente');
+console.log('📊 Intentos: ' + intentoActual + ' de ' + intentosMaximos);
 </script>
 
 <script src="js/Inicio.js"></script>

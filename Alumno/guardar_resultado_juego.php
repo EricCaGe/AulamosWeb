@@ -69,5 +69,55 @@ try {
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 
+// Al final de guardar_resultado_juego.php, después del código existente
+
+// =============================================
+// NUEVA FUNCIÓN: CREAR INTENTO MANUALMENTE
+// =============================================
+
+if (isset($_POST['accion']) && $_POST['accion'] === 'crear_intento') {
+    $id_asignacion = isset($_POST['id_asignacion']) ? intval($_POST['id_asignacion']) : 0;
+    $id_juego = isset($_POST['id_juego']) ? intval($_POST['id_juego']) : 0;
+    
+    if ($id_asignacion <= 0 || $id_juego <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Datos inválidos']);
+        exit;
+    }
+    
+    try {
+        // Obtener número de intento
+        $query_intento = "SELECT COUNT(*) + 1 AS intento FROM conecta_intentos WHERE id_asignacion = ?";
+        $stmt_intento = $conexion->prepare($query_intento);
+        $stmt_intento->bind_param("i", $id_asignacion);
+        $stmt_intento->execute();
+        $result_intento = $stmt_intento->get_result();
+        $row_intento = $result_intento->fetch_assoc();
+        $numero_intento = $row_intento['intento'] ?? 1;
+        $stmt_intento->close();
+        
+        // Actualizar asignación a "En_proceso"
+        $update = $conexion->prepare("
+            UPDATE conecta_asignaciones 
+            SET estado = 'En_proceso', fecha_inicio = NOW() 
+            WHERE id_asignacion = ? AND id_alumno = ?
+        ");
+        $update->bind_param("ii", $id_asignacion, $id_alumno);
+        $update->execute();
+        $update->close();
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Nuevo intento creado',
+            'numero_intento' => $numero_intento
+        ]);
+        
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    
+    $conexion->close();
+    exit;
+}
+
 $conexion->close();
 ?>

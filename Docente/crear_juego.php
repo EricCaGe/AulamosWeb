@@ -44,11 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
     $titulo = trim($_POST['titulo'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
     $tema = trim($_POST['tema'] ?? '');
-    
-    // IMPORTANTE: Tomar el valor del select
     $modo = isset($_POST['modo']) ? $_POST['modo'] : 'Relacionar';
     $modalidad = isset($_POST['modalidad']) ? $_POST['modalidad'] : 'Individual';
-    
     $tiempo_limite = !empty($_POST['tiempo_limite']) ? intval($_POST['tiempo_limite']) : null;
     $puntos_por_acierto = intval($_POST['puntos_por_acierto'] ?? 50);
     $intentos_maximos = !empty($_POST['intentos_maximos']) ? intval($_POST['intentos_maximos']) : null;
@@ -58,11 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
     // VALIDACIÓN ESTRICTA - COINCIDIR CON ENUM
     // ==========================================
     
-    // Valores exactos como están en la base de datos
     $modos_permitidos = ['Relacionar', 'Memoria', 'Clasificar', 'Secuencia'];
     $modalidades_permitidas = ['Individual', 'Parejas', 'Equipos'];
     
-    // Validar y forzar valores correctos
     if (!in_array($modo, $modos_permitidos, true)) {
         $modo = 'Relacionar';
     }
@@ -71,33 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
         $modalidad = 'Individual';
     }
     
-    // Validar campos de texto - NUNCA enviar NULL en campos NOT NULL
     $titulo = !empty($titulo) ? $titulo : 'Juego sin título';
-    $descripcion = !empty($descripcion) ? $descripcion : '';  // ← CAMBIADO: usar '' en lugar de NULL
-    $tema = !empty($tema) ? $tema : '';  // ← CAMBIADO: usar '' en lugar de NULL
+    $descripcion = !empty($descripcion) ? $descripcion : '';
+    $tema = !empty($tema) ? $tema : '';
     
-    // Validar números - NUNCA enviar NULL en campos NOT NULL
     $tiempo_limite = (!empty($tiempo_limite) && $tiempo_limite > 0) ? $tiempo_limite : null;
     $puntos_por_acierto = ($puntos_por_acierto > 0) ? $puntos_por_acierto : 50;
     $intentos_maximos = (!empty($intentos_maximos) && $intentos_maximos > 0) ? $intentos_maximos : null;
     $mostrar_retroalimentacion = isset($_POST['mostrar_retroalimentacion']) ? 1 : 0;
-    
-    // ==========================================
-    // DEPURACIÓN - Log de valores exactos
-    // ==========================================
-    
-    $log = "=== " . date('Y-m-d H:i:s') . " ===\n";
-    $log .= "modo: '" . $modo . "' (largo: " . strlen($modo) . ")\n";
-    $log .= "modalidad: '" . $modalidad . "' (largo: " . strlen($modalidad) . ")\n";
-    $log .= "titulo: '" . $titulo . "'\n";
-    $log .= "descripcion: '" . $descripcion . "'\n";
-    $log .= "tema: '" . $tema . "'\n";
-    $log .= "tiempo_limite: " . ($tiempo_limite ?? 'NULL') . "\n";
-    $log .= "puntos_por_acierto: " . $puntos_por_acierto . "\n";
-    $log .= "intentos_maximos: " . ($intentos_maximos ?? 'NULL') . "\n";
-    $log .= "mostrar_retroalimentacion: " . $mostrar_retroalimentacion . "\n";
-    $log .= "----------------------------------------\n";
-    file_put_contents(__DIR__ . '/debug_juego.log', $log, FILE_APPEND);
     
     // ==========================================
     // VALIDACIONES DE ERRORES
@@ -127,20 +103,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
     
     if (empty($errores)) {
         try {
-            // Usar SET con todos los campos
             $query_insert = "
                 INSERT INTO conecta_juegos (
-                    id_curso, 
-                    id_docente, 
-                    titulo, 
-                    descripcion, 
-                    tema, 
-                    modo, 
-                    modalidad, 
-                    tiempo_limite_seg, 
-                    puntos_por_acierto, 
-                    intentos_maximos, 
-                    mostrar_retroalimentacion
+                    id_curso, id_docente, titulo, descripcion, tema, 
+                    modo, modalidad, tiempo_limite_seg, puntos_por_acierto, 
+                    intentos_maximos, mostrar_retroalimentacion
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ";
             
@@ -150,20 +117,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
                 throw new Exception('Error en la preparación: ' . $conexion->error);
             }
             
-            // IMPORTANTE: Usar '' para campos NOT NULL que pueden estar vacíos
             $stmt_insert->bind_param(
                 "iisssssiiii",
-                $id_curso,           // i - int
-                $id_docente,         // i - int
-                $titulo,             // s - string
-                $descripcion,        // s - string (USAR '' en lugar de NULL)
-                $tema,               // s - string (USAR '' en lugar de NULL)
-                $modo,               // s - string
-                $modalidad,          // s - string
-                $tiempo_limite,      // i - int (puede ser NULL)
-                $puntos_por_acierto, // i - int
-                $intentos_maximos,   // i - int (puede ser NULL)
-                $mostrar_retroalimentacion // i - int (0 o 1)
+                $id_curso,
+                $id_docente,
+                $titulo,
+                $descripcion,
+                $tema,
+                $modo,
+                $modalidad,
+                $tiempo_limite,
+                $puntos_por_acierto,
+                $intentos_maximos,
+                $mostrar_retroalimentacion
             );
             
             if ($stmt_insert->execute()) {

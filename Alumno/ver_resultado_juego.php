@@ -113,6 +113,25 @@ $result_historial = $stmt_historial->get_result();
 $historial = $result_historial->fetch_all(MYSQLI_ASSOC);
 $stmt_historial->close();
 
+// Obtener parejas del juego (para mostrar imágenes en los resultados)
+$query_parejas = "
+    SELECT 
+        id_pareja,
+        elemento_a_texto,
+        elemento_a_imagen,
+        elemento_b_texto,
+        elemento_b_imagen
+    FROM conecta_parejas 
+    WHERE id_juego = ? 
+    ORDER BY orden ASC
+";
+$stmt_parejas = $conexion->prepare($query_parejas);
+$stmt_parejas->bind_param("i", $id_juego);
+$stmt_parejas->execute();
+$result_parejas = $stmt_parejas->get_result();
+$parejas = $result_parejas->fetch_all(MYSQLI_ASSOC);
+$stmt_parejas->close();
+
 // Obtener estadísticas de todos los intentos
 $total_intentos = count($historial);
 $mejor_puntuacion = 0;
@@ -128,6 +147,15 @@ foreach ($historial as $h) {
 }
 
 $conexion->close();
+
+// Función para obtener URL de imagen
+function getUrlImagen($ruta) {
+    if (empty($ruta)) return null;
+    if (strpos($ruta, 'http://') === 0 || strpos($ruta, 'https://') === 0) {
+        return $ruta;
+    }
+    return '../' . ltrim($ruta, '/');
+}
 
 function getIconoModo($modo) {
     switch ($modo) {
@@ -446,6 +474,42 @@ function formatearTiempo($segundos) {
             height: 100%;
             border-radius: 3px;
             transition: width 0.5s ease;
+        }
+        
+        /* Estilo para mostrar parejas con imágenes */
+        .parejas-resultado {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .pareja-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .pareja-item .imagen-mini {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .pareja-item .texto {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1e293b;
+        }
+        
+        .pareja-item .flecha {
+            color: #3b71f3;
         }
         
         /* Acciones */
@@ -861,6 +925,35 @@ function formatearTiempo($segundos) {
                             <?php echo round($intento['porcentaje']); ?>%
                         </div>
                         <div class="label"><i class="fa-regular fa-percent"></i> Precisión</div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            
+            <!-- MOSTRAR PAREJAS CON IMÁGENES -->
+            <?php if (!empty($parejas)): ?>
+                <div class="historial-container">
+                    <div class="historial-header">
+                        <h3><i class="fa-regular fa-images"></i> Parejas del juego</h3>
+                    </div>
+                    <div class="parejas-resultado">
+                        <?php foreach ($parejas as $pareja): 
+                            $imagenA = getUrlImagen($pareja['elemento_a_imagen']);
+                            $imagenB = getUrlImagen($pareja['elemento_b_imagen']);
+                        ?>
+                            <div class="pareja-item">
+                                <?php if ($imagenA): ?>
+                                    <img src="<?php echo $imagenA; ?>" class="imagen-mini" alt="Imagen A">
+                                <?php else: ?>
+                                    <span class="texto"><?php echo htmlspecialchars($pareja['elemento_a_texto'] ?? 'A'); ?></span>
+                                <?php endif; ?>
+                                <span class="flecha"><i class="fa-solid fa-arrow-right"></i></span>
+                                <?php if ($imagenB): ?>
+                                    <img src="<?php echo $imagenB; ?>" class="imagen-mini" alt="Imagen B">
+                                <?php else: ?>
+                                    <span class="texto"><?php echo htmlspecialchars($pareja['elemento_b_texto'] ?? 'B'); ?></span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             <?php endif; ?>

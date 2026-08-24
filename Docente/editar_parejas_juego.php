@@ -60,6 +60,51 @@ $result_parejas = $stmt_parejas->get_result();
 $parejas = $result_parejas->fetch_all(MYSQLI_ASSOC);
 $stmt_parejas->close();
 
+// =============================================
+// FUNCIÓN PARA SUBIR IMAGEN VÍA AJAX
+// =============================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['subir_imagen'])) {
+    $archivo = $_FILES['imagen'] ?? null;
+    
+    if (!$archivo || $archivo['error'] !== UPLOAD_ERR_OK) {
+        echo json_encode(['success' => false, 'message' => 'No se recibió ninguna imagen']);
+        exit;
+    }
+    
+    $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+    $tipos_permitidos = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    
+    if (!in_array($extension, $tipos_permitidos, true)) {
+        echo json_encode(['success' => false, 'message' => 'Tipo de archivo no permitido']);
+        exit;
+    }
+    
+    if ($archivo['size'] > 5 * 1024 * 1024) {
+        echo json_encode(['success' => false, 'message' => 'La imagen no debe superar los 5MB']);
+        exit;
+    }
+    
+    $carpeta_destino = __DIR__ . '/../uploads/juegos/';
+    if (!is_dir($carpeta_destino)) {
+        mkdir($carpeta_destino, 0777, true);
+    }
+    
+    $nombre_archivo = 'juego_' . $id_juego . '_' . $id_docente . '_' . time() . '.' . $extension;
+    $ruta_completa = $carpeta_destino . $nombre_archivo;
+    $ruta_publica = '../uploads/juegos/' . $nombre_archivo;
+    
+    if (move_uploaded_file($archivo['tmp_name'], $ruta_completa)) {
+        echo json_encode([
+            'success' => true, 
+            'ruta' => $ruta_publica,
+            'nombre' => $nombre_archivo
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error al mover la imagen']);
+    }
+    exit;
+}
+
 // Procesar formulario
 $mensaje = '';
 $tipo_mensaje = '';
@@ -71,20 +116,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $explicacion = trim($_POST['explicacion'] ?? '');
         $categoria = trim($_POST['categoria'] ?? '');
         $puntos = intval($_POST['puntos'] ?? 50);
+        $elemento_a_imagen = isset($_POST['elemento_a_imagen']) ? trim($_POST['elemento_a_imagen']) : null;
+        $elemento_b_imagen = isset($_POST['elemento_b_imagen']) ? trim($_POST['elemento_b_imagen']) : null;
         
-        if (empty($elemento_a) || empty($elemento_b)) {
-            $mensaje = 'Ambos elementos son obligatorios.';
+        if (empty($elemento_a) && empty($elemento_a_imagen)) {
+            $mensaje = 'El elemento A es obligatorio (texto o imagen).';
+            $tipo_mensaje = 'error';
+        } elseif (empty($elemento_b) && empty($elemento_b_imagen)) {
+            $mensaje = 'El elemento B es obligatorio (texto o imagen).';
             $tipo_mensaje = 'error';
         } else {
             try {
                 $insert = $conexion->prepare("
                     INSERT INTO conecta_parejas (
-                        id_juego, elemento_a_texto, elemento_b_texto, 
+                        id_juego, elemento_a_texto, elemento_a_imagen, 
+                        elemento_b_texto, elemento_b_imagen,
                         explicacion, categoria, orden, puntos
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $orden = count($parejas) + 1;
-                $insert->bind_param("issssii", $id_juego, $elemento_a, $elemento_b, $explicacion, $categoria, $orden, $puntos);
+                $insert->bind_param(
+                    "issssssii",
+                    $id_juego,
+                    $elemento_a,
+                    $elemento_a_imagen,
+                    $elemento_b,
+                    $elemento_b_imagen,
+                    $explicacion,
+                    $categoria,
+                    $orden,
+                    $puntos
+                );
                 $insert->execute();
                 $insert->close();
                 
@@ -326,6 +388,111 @@ function getIconoModo($modo) {
             background: #2a5bd6;
         }
         
+        /* Estilos para subida de imágenes */
+        .image-upload-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+        
+        .upload-box {
+            flex: 1;
+            min-height: 80px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+        
+        .upload-box:hover {
+            border-color: #3b71f3;
+            background: #eff6ff;
+        }
+        
+        .upload-box .preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .upload-box .placeholder {
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .upload-box .placeholder i {
+            font-size: 24px;
+            display: block;
+        }
+        
+        .upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .upload-box .btn-remove-image {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 3;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .upload-box .btn-remove-image:hover {
+            background: #dc2626;
+        }
+        
+        .upload-box .nombre-archivo {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 3;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
         .list-parejas {
             display: grid;
             grid-template-columns: 1fr;
@@ -340,6 +507,7 @@ function getIconoModo($modo) {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
         
         .item-pareja .numero {
@@ -366,11 +534,20 @@ function getIconoModo($modo) {
             gap: 10px;
             font-weight: 600;
             color: #1e293b;
+            flex-wrap: wrap;
         }
         
         .item-pareja .contenido .elementos .flecha {
             color: #3b71f3;
             font-size: 14px;
+        }
+        
+        .item-pareja .contenido .elementos .imagen-miniatura {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
         }
         
         .item-pareja .contenido .extra {
@@ -507,6 +684,14 @@ function getIconoModo($modo) {
                 width: 100%;
                 justify-content: center;
             }
+            
+            .image-upload-container {
+                flex-direction: column;
+            }
+            
+            .upload-box {
+                min-height: 60px;
+            }
         }
     </style>
 </head>
@@ -605,18 +790,49 @@ function getIconoModo($modo) {
                     <h4 style="margin: 0 0 15px 0; font-size: 16px; color: #1e293b;">
                         <i class="fa-solid fa-plus"></i> Nueva pareja
                     </h4>
-                    <form method="POST" action="">
+                    <form method="POST" action="" id="formPareja">
                         <div class="form-group">
                             <label>Elemento A <span class="required">*</span></label>
-                            <input type="text" name="elemento_a" placeholder="Ej. Dog" required>
+                            <input type="text" name="elemento_a" id="elementoA" placeholder="Ej. Dog">
+                            
+                            <!-- Subida de imagen para Elemento A -->
+                            <div class="image-upload-container">
+                                <div class="upload-box" id="uploadBoxA">
+                                    <span class="placeholder" id="placeholderA">
+                                        <i class="fa-regular fa-image"></i>
+                                        Subir imagen
+                                    </span>
+                                    <input type="file" name="imagen_a" id="imagenA" accept="image/*" onchange="previsualizarImagen('A')">
+                                    <button type="button" class="btn-remove-image" id="removeA" onclick="eliminarImagen('A')">×</button>
+                                </div>
+                            </div>
+                            <input type="hidden" name="elemento_a_imagen" id="elementoAImagen" value="">
+                            <small style="color: #64748b; font-size: 11px;">Puedes usar texto o imagen (o ambos)</small>
                         </div>
+                        
                         <div class="conector">
                             <i class="fa-solid fa-arrow-down"></i>
                         </div>
+                        
                         <div class="form-group">
                             <label>Elemento B <span class="required">*</span></label>
-                            <input type="text" name="elemento_b" placeholder="Ej. Perro" required>
+                            <input type="text" name="elemento_b" id="elementoB" placeholder="Ej. Perro">
+                            
+                            <!-- Subida de imagen para Elemento B -->
+                            <div class="image-upload-container">
+                                <div class="upload-box" id="uploadBoxB">
+                                    <span class="placeholder" id="placeholderB">
+                                        <i class="fa-regular fa-image"></i>
+                                        Subir imagen
+                                    </span>
+                                    <input type="file" name="imagen_b" id="imagenB" accept="image/*" onchange="previsualizarImagen('B')">
+                                    <button type="button" class="btn-remove-image" id="removeB" onclick="eliminarImagen('B')">×</button>
+                                </div>
+                            </div>
+                            <input type="hidden" name="elemento_b_imagen" id="elementoBImagen" value="">
+                            <small style="color: #64748b; font-size: 11px;">Puedes usar texto o imagen (o ambos)</small>
                         </div>
+                        
                         <div class="form-group">
                             <label>Explicación</label>
                             <textarea name="explicacion" placeholder="Ej. Dog significa perro en español."></textarea>
@@ -655,9 +871,21 @@ function getIconoModo($modo) {
                                     <span class="numero"><?php echo $index + 1; ?></span>
                                     <div class="contenido">
                                         <div class="elementos">
-                                            <span><?php echo htmlspecialchars($pareja['elemento_a_texto'] ?? 'Multimedia'); ?></span>
+                                            <!-- Elemento A -->
+                                            <?php if (!empty($pareja['elemento_a_imagen'])): ?>
+                                                <img src="<?php echo $pareja['elemento_a_imagen']; ?>" class="imagen-miniatura" alt="Imagen A">
+                                            <?php else: ?>
+                                                <span><?php echo htmlspecialchars($pareja['elemento_a_texto'] ?? 'Multimedia'); ?></span>
+                                            <?php endif; ?>
+                                            
                                             <span class="flecha"><i class="fa-solid fa-arrow-right"></i></span>
-                                            <span><?php echo htmlspecialchars($pareja['elemento_b_texto'] ?? 'Multimedia'); ?></span>
+                                            
+                                            <!-- Elemento B -->
+                                            <?php if (!empty($pareja['elemento_b_imagen'])): ?>
+                                                <img src="<?php echo $pareja['elemento_b_imagen']; ?>" class="imagen-miniatura" alt="Imagen B">
+                                            <?php else: ?>
+                                                <span><?php echo htmlspecialchars($pareja['elemento_b_texto'] ?? 'Multimedia'); ?></span>
+                                            <?php endif; ?>
                                         </div>
                                         <?php if ($pareja['categoria']): ?>
                                             <div class="extra">
@@ -715,6 +943,169 @@ function getIconoModo($modo) {
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
+
+<!-- SCRIPTS -->
+<script>
+
+// =============================================
+// SUBIR IMAGEN CON AJAX (CORREGIDO)
+// =============================================
+
+function previsualizarImagen(lado) {
+    const input = document.getElementById('imagen' + lado);
+    const file = input.files[0];
+    
+    if (!file) return;
+    
+    // Validar tamaño
+    if (file.size > 5 * 1024 * 1024) {
+        alert('⚠️ La imagen no debe superar los 5MB.');
+        input.value = '';
+        return;
+    }
+    
+    // Validar tipo
+    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!tiposPermitidos.includes(file.type)) {
+        alert('⚠️ Solo se permiten imágenes JPG, PNG, GIF o WEBP.');
+        input.value = '';
+        return;
+    }
+    
+    const uploadBox = document.getElementById('uploadBox' + lado);
+    const placeholder = document.getElementById('placeholder' + lado);
+    const removeBtn = document.getElementById('remove' + lado);
+    const hiddenInput = document.getElementById('elemento' + lado + 'Imagen');
+    
+    // Mostrar preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Eliminar preview anterior si existe
+        const preview = uploadBox.querySelector('img.preview');
+        if (preview) preview.remove();
+        
+        // Crear preview
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'preview';
+        uploadBox.appendChild(img);
+        
+        // Ocultar placeholder
+        placeholder.style.display = 'none';
+        
+        // Mostrar botón eliminar
+        removeBtn.style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+    
+    // Subir archivo con AJAX - 🔥 RUTA CORREGIDA
+    const formData = new FormData();
+    formData.append('imagen', file);
+    formData.append('id_juego', <?php echo $id_juego; ?>);
+    formData.append('subir_imagen', '1');
+    
+    // Mostrar estado de carga
+    uploadBox.style.borderColor = '#f59e0b';
+    placeholder.textContent = '⏳ Subiendo...';
+    placeholder.style.display = 'flex';
+    placeholder.innerHTML = '⏳ Subiendo...';
+    
+    // 🔥 CAMBIAR: usar subir_imagen_juego.php en lugar de window.location.href
+    fetch('subir_imagen_juego.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Guardar ruta en el campo oculto
+            hiddenInput.value = data.ruta;
+            uploadBox.style.borderColor = '#22c55e';
+            placeholder.style.display = 'none';
+            
+            // Mostrar el nombre del archivo
+            const nombreArchivo = document.createElement('div');
+            nombreArchivo.className = 'nombre-archivo';
+            nombreArchivo.textContent = file.name;
+            nombreArchivo.id = 'nombreArchivo' + lado;
+            
+            // Eliminar nombre anterior si existe
+            const nombreAnterior = uploadBox.querySelector('#nombreArchivo' + lado);
+            if (nombreAnterior) nombreAnterior.remove();
+            
+            uploadBox.appendChild(nombreArchivo);
+            
+            console.log('✅ Imagen subida correctamente:', data.ruta);
+        } else {
+            alert('❌ Error al subir la imagen: ' + (data.message || 'Desconocido'));
+            uploadBox.style.borderColor = '#dc2626';
+            placeholder.textContent = '❌ Error';
+            placeholder.style.display = 'flex';
+            input.value = '';
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error de conexión:', error);
+        alert('❌ Error de conexión al subir la imagen. Verifica que el servidor esté funcionando.');
+        uploadBox.style.borderColor = '#dc2626';
+        placeholder.textContent = '❌ Error';
+        placeholder.style.display = 'flex';
+        input.value = '';
+    });
+}
+
+function eliminarImagen(lado) {
+    const uploadBox = document.getElementById('uploadBox' + lado);
+    const placeholder = document.getElementById('placeholder' + lado);
+    const removeBtn = document.getElementById('remove' + lado);
+    const hiddenInput = document.getElementById('elemento' + lado + 'Imagen');
+    const input = document.getElementById('imagen' + lado);
+    const nombreArchivo = uploadBox.querySelector('.nombre-archivo');
+    
+    // Eliminar preview
+    const preview = uploadBox.querySelector('img.preview');
+    if (preview) preview.remove();
+    
+    // Eliminar nombre del archivo
+    if (nombreArchivo) nombreArchivo.remove();
+    
+    // Resetear
+    hiddenInput.value = '';
+    input.value = '';
+    removeBtn.style.display = 'none';
+    placeholder.style.display = 'flex';
+    placeholder.innerHTML = '<i class="fa-regular fa-image"></i> Subir imagen';
+    uploadBox.style.borderColor = '#e2e8f0';
+}
+
+// =============================================
+// VALIDACIÓN DEL FORMULARIO
+// =============================================
+
+document.getElementById('formPareja').addEventListener('submit', function(e) {
+    const elementoA = document.getElementById('elementoA').value.trim();
+    const elementoAImagen = document.getElementById('elementoAImagen').value;
+    const elementoB = document.getElementById('elementoB').value.trim();
+    const elementoBImagen = document.getElementById('elementoBImagen').value;
+    
+    // Validar que al menos tenga texto o imagen
+    if (!elementoA && !elementoAImagen) {
+        e.preventDefault();
+        alert('⚠️ El Elemento A debe tener texto o una imagen.');
+        return false;
+    }
+    
+    if (!elementoB && !elementoBImagen) {
+        e.preventDefault();
+        alert('⚠️ El Elemento B debe tener texto o una imagen.');
+        return false;
+    }
+    
+    console.log('✅ Formulario validado correctamente');
+});
+
+console.log('📸 Página de edición de parejas con soporte de imágenes cargada');
+</script>
 
 <script src="jss/docente_dashboard.js"></script>
 <script src="../Accesibilidad/accesibilidad.js"></script>

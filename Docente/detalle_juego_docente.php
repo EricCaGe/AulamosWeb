@@ -9,6 +9,12 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
     exit;
 }
 
+// Verificar sesión válida
+if (!isset($_SESSION['usuario']['id_usuario'])) {
+    header('Location: ../InicioSesion/login.php?error=sesion_expirada');
+    exit;
+}
+
 require_once '../Conexion/conexion.php';
 
 $id_docente = $_SESSION['usuario']['id_usuario'];
@@ -51,9 +57,24 @@ if (!$juego) {
     exit;
 }
 
-// Obtener parejas del juego
+// Verificar que el juego no esté cerrado
+if ($juego['estado'] === 'Cerrado') {
+    header('Location: juegos_docente.php?error=Juego cerrado');
+    exit;
+}
+
+// Obtener parejas del juego (CON IMÁGENES)
 $query_parejas = "
-    SELECT * FROM conecta_parejas 
+    SELECT 
+        id_pareja,
+        elemento_a_texto,
+        elemento_a_imagen,
+        elemento_b_texto,
+        elemento_b_imagen,
+        explicacion,
+        categoria,
+        puntos
+    FROM conecta_parejas 
     WHERE id_juego = ? 
     ORDER BY orden ASC
 ";
@@ -92,6 +113,9 @@ if (isset($_POST['publicar']) && $juego['estado'] === 'Borrador') {
         $tipo_mensaje = 'error';
     } else {
         try {
+            // Iniciar transacción
+            $conexion->begin_transaction();
+            
             // Actualizar estado
             $update = $conexion->prepare("UPDATE conecta_juegos SET estado = 'Publicado' WHERE id_juego = ?");
             $update->bind_param("i", $id_juego);
@@ -122,6 +146,9 @@ if (isset($_POST['publicar']) && $juego['estado'] === 'Borrador') {
             }
             $stmt_alumnos->close();
             
+            // Confirmar transacción
+            $conexion->commit();
+            
             $mensaje = "Juego publicado correctamente. Asignado a $asignados alumno(s).";
             $tipo_mensaje = 'success';
             
@@ -129,6 +156,8 @@ if (isset($_POST['publicar']) && $juego['estado'] === 'Borrador') {
             $juego['estado'] = 'Publicado';
             
         } catch (Exception $e) {
+            // Revertir transacción en caso de error
+            $conexion->rollback();
             $mensaje = 'Error al publicar: ' . $e->getMessage();
             $tipo_mensaje = 'error';
         }
@@ -136,6 +165,19 @@ if (isset($_POST['publicar']) && $juego['estado'] === 'Borrador') {
 }
 
 $conexion->close();
+
+// =============================================
+// FUNCIONES AUXILIARES (CORREGIDAS)
+// =============================================
+
+function getUrlImagen($ruta) {
+    if (empty($ruta)) return null;
+    if (strpos($ruta, 'http://') === 0 || strpos($ruta, 'https://') === 0) {
+        return $ruta;
+    }
+    // Elimina la barra inicial si existe para consistencia
+    return '../' . ltrim($ruta, '/');
+}
 
 function getIconoModo($modo) {
     switch ($modo) {
@@ -303,6 +345,7 @@ function getIconoEstado($estado) {
             color: #374151;
         }
         
+        /* Estilos para parejas con imágenes */
         .list-parejas {
             display: grid;
             grid-template-columns: 1fr;
@@ -359,6 +402,7 @@ function getIconoEstado($estado) {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
         
         .card-pareja .elementos .elemento {
@@ -370,6 +414,19 @@ function getIconoEstado($estado) {
             border: 1px solid #e2e8f0;
             font-weight: 600;
             color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-height: 60px;
+            justify-content: center;
+        }
+        
+        .card-pareja .elementos .elemento .imagen-elemento {
+            max-width: 80px;
+            max-height: 60px;
+            border-radius: 6px;
+            object-fit: cover;
         }
         
         .card-pareja .elementos .conector {
@@ -695,7 +752,7 @@ function getIconoEstado($estado) {
                 <?php endif; ?>
             </div>
             
-            <!-- Parejas -->
+            <!-- Parejas CON IMÁGENES -->
             <div class="card-detalle">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                     <h3 style="margin: 0; font-size: 18px; color: #1e293b;">
@@ -722,7 +779,10 @@ function getIconoEstado($estado) {
                     </div>
                 <?php else: ?>
                     <div class="list-parejas">
-                        <?php foreach ($parejas as $index => $pareja): ?>
+                        <?php foreach ($parejas as $index => $pareja): 
+                            $imagenA = getUrlImagen($pareja['elemento_a_imagen']);
+                            $imagenB = getUrlImagen($pareja['elemento_b_imagen']);
+                        ?>
                             <div class="card-pareja">
                                 <div class="pareja-header">
                                     <span class="numero"><?php echo $index + 1; ?></span>
@@ -733,10 +793,16 @@ function getIconoEstado($estado) {
                                 </div>
                                 <div class="elementos">
                                     <div class="elemento">
+                                        <?php if ($imagenA): ?>
+                                            <img src="<?php echo $imagenA; ?>" class="imagen-elemento" alt="Imagen A">
+                                        <?php endif; ?>
                                         <?php echo htmlspecialchars($pareja['elemento_a_texto'] ?? 'Multimedia'); ?>
                                     </div>
                                     <div class="conector"><i class="fa-solid fa-arrow-right"></i></div>
                                     <div class="elemento">
+                                        <?php if ($imagenB): ?>
+                                            <img src="<?php echo $imagenB; ?>" class="imagen-elemento" alt="Imagen B">
+                                        <?php endif; ?>
                                         <?php echo htmlspecialchars($pareja['elemento_b_texto'] ?? 'Multimedia'); ?>
                                     </div>
                                 </div>
