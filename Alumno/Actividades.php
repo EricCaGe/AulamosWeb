@@ -142,20 +142,26 @@ $conexion->close();
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
-        
         <header class="content-header">
             <div class="welcome-text">
                 <h1>Mis actividades</h1>
                 <p>Aquí están tus tareas, evaluaciones y actividades asignadas</p>
             </div>
             <div class="header-actions">
-               <button class="btn-assistant" id="btn-asistente"
+    <button class="btn-assistant" id="btn-asistente"
         onclick="window.open('Chatbot.php?rol=alumno', '_blank')">
-    Asistente Virtual <span class="robot-icon">🤖</span>
-</button>
-                <div class="icon-bell"><i class="fa-regular fa-bell"></i></div>
-                <img src="https://placehold.co/40x40/ff7675/white?text=👩" alt="Avatar" class="avatar">
-            </div>
+        Asistente Virtual
+        <span class="robot-icon">🤖</span>
+    </button>
+    <div class="icon-bell">
+        <i class="fa-regular fa-bell"></i>
+    </div>
+    <img
+        src="<?php echo htmlspecialchars($ruta_foto_alumno); ?>"
+        alt="Foto de perfil"
+        class="avatar"
+    >
+</div>
         </header>
 
         <!-- ========================================== -->

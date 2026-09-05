@@ -14,6 +14,7 @@ $usuario = 'Aulamos';
 
 
 $password = 'E12345678!';
+//$password = '';
 //$password = '12345678'; //eric
 //$password = 'Jaziel123'; 
 //$password = 'qwerty1234.'; //Obregon
