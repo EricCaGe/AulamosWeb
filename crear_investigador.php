@@ -14,10 +14,7 @@ $investigador_password = 'Invest123!';
 $investigador_password_hash = password_hash($investigador_password, PASSWORD_DEFAULT);
 
 try {
-    // ========================================== */
-    // VERIFICAR SI EL INVESTIGADOR YA EXISTE    */
-    // ========================================== */
-    
+    // Verificar si el investigador ya existe
     $stmt = $conexion->prepare("SELECT id_usuario FROM usuarios WHERE correo = ?");
     $stmt->bind_param("s", $investigador_correo);
     $stmt->execute();
@@ -26,10 +23,7 @@ try {
     $stmt->close();
 
     if (!$investigador_existe) {
-        // ========================================== */
-        // INSERTAR INVESTIGADOR                      */
-        // ========================================== */
-        
+        // Insertar investigador (CON verificado = 1)
         $stmt = $conexion->prepare("
             INSERT INTO usuarios (
                 nombre, 
@@ -38,8 +32,9 @@ try {
                 correo, 
                 password_hash, 
                 estado,
+                verificado,
                 fecha_registro
-            ) VALUES (?, ?, ?, ?, ?, 'Activo', NOW())
+            ) VALUES (?, ?, ?, ?, ?, 'Activo', 1, NOW())
         ");
         $stmt->bind_param(
             "sssss", 
@@ -53,19 +48,13 @@ try {
         $id_investigador = $conexion->insert_id;
         $stmt->close();
 
-        // ========================================== */
-        // ASIGNAR ROL INVESTIGADOR (id_rol = 3)     */
-        // ========================================== */
-        
+        // Asignar rol Investigador (id_rol = 3)
         $stmt = $conexion->prepare("INSERT INTO usuario_roles (id_usuario, id_rol) VALUES (?, 3)");
         $stmt->bind_param("i", $id_investigador);
         $stmt->execute();
         $stmt->close();
 
-        // ========================================== */
-        // CREAR PREFERENCIAS DE ACCESIBILIDAD BASE   */
-        // ========================================== */
-        
+        // Crear preferencias de accesibilidad base
         $stmt = $conexion->prepare("
             INSERT INTO preferencias_accesibilidad (
                 id_usuario,
@@ -90,6 +79,7 @@ try {
         echo "🔑 Contraseña: <strong>$investigador_password</strong><br>";
         echo "👤 Nombre: <strong>$investigador_nombre $investigador_apellido_paterno $investigador_apellido_materno</strong><br>";
         echo "🎯 Rol: <strong>Investigador</strong><br>";
+        echo "✅ Cuenta verificada: <strong>Sí</strong><br>";
         echo "♿ Preferencias de accesibilidad: <strong>Creadas</strong><br>";
 
     } else {
