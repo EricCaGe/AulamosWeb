@@ -1,27 +1,48 @@
 <?php
 session_start();
 
-// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
-echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
+// Evitar que el navegador muestre datos anteriores al volver desde otra pantalla.
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
-// Verificar que el usuario haya iniciado sesión y sea Docente
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+// Verificar sesión ANTES de utilizar $_SESSION.
+if (
+    !isset($_SESSION['usuario']) ||
+    ($_SESSION['usuario']['rol'] ?? '') !== 'Docente' ||
+    empty($_SESSION['usuario']['id_usuario'])
+) {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
 
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario.
+echo '<script>window.idUsuario = ' . json_encode((int)$_SESSION['usuario']['id_usuario']) . ';</script>';
+
 require_once '../Conexion/conexion.php';
 
-$id_docente = $_SESSION['usuario']['id_usuario'];
-$nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido_paterno'];
+$id_docente = (int)$_SESSION['usuario']['id_usuario'];
 
-// Consultar los cursos del docente
+$nombre_docente = trim(
+    ($_SESSION['usuario']['nombre'] ?? '') . ' ' .
+    ($_SESSION['usuario']['apellido_paterno'] ?? '')
+);
+
+// Consultar los cursos activos del docente.
 $query_cursos = "
-    SELECT c.id_curso, g.nombre AS grupo_nombre
+    SELECT
+        c.id_curso,
+        c.nombre AS curso_nombre,
+        g.nombre AS grupo_nombre,
+        m.nombre AS materia
     FROM cursos c
-    JOIN grupos g ON c.id_grupo = g.id_grupo
-    WHERE c.id_docente = ? AND c.estado = 'Activo'
+    INNER JOIN grupos g ON g.id_grupo = c.id_grupo
+    INNER JOIN materias m ON m.id_materia = c.id_materia
+    WHERE c.id_docente = ?
+      AND c.estado = 'Activo'
+    ORDER BY g.nombre, m.nombre, c.nombre
 ";
+
 $stmt_cursos = $conexion->prepare($query_cursos);
 $stmt_cursos->bind_param("i", $id_docente);
 $stmt_cursos->execute();
@@ -31,12 +52,26 @@ $cursos = [];
 while ($row = $result_cursos->fetch_assoc()) {
     $cursos[] = $row;
 }
+$stmt_cursos->close();
 
-// Obtener los grupos únicos para los botones de filtro
-$grupos_unicos = array_unique(array_column($cursos, 'grupo_nombre'));
+// Grupos únicos para los filtros.
+$grupos_unicos = array_values(
+    array_unique(
+        array_filter(
+            array_column($cursos, 'grupo_nombre')
+        )
+    )
+);
 sort($grupos_unicos);
 
-// Consultar los estudiantes inscritos en los cursos del docente
+/*
+ * IMPORTANTE:
+ * Esta consulta obtiene una sola fila por alumno y calcula las estadísticas
+ * directamente con los datos actuales de entregas.
+ *
+ * Antes la página agrupaba también por grupo, por lo que un mismo alumno
+ * podía aparecer varias veces y sus datos podían verse inconsistentes.
+ */
 $query_estudiantes = "
     SELECT
         u.id_usuario,
@@ -44,70 +79,119 @@ $query_estudiantes = "
         u.apellido_paterno,
         u.apellido_materno,
         u.correo,
-        g.nombre AS grupo_nombre,
-        GROUP_CONCAT(DISTINCT m.nombre SEPARATOR ', ') AS materias
-    FROM inscripciones i
-    JOIN cursos c ON i.id_curso = c.id_curso
-    JOIN grupos g ON c.id_grupo = g.id_grupo
-    JOIN usuarios u ON i.id_alumno = u.id_usuario
-    JOIN materias m ON c.id_materia = m.id_materia
-    WHERE c.id_docente = ? AND i.estado = 'Activo'
-    GROUP BY u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.correo, g.nombre
-    ORDER BY g.nombre, u.apellido_paterno, u.nombre
+
+        GROUP_CONCAT(
+            DISTINCT g.nombre
+            ORDER BY g.nombre
+            SEPARATOR ', '
+        ) AS grupo_nombre,
+
+        GROUP_CONCAT(
+            DISTINCT m.nombre
+            ORDER BY m.nombre
+            SEPARATOR ', '
+        ) AS materias,
+
+        COUNT(
+            DISTINCT CASE
+                WHEN e.id_entrega IS NOT NULL
+                THEN e.id_entrega
+            END
+        ) AS total_entregas,
+
+        COUNT(
+            DISTINCT CASE
+                WHEN e.calificacion IS NOT NULL
+                THEN e.id_entrega
+            END
+        ) AS total_calificaciones,
+
+        ROUND(
+            AVG(
+                CASE
+                    WHEN e.calificacion IS NOT NULL THEN
+                        (
+                            e.calificacion /
+                            CASE
+                                WHEN a.puntaje_maximo IS NULL
+                                  OR a.puntaje_maximo <= 0
+                                THEN 100
+                                ELSE a.puntaje_maximo
+                            END
+                        ) * 100
+                    ELSE NULL
+                END
+            ),
+            1
+        ) AS promedio
+
+    FROM usuarios u
+
+    INNER JOIN inscripciones i
+        ON i.id_alumno = u.id_usuario
+       AND i.estado = 'Activo'
+
+    INNER JOIN cursos c
+        ON c.id_curso = i.id_curso
+       AND c.id_docente = ?
+       AND c.estado = 'Activo'
+
+    INNER JOIN grupos g
+        ON g.id_grupo = c.id_grupo
+
+    INNER JOIN materias m
+        ON m.id_materia = c.id_materia
+
+    LEFT JOIN actividades a
+        ON a.id_curso = c.id_curso
+
+    LEFT JOIN actividad_estudiantes ae
+        ON ae.id_actividad = a.id_actividad
+       AND ae.id_alumno = u.id_usuario
+
+    LEFT JOIN entregas e
+        ON e.id_actividad_estudiante = ae.id_actividad_estudiante
+
+    GROUP BY
+        u.id_usuario,
+        u.nombre,
+        u.apellido_paterno,
+        u.apellido_materno,
+        u.correo
+
+    ORDER BY
+        u.apellido_paterno,
+        u.apellido_materno,
+        u.nombre
 ";
+
 $stmt_estudiantes = $conexion->prepare($query_estudiantes);
 $stmt_estudiantes->bind_param("i", $id_docente);
 $stmt_estudiantes->execute();
 $result_estudiantes = $stmt_estudiantes->get_result();
 
 $estudiantes = [];
+
 while ($row = $result_estudiantes->fetch_assoc()) {
+    $row['promedio'] = $row['promedio'] !== null
+        ? (float)$row['promedio']
+        : 0;
+
+    $row['total_calificaciones'] = (int)$row['total_calificaciones'];
+    $row['total_entregas'] = (int)$row['total_entregas'];
+
     $estudiantes[] = $row;
 }
 
-// Calcular promedio y estadísticas para cada estudiante
-foreach ($estudiantes as &$estudiante) {
-    $id_alumno = $estudiante['id_usuario'];
-    
-    // Obtener calificaciones del estudiante en cursos del docente
-    $query_calificaciones = "
-        SELECT 
-            e.calificacion,
-            a.puntaje_maximo,
-            c.id_curso
-        FROM entregas e
-        JOIN actividad_estudiantes ae ON e.id_actividad_estudiante = ae.id_actividad_estudiante
-        JOIN actividades a ON ae.id_actividad = a.id_actividad
-        JOIN cursos c ON a.id_curso = c.id_curso
-        WHERE ae.id_alumno = ? 
-        AND c.id_docente = ?
-        AND e.calificacion IS NOT NULL
-    ";
-    
-    $stmt_calif = $conexion->prepare($query_calificaciones);
-    $stmt_calif->bind_param("ii", $id_alumno, $id_docente);
-    $stmt_calif->execute();
-    $result_calif = $stmt_calif->get_result();
-    
-    $suma_porcentajes = 0;
-    $total_calif = 0;
-    
-    while ($row = $result_calif->fetch_assoc()) {
-        $puntaje_maximo = $row['puntaje_maximo'] > 0 ? $row['puntaje_maximo'] : 100;
-        $porcentaje = ($row['calificacion'] / $puntaje_maximo) * 100;
-        $suma_porcentajes += $porcentaje;
-        $total_calif++;
-    }
-    
-    $estudiante['promedio'] = $total_calif > 0 ? round($suma_porcentajes / $total_calif, 1) : 0;
-    $estudiante['total_calificaciones'] = $total_calif;
-    
-    $stmt_calif->close();
-}
-
-// Cerrar conexiones
-$stmt_cursos->close();
 $stmt_estudiantes->close();
+
+// Datos del docente.
+$foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
+
+$ruta_foto_docente = !empty($foto_perfil_docente)
+    ? '../uploads/perfiles/' . $foto_perfil_docente
+    : 'https://placehold.co/40x40/ff7675/white?text=👨';
+
 $conexion->close();
 ?>
 
@@ -366,11 +450,7 @@ $conexion->close();
     <main class="main-content">
 
         <!-- ENCABEZADO CON FOTO DE PERFIL -->
-        <?php
-        // Obtener foto de perfil del docente
-        $foto_perfil_docente = $_SESSION['usuario']['foto_perfil'] ?? null;
-        $ruta_foto_docente = !empty($foto_perfil_docente) ? '../uploads/perfiles/' . $foto_perfil_docente : 'https://placehold.co/40x40/ff7675/white?text=👨';
-        ?>
+
         <header class="content-header">
             <div class="welcome-text">
                 <h1>Ver estudiantes</h1>
@@ -421,7 +501,9 @@ $conexion->close();
                         </div>
                     <?php else: ?>
                         <?php foreach ($estudiantes as $estudiante): ?>
-                            <div class="student-card" data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>">
+                            <div class="student-card"
+                                 data-group="<?php echo htmlspecialchars($estudiante['grupo_nombre']); ?>"
+                                 data-name="<?php echo htmlspecialchars(strtolower(trim($estudiante['nombre'] . ' ' . $estudiante['apellido_paterno'] . ' ' . $estudiante['apellido_materno']))); ?>">
                                 <a href="ver_avances_estudiante.php?id=<?= $estudiante['id_usuario'] ?>">
                                     <div class="student-info-left">
                                         <i class="fa-solid fa-circle-user avatar-icon"></i>
@@ -447,7 +529,11 @@ $conexion->close();
                                             <div class="stat-label">Promedio</div>
                                         </div>
                                         <div class="stat-item">
-                                            <div class="stat-number"><?= $estudiante['total_calificaciones'] ?></div>
+                                            <div class="stat-number"><?= (int)$estudiante['total_entregas'] ?></div>
+                                            <div class="stat-label">Entregas</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-number"><?= (int)$estudiante['total_calificaciones'] ?></div>
                                             <div class="stat-label">Calif.</div>
                                         </div>
                                         <i class="fa-solid fa-chevron-right chevron-icon"></i>
@@ -521,10 +607,20 @@ document.addEventListener("DOMContentLoaded", function() {
         let visibleStudents = 0;
 
         students.forEach(student => {
-            const studentGroup = student.getAttribute('data-group');
-            const studentName = student.querySelector('h4')?.textContent.toLowerCase() || '';
+            const studentGroup = student.getAttribute('data-group') || '';
+            const studentGroups = studentGroup
+                .split(',')
+                .map(group => group.trim())
+                .filter(Boolean);
 
-            const matchesGroup = (groupFilter === 'todos' || groupFilter === studentGroup);
+            const studentName =
+                student.getAttribute('data-name') ||
+                student.querySelector('h4')?.textContent.toLowerCase() ||
+                '';
+
+            const matchesGroup =
+                groupFilter === 'todos' ||
+                studentGroups.includes(groupFilter);
             const matchesSearch = studentName.includes(searchTerm);
 
             if (matchesGroup && matchesSearch) {

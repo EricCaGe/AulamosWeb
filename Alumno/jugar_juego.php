@@ -636,11 +636,13 @@ function getUrlImagen($ruta) {
         }
         
         .feedback-message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin: 10px 0;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin: 12px 0;
             font-weight: 500;
             display: none;
+            white-space: pre-line;
+            line-height: 1.6;
         }
         
         .feedback-message.show {
@@ -1099,26 +1101,96 @@ function actualizarInfoIntento() {
 
 function iniciarJuego() {
     const gameArea = document.getElementById('gameArea');
-    
+
     switch (modo) {
         case 'Relacionar':
             gameArea.innerHTML = generarRelacionar();
             break;
+
         case 'Memoria':
             gameArea.innerHTML = generarMemoria();
             break;
+
         case 'Secuencia':
             gameArea.innerHTML = generarSecuencia();
             break;
+
         case 'Clasificar':
             gameArea.innerHTML = generarClasificar();
             break;
+
         default:
-            gameArea.innerHTML = '<p style="text-align:center; color:#64748b;">Modo no disponible</p>';
+            gameArea.innerHTML =
+                '<p style="text-align:center; color:#64748b;">Modo no disponible</p>';
     }
-    
+
     actualizarEstadisticas();
 }
+
+
+// =============================================
+// OBTENER EXPLICACIÓN DEL DOCENTE
+// =============================================
+
+function obtenerExplicacionPareja(idPareja) {
+    const pareja = parejasData.find(
+        p =>
+            Number(p.id_pareja) ===
+            Number(idPareja)
+    );
+
+    if (
+        !pareja ||
+        !pareja.explicacion
+    ) {
+        return '';
+    }
+
+    return String(
+        pareja.explicacion
+    ).trim();
+}
+
+
+// =============================================
+// MOSTRAR RETROALIMENTACIÓN CORRECTA
+// =============================================
+
+function mostrarRetroalimentacionCorrecta(
+    idPareja,
+    mensajeCorrecto
+) {
+    const retroalimentacionActiva =
+        Number(
+            juegoData.mostrar_retroalimentacion
+        ) === 1;
+
+    const explicacion =
+        obtenerExplicacionPareja(
+            idPareja
+        );
+
+    if (
+        retroalimentacionActiva &&
+        explicacion
+    ) {
+        mostrarFeedback(
+            mensajeCorrecto +
+            '\n\n💡 Explicación del docente:\n' +
+            explicacion,
+            'success',
+            6500
+        );
+
+        return;
+    }
+
+    mostrarFeedback(
+        mensajeCorrecto,
+        'success'
+    );
+}
+
 
 // =============================================
 // MODO RELACIONAR (CON IMÁGENES)
@@ -1221,7 +1293,12 @@ function verificarRelacionar() {
         puntos += puntosPorAcierto;
         parejasCompletadas++;
         
-        mostrarFeedback('¡Correcto! +' + puntosPorAcierto + ' puntos', 'success');
+        mostrarRetroalimentacionCorrecta(
+            idA,
+            '✅ ¡Correcto! +' +
+            puntosPorAcierto +
+            ' puntos'
+        );
     } else {
         seleccionA.classList.remove('seleccionado');
         seleccionB.classList.remove('seleccionado');
@@ -1327,7 +1404,12 @@ function verificarMemoria() {
         parejasCompletadas++;
         cartasEncontradas += 2;
         
-        mostrarFeedback('¡Pareja encontrada! +' + puntosPorAcierto + ' puntos', 'success');
+        mostrarRetroalimentacionCorrecta(
+            carta1.dataset.id,
+            '✅ ¡Pareja encontrada! +' +
+            puntosPorAcierto +
+            ' puntos'
+        );
     } else {
         errores++;
         mostrarFeedback('No coinciden. Intenta de nuevo.', 'error');
@@ -1395,7 +1477,12 @@ function seleccionarSecuencia(elemento) {
         parejasCompletadas++;
         ordenSeleccionado++;
         
-        mostrarFeedback('¡Correcto! +' + puntosPorAcierto + ' puntos', 'success');
+        mostrarRetroalimentacionCorrecta(
+            idActual,
+            '✅ ¡Correcto! +' +
+            puntosPorAcierto +
+            ' puntos'
+        );
     } else {
         elemento.classList.add('incorrecto');
         errores++;
@@ -1462,7 +1549,12 @@ function seleccionarClasificar(elemento, categoria) {
         puntos += puntosPorAcierto;
         parejasCompletadas++;
         
-        mostrarFeedback('¡Correcto! +' + puntosPorAcierto + ' puntos', 'success');
+        mostrarRetroalimentacionCorrecta(
+            idActual,
+            '✅ ¡Correcto! +' +
+            puntosPorAcierto +
+            ' puntos'
+        );
     } else {
         elemento.classList.add('incorrecto');
         errores++;
@@ -1492,16 +1584,40 @@ function actualizarEstadisticas() {
     document.getElementById('progresoDisplay').textContent = parejasCompletadas + '/' + totalParejas;
 }
 
-function mostrarFeedback(mensaje, tipo) {
-    const feedback = document.getElementById('feedbackMessage');
-    feedback.textContent = mensaje;
-    feedback.className = 'feedback-message ' + tipo + ' show';
-    
-    clearTimeout(feedback._timeout);
-    feedback._timeout = setTimeout(() => {
-        feedback.classList.remove('show');
-    }, 3000);
+function mostrarFeedback(
+    mensaje,
+    tipo,
+    duracion = 3000
+) {
+    const feedback =
+        document.getElementById(
+            'feedbackMessage'
+        );
+
+    if (!feedback) {
+        return;
+    }
+
+    feedback.textContent =
+        mensaje;
+
+    feedback.className =
+        'feedback-message ' +
+        tipo +
+        ' show';
+
+    clearTimeout(
+        feedback._timeout
+    );
+
+    feedback._timeout =
+        setTimeout(() => {
+            feedback.classList.remove(
+                'show'
+            );
+        }, duracion);
 }
+
 
 function iniciarTimer() {
     timerInterval = setInterval(() => {

@@ -16,17 +16,17 @@ $foto_perfil_header = $_SESSION['usuario']['foto_perfil'] ?? null;
 // Si la sesión NO tiene la foto, obtenerla de la BD
 if (empty($foto_perfil_header) && $id_usuario > 0) {
     require_once __DIR__ . '/../../Conexion/conexion.php';
-    $stmt = $conexion->prepare("SELECT foto_perfil FROM usuarios WHERE id_usuario = ?");
-    $stmt->bind_param("i", $id_usuario);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $usuario_data = $resultado->fetch_assoc();
-    if ($usuario_data && !empty($usuario_data['foto_perfil'])) {
-        $foto_perfil_header = $usuario_data['foto_perfil'];
-        // Guardar en sesión para futuras cargas
-        $_SESSION['usuario']['foto_perfil'] = $foto_perfil_header;
+    
+    // ✅ USAR query() en lugar de prepare() para evitar errores
+    $resultado = $conexion->query("SELECT foto_perfil FROM usuarios WHERE id_usuario = $id_usuario");
+    
+    if ($resultado) {
+        $usuario_data = $resultado->fetch_assoc();
+        if ($usuario_data && !empty($usuario_data['foto_perfil'])) {
+            $foto_perfil_header = $usuario_data['foto_perfil'];
+            $_SESSION['usuario']['foto_perfil'] = $foto_perfil_header;
+        }
     }
-    $stmt->close();
 }
 
 // Determinar la ruta de la foto

@@ -237,7 +237,17 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
 
                     <div class="form-group">
                         <label for="modalNombre">Nombre de la materia <span class="text-danger">*</span></label>
-                        <input type="text" id="modalNombre" name="nombre" placeholder="Ej: Matemáticas I" required>
+                        <select id="modalNombre" name="nombre" required>
+                            <option value="">-- Seleccionar materia --</option>
+                            <option value="Inglés">Inglés</option>
+                            <option value="Educación socioemocional">Educación socioemocional</option>
+                            <option value="Español">Español</option>
+                            <option value="Ajedrez">Ajedrez</option>
+                            <option value="Física">Física</option>
+                            <option value="Música">Música</option>
+                            <option value="Danza">Danza</option>
+                            <option value="Matemáticas">Matemáticas</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -246,9 +256,12 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
                             <option value="">-- Seleccionar campo --</option>
                             <option value="Lenguajes">Lenguajes</option>
                             <option value="Saberes y Pensamiento Científico">Saberes y Pensamiento Científico</option>
-                            <option value="Naturaleza y Sociedades">Naturaleza y Sociedades</option>
+                            <option value="Ética, Naturaleza y Sociedades">Ética, Naturaleza y Sociedades</option>
                             <option value="De lo Humano y lo Comunitario">De lo Humano y lo Comunitario</option>
                         </select>
+                        <small id="ayudaCampoFormativo" style="display:block; margin-top:6px; color:#64748b;">
+                            El campo formativo se completa automáticamente según la materia. Para Ajedrez puedes seleccionarlo manualmente.
+                        </small>
                     </div>
 
                     <div class="form-group">
@@ -289,6 +302,42 @@ $ruta_foto_admin = !empty($foto_perfil_admin) ? '../uploads/perfiles/' . $foto_p
 <button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
     <i class="fa-solid fa-universal-access"></i>
 </button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectMateria = document.getElementById('modalNombre');
+    const selectCampo = document.getElementById('modalCampo');
+
+    if (!selectMateria || !selectCampo) {
+        return;
+    }
+
+    const campoPorMateria = {
+        'Inglés': 'Lenguajes',
+        'Español': 'Lenguajes',
+        'Física': 'Saberes y Pensamiento Científico',
+        'Matemáticas': 'Saberes y Pensamiento Científico',
+        'Educación socioemocional': 'De lo Humano y lo Comunitario',
+        'Música': 'De lo Humano y lo Comunitario',
+        'Danza': 'De lo Humano y lo Comunitario'
+        // Ajedrez se deja manual porque el documento no lo asigna
+        // explícitamente a un campo formativo.
+    };
+
+    function actualizarCampoFormativo() {
+        const materia = selectMateria.value;
+        const campo = campoPorMateria[materia];
+
+        if (campo) {
+            selectCampo.value = campo;
+        } else if (materia === 'Ajedrez') {
+            selectCampo.value = '';
+        }
+    }
+
+    selectMateria.addEventListener('change', actualizarCampoFormativo);
+});
+</script>
 
 <script src="js/admin.js"></script>
 <script src="js/materias.js"></script>

@@ -2,12 +2,12 @@
 session_start();
 
 // Pasar el ID del usuario al JavaScript para accesibilidad por usuario
-echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
-
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+if (!isset($_SESSION['usuario']) || ($_SESSION['usuario']['rol'] ?? '') !== 'Docente' || empty($_SESSION['usuario']['id_usuario'])) {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
+
+echo '<script>window.idUsuario = ' . json_encode((int)$_SESSION['usuario']['id_usuario']) . ';</script>';
 
 require_once '../Conexion/conexion.php';
 
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
     $descripcion = trim($_POST['descripcion'] ?? '');
     $tema = trim($_POST['tema'] ?? '');
     $modo = isset($_POST['modo']) ? $_POST['modo'] : 'Relacionar';
-    $modalidad = isset($_POST['modalidad']) ? $_POST['modalidad'] : 'Individual';
+    $modalidad = 'Individual';
     $tiempo_limite = !empty($_POST['tiempo_limite']) ? intval($_POST['tiempo_limite']) : null;
     $puntos_por_acierto = intval($_POST['puntos_por_acierto'] ?? 50);
     $intentos_maximos = !empty($_POST['intentos_maximos']) ? intval($_POST['intentos_maximos']) : null;
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
     // ==========================================
     
     $modos_permitidos = ['Relacionar', 'Memoria', 'Clasificar', 'Secuencia'];
-    $modalidades_permitidas = ['Individual', 'Parejas', 'Equipos'];
+    $modalidades_permitidas = ['Individual'];
     
     if (!in_array($modo, $modos_permitidos, true)) {
         $modo = 'Relacionar';
@@ -91,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
     
     if (strlen($titulo) > 150) {
         $errores[] = 'El título no puede superar los 150 caracteres.';
+    }
+
+    if (empty($tema)) {
+        $errores[] = 'Selecciona un tema.';
     }
     
     if ($puntos_por_acierto <= 0) {
@@ -136,7 +140,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
                 $id_juego = $stmt_insert->insert_id;
                 $stmt_insert->close();
                 
-                header('Location: editar_parejas_juego.php?id_juego=' . $id_juego . '&success=1');
+                // =====================================================
+                // REDIRECCIONAR A LA PANTALLA DEL MODO
+                // =====================================================
+
+                $pantallas_modo = [
+                    'Relacionar' => 'editar_parejas_juego.php',
+                    'Memoria' => 'editar_memoria_juego.php',
+                    'Clasificar' => 'editar_clasificar_juego.php',
+                    'Secuencia' => 'editar_secuencia_juego.php',
+                ];
+
+                $pantalla_destino =
+                    $pantallas_modo[$modo]
+                    ?? 'editar_parejas_juego.php';
+
+                header(
+                    'Location: ' .
+                    $pantalla_destino .
+                    '?id_juego=' .
+                    $id_juego .
+                    '&success=1'
+                );
+
                 exit;
             } else {
                 $mensaje = 'Error al crear el juego: ' . $stmt_insert->error;
@@ -157,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_juego'])) {
 $conexion->close();
 
 $modos = ['Relacionar', 'Memoria', 'Clasificar', 'Secuencia'];
-$modalidades = ['Individual', 'Parejas', 'Equipos'];
+$modalidades = ['Individual'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -305,12 +331,49 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
             border-left: 4px solid #22c55e;
         }
         
+        .modalidad-fija {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .modalidad-fija i {
+            font-size: 22px;
+            color: #3b71f3;
+        }
+
+        .modalidad-fija div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modalidad-fija strong {
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .modalidad-fija span {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
         .modo-opciones {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
         
+        .modo-destino {
+            display: flex; gap: 10px; align-items: flex-start; padding: 13px 15px;
+            margin-top: 14px; background: #eff6ff; color: #1e40af;
+            border: 1px solid #bfdbfe; border-radius: 10px; font-size: 13px; line-height: 1.5;
+        }
+        .modo-destino i { color: #3b71f3; margin-top: 2px; }
         .modo-opcion {
             padding: 12px 16px;
             border: 2px solid #e2e8f0;
@@ -498,7 +561,38 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
                 grid-template-columns: 1fr;
             }
             
-            .modo-opciones {
+            .modalidad-fija {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .modalidad-fija i {
+            font-size: 22px;
+            color: #3b71f3;
+        }
+
+        .modalidad-fija div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modalidad-fija strong {
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .modalidad-fija span {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .modo-opciones {
                 grid-template-columns: 1fr;
             }
             
@@ -589,10 +683,14 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
                     <!-- Información general -->
                     <div class="form-group">
                         <label>Curso <span class="required">*</span></label>
-                        <select name="id_curso" required>
+                        <select name="id_curso" id="id_curso" required>
                             <option value="">Selecciona un curso</option>
                             <?php foreach ($cursos as $curso): ?>
-                                <option value="<?php echo $curso['id_curso']; ?>">
+                                <option
+                                    value="<?php echo $curso['id_curso']; ?>"
+                                    data-materia="<?php echo htmlspecialchars($curso['materia'], ENT_QUOTES, 'UTF-8'); ?>"
+                                    <?php echo ((string)($_POST['id_curso'] ?? '') === (string)$curso['id_curso']) ? 'selected' : ''; ?>
+                                >
                                     <?php echo htmlspecialchars($curso['nombre'] . ' - ' . $curso['materia'] . ' (' . $curso['grupo'] . ')'); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -605,8 +703,13 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
                     </div>
                     
                     <div class="form-group">
-                        <label>Tema</label>
-                        <input type="text" name="tema" placeholder="Ej. Animals, Sistema Solar, Geometría">
+                        <label>Tema <span class="required">*</span></label>
+                        <select name="tema" id="tema" required disabled>
+                            <option value="">Primero selecciona un curso</option>
+                        </select>
+                        <small id="ayudaTema" style="display:block; margin-top:6px; color:#64748b; font-size:12px;">
+                            Los temas se filtrarán automáticamente según la materia del curso seleccionado.
+                        </small>
                     </div>
                     
                     <div class="form-group">
@@ -628,7 +731,7 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
                                 ];
                                 $descripciones = [
                                     'Relacionar' => 'Relaciona conceptos, palabras, imágenes o definiciones.',
-                                    'Memoria' => 'Encuentra las parejas ocultas.',
+                                    'Memoria' => 'Encuentra las parejas del memorama.',
                                     'Clasificar' => 'Organiza elementos dentro de una categoría.',
                                     'Secuencia' => 'Ordena elementos siguiendo una secuencia correcta.'
                                 ];
@@ -636,21 +739,24 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
                                 <div class="modo-opcion <?php echo $modo === 'Relacionar' ? 'active' : ''; ?>" onclick="seleccionarModo(this)">
                                     <input type="radio" name="modo" value="<?php echo $modo; ?>" <?php echo $modo === 'Relacionar' ? 'checked' : ''; ?> style="display: none;">
                                     <div class="icono"><i class="<?php echo $iconos[$modo]; ?>"></i></div>
-                                    <div class="nombre"><?php echo $modo; ?></div>
+                                    <div class="nombre"><?php echo $modo === 'Memoria' ? 'Memorama' : $modo; ?></div>
                                     <div class="desc"><?php echo $descripciones[$modo]; ?></div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
                     
-                    <!-- Modalidad -->
+                    <!-- Modalidad fija -->
                     <div class="form-group">
-                        <label>Modalidad <span class="required">*</span></label>
-                        <select name="modalidad" required>
-                            <option value="Individual">Individual</option>
-                            <option value="Parejas">Parejas</option>
-                            <option value="Equipos">Equipos</option>
-                        </select>
+                        <label>Modalidad</label>
+                        <div class="modalidad-fija">
+                            <i class="fa-solid fa-user"></i>
+                            <div>
+                                <strong>Individual</strong>
+                                <span>El juego será realizado individualmente por cada alumno.</span>
+                            </div>
+                        </div>
+                        <input type="hidden" name="modalidad" value="Individual">
                     </div>
                     
                     <!-- Configuración -->
@@ -685,8 +791,12 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
                             <i class="fa-solid fa-times"></i> Cancelar
                         </a>
                         <button type="submit" name="crear_juego" class="btn btn-primary">
-                            <i class="fa-solid fa-plus"></i> Crear y agregar parejas
+                            <i class="fa-solid fa-plus"></i> <span id="textoBtnCrear">Crear y configurar Relacionar</span>
                         </button>
+                    </div>
+                    <div class="modo-destino" id="modoDestino">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="textoModoDestino">Después de crear el juego podrás configurar el contenido correspondiente al modo seleccionado.</span>
                     </div>
                 </form>
             </div>
@@ -705,14 +815,179 @@ $modalidades = ['Individual', 'Parejas', 'Equipos'];
 </button>
 
 <script>
+
+const temasPorMateria = {
+    ingles: [
+        'Información personal',
+        'Pronunciación',
+        'Números',
+        'Adjetivos',
+        'Verbos',
+        'Preposiciones',
+        'Familia',
+        'Clima',
+        'Transporte',
+        'Deportes',
+        'Sinónimos y antónimos'
+    ],
+    educacionsocioemocional: [
+        'Cultura de paz',
+        'Empatía',
+        'Respeto',
+        'Inclusión',
+        'Resolución de conflictos',
+        'Fortalezas de carácter',
+        'Redes de apoyo',
+        'Amistad',
+        'Gestión de emociones',
+        'Proyecto de vida'
+    ],
+    espanol: [
+        'Comprensión lectora',
+        'Análisis de textos',
+        'Argumentación',
+        'Pensamiento crítico'
+    ],
+    fisica: [
+        'Universo',
+        'Galaxias',
+        'Sistema Solar',
+        'Estrellas',
+        'Agujeros negros',
+        'Nebulosas',
+        'Cometas',
+        'Satélites naturales'
+    ],
+    matematicas: [
+        'Ángulos',
+        'Polígonos',
+        'Área',
+        'Perímetro',
+        'Círculo y circunferencia',
+        'Figuras compuestas',
+        'Probabilidad',
+        'Azar',
+        'Espacio muestral',
+        'Frecuencias',
+        'Ecuaciones de primer grado',
+        'Ecuaciones de segundo grado',
+        'Sistemas de ecuaciones'
+    ],
+    danza: [
+        'Expresión corporal',
+        'Emociones',
+        'Coreografía'
+    ],
+    musica: [
+        'Ritmo',
+        'Piano',
+        'Melodía'
+    ],
+    ajedrez: [
+        'Tácticas de ajedrez',
+        'Coronación del peón',
+        'Notación algebraica'
+    ]
+};
+
+function normalizarMateria(texto) {
+    return (texto || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+}
+
+function obtenerTemasMateria(materia) {
+    const clave = normalizarMateria(materia);
+
+    if (temasPorMateria[clave]) {
+        return temasPorMateria[clave];
+    }
+
+    // Compatibilidad con nombres de materia que incluyan texto adicional.
+    const coincidencia = Object.keys(temasPorMateria).find(k =>
+        clave.includes(k) || k.includes(clave)
+    );
+
+    return coincidencia ? temasPorMateria[coincidencia] : [];
+}
+
+function actualizarTemasPorCurso() {
+    const selectCurso = document.getElementById('id_curso');
+    const selectTema = document.getElementById('tema');
+    const ayudaTema = document.getElementById('ayudaTema');
+    const opcionCurso = selectCurso.options[selectCurso.selectedIndex];
+    const materia = opcionCurso ? (opcionCurso.dataset.materia || '') : '';
+    const temas = obtenerTemasMateria(materia);
+    const temaAnterior = selectTema.dataset.temaAnterior || '';
+
+    selectTema.innerHTML = '';
+
+    if (!selectCurso.value) {
+        selectTema.disabled = true;
+        selectTema.innerHTML = '<option value="">Primero selecciona un curso</option>';
+        ayudaTema.textContent = 'Los temas se filtrarán automáticamente según la materia del curso seleccionado.';
+        return;
+    }
+
+    selectTema.disabled = false;
+
+    const opcionInicial = document.createElement('option');
+    opcionInicial.value = '';
+    opcionInicial.textContent = temas.length ? 'Selecciona un tema' : 'No hay temas predefinidos para esta materia';
+    selectTema.appendChild(opcionInicial);
+
+    temas.forEach(tema => {
+        const option = document.createElement('option');
+        option.value = tema;
+        option.textContent = tema;
+        if (tema === temaAnterior) option.selected = true;
+        selectTema.appendChild(option);
+    });
+
+    ayudaTema.textContent = temas.length
+        ? `Mostrando temas de ${materia}.`
+        : `No hay temas configurados para ${materia}.`;
+}
+
+const configuracionModos = {
+    Relacionar: { boton: 'Crear y configurar Relacionar', texto: 'Después podrás agregar las parejas que relacionarán los estudiantes.' },
+    Memoria: { boton: 'Crear y configurar Memorama', texto: 'Después podrás agregar las parejas de tarjetas que formarán el memorama.' },
+    Clasificar: { boton: 'Crear y configurar Clasificar', texto: 'Después podrás agregar elementos y asignarlos a sus categorías correctas.' },
+    Secuencia: { boton: 'Crear y configurar Secuencia', texto: 'Después podrás agregar los pasos y definir el orden correcto de la secuencia.' }
+};
+
+function actualizarTextoModo() {
+    const radio = document.querySelector('input[name="modo"]:checked');
+    const modo = radio ? radio.value : 'Relacionar';
+    const cfg = configuracionModos[modo] || configuracionModos.Relacionar;
+    document.getElementById('textoBtnCrear').textContent = cfg.boton;
+    document.getElementById('textoModoDestino').textContent = cfg.texto;
+}
+
 function seleccionarModo(elemento) {
     document.querySelectorAll('.modo-opcion').forEach(el => el.classList.remove('active'));
     elemento.classList.add('active');
     const radio = elemento.querySelector('input[type="radio"]');
-    if (radio) {
-        radio.checked = true;
-    }
+    if (radio) radio.checked = true;
+    actualizarTextoModo();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const selectCurso = document.getElementById('id_curso');
+    const selectTema = document.getElementById('tema');
+
+    selectTema.dataset.temaAnterior = <?php echo json_encode($_POST['tema'] ?? ''); ?>;
+
+    actualizarTextoModo();
+    actualizarTemasPorCurso();
+
+    selectCurso.addEventListener('change', () => {
+        selectTema.dataset.temaAnterior = '';
+        actualizarTemasPorCurso();
+    });
+});
 </script>
 
 <script src="jss/docente_dashboard.js"></script>

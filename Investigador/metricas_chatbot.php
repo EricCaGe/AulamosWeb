@@ -41,19 +41,37 @@ if ($resultado) {
 // CONSULTAS A LA BD (usando query() en lugar de prepare())
 // =====================================================
 
-// Total de interacciones
-if ($id_prueba_activa && $tiene_participantes) {
-    $sql = "
-        SELECT COUNT(*) AS total 
-        FROM mensajes_chatbot
-        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
-    ";
-} else {
-    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot";
-}
-$resultado = $conexion->query($sql);
-$total_interacciones = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+// =====================================================
+// TOTAL DE INTERACCIONES
+// =====================================================
 
+if ($id_prueba_activa && $tiene_participantes) {
+
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s
+            ON m.id_sesion = s.id_sesion
+        WHERE s.id_usuario IN (
+            SELECT id_usuario
+            FROM participantes_prueba
+            WHERE id_prueba = $id_prueba_activa
+        )
+    ";
+
+} else {
+
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM mensajes_chatbot
+    ";
+}
+
+$resultado = $conexion->query($sql);
+
+$total_interacciones = $resultado
+    ? ($resultado->fetch_assoc()['total'] ?? 0)
+    : 0;
 // Estudiantes usuarios
 if ($id_prueba_activa && $tiene_participantes) {
     $sql = "
@@ -84,48 +102,103 @@ $promedio_minutos = floor($promedio_segundos / 60);
 $promedio_segundos_resto = $promedio_segundos % 60;
 $promedio_duracion = $promedio_minutos . ' min ' . $promedio_segundos_resto . ' s';
 
-// Preguntas hoy
-if ($id_prueba_activa && $tiene_participantes) {
-    $sql = "
-        SELECT COUNT(*) AS total 
-        FROM mensajes_chatbot
-        WHERE DATE(fecha_mensaje) = CURDATE() 
-        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
-    ";
-} else {
-    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot WHERE DATE(fecha_mensaje) = CURDATE()";
-}
-$resultado = $conexion->query($sql);
-$preguntas_hoy = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+// =====================================================
+// PREGUNTAS DE HOY
+// =====================================================
 
-// Tipos de consulta
 if ($id_prueba_activa && $tiene_participantes) {
+
     $sql = "
-        SELECT tipo_consulta, COUNT(*) AS total 
+        SELECT COUNT(*) AS total
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s
+            ON m.id_sesion = s.id_sesion
+        WHERE DATE(m.fecha_mensaje) = CURDATE()
+        AND s.id_usuario IN (
+            SELECT id_usuario
+            FROM participantes_prueba
+            WHERE id_prueba = $id_prueba_activa
+        )
+    ";
+
+} else {
+
+    $sql = "
+        SELECT COUNT(*) AS total
         FROM mensajes_chatbot
-        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
-        GROUP BY tipo_consulta 
-        ORDER BY total DESC 
+        WHERE DATE(fecha_mensaje) = CURDATE()
+    ";
+}
+
+$resultado = $conexion->query($sql);
+
+$preguntas_hoy = $resultado
+    ? ($resultado->fetch_assoc()['total'] ?? 0)
+    : 0;
+// =====================================================
+// TIPOS DE CONSULTA
+// =====================================================
+
+if ($id_prueba_activa && $tiene_participantes) {
+
+    $sql = "
+        SELECT m.tipo_consulta, COUNT(*) AS total
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s
+            ON m.id_sesion = s.id_sesion
+        WHERE s.id_usuario IN (
+            SELECT id_usuario
+            FROM participantes_prueba
+            WHERE id_prueba = $id_prueba_activa
+        )
+        GROUP BY m.tipo_consulta
+        ORDER BY total DESC
         LIMIT 5
     ";
-} else {
-    $sql = "SELECT tipo_consulta, COUNT(*) AS total FROM mensajes_chatbot GROUP BY tipo_consulta ORDER BY total DESC LIMIT 5";
-}
-$resultado = $conexion->query($sql);
-$tipos_consulta = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
-$max_consultas = !empty($tipos_consulta) ? max(array_column($tipos_consulta, 'total')) : 1;
 
-// Interacciones por día (última semana)
-if ($id_prueba_activa && $tiene_participantes) {
+} else {
+
     $sql = "
-        SELECT DATE(fecha_mensaje) AS fecha, COUNT(*) AS total
+        SELECT tipo_consulta, COUNT(*) AS total
         FROM mensajes_chatbot
-        WHERE fecha_mensaje >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
-        AND id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
-        GROUP BY DATE(fecha_mensaje)
+        GROUP BY tipo_consulta
+        ORDER BY total DESC
+        LIMIT 5
+    ";
+}
+
+$resultado = $conexion->query($sql);
+
+$tipos_consulta = $resultado
+    ? $resultado->fetch_all(MYSQLI_ASSOC)
+    : [];
+
+$max_consultas = !empty($tipos_consulta)
+    ? max(array_column($tipos_consulta, 'total'))
+    : 1;
+// =====================================================
+// INTERACCIONES POR DÍA - ÚLTIMA SEMANA
+// =====================================================
+
+if ($id_prueba_activa && $tiene_participantes) {
+
+    $sql = "
+        SELECT DATE(m.fecha_mensaje) AS fecha, COUNT(*) AS total
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s
+            ON m.id_sesion = s.id_sesion
+        WHERE m.fecha_mensaje >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        AND s.id_usuario IN (
+            SELECT id_usuario
+            FROM participantes_prueba
+            WHERE id_prueba = $id_prueba_activa
+        )
+        GROUP BY DATE(m.fecha_mensaje)
         ORDER BY fecha ASC
     ";
+
 } else {
+
     $sql = "
         SELECT DATE(fecha_mensaje) AS fecha, COUNT(*) AS total
         FROM mensajes_chatbot
@@ -134,17 +207,38 @@ if ($id_prueba_activa && $tiene_participantes) {
         ORDER BY fecha ASC
     ";
 }
-$resultado = $conexion->query($sql);
-$interacciones_semana = $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 
-$dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+$resultado = $conexion->query($sql);
+
+$interacciones_semana = $resultado
+    ? $resultado->fetch_all(MYSQLI_ASSOC)
+    : [];
+
+$dias_semana = [
+    'Lun',
+    'Mar',
+    'Mié',
+    'Jue',
+    'Vie',
+    'Sáb',
+    'Dom'
+];
+
 $interacciones_por_dia = array_fill(0, 7, 0);
 
 foreach ($interacciones_semana as $row) {
-    $dia_num = date('N', strtotime($row['fecha'])) - 1;
+
+    $dia_num = date(
+        'N',
+        strtotime($row['fecha'])
+    ) - 1;
+
     $interacciones_por_dia[$dia_num] = $row['total'];
 }
-$max_dia = !empty($interacciones_por_dia) ? max($interacciones_por_dia) : 1;
+
+$max_dia = !empty($interacciones_por_dia)
+    ? max($interacciones_por_dia)
+    : 1;
 
 // Interacciones recientes
 if ($id_prueba_activa && $tiene_participantes) {

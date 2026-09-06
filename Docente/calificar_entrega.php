@@ -41,9 +41,11 @@ $query = "
         e.calificacion,
         e.retroalimentacion,
         e.estado AS entrega_estado,
+        e.calificado_en,
         adj.id_adjunto,
         adj.nombre_archivo,
         adj.url_archivo,
+        adj.tipo_archivo,
         adj.tamano_bytes,
         u.nombre AS estudiante_nombre,
         u.apellido_paterno AS estudiante_apellido,
@@ -59,10 +61,11 @@ $query = "
     LEFT JOIN adjuntos adj ON adj.entidad_tipo = 'Entrega' AND adj.entidad_id = e.id_entrega
     WHERE a.id_actividad = ? 
     AND ae.id_alumno = ?
+    AND c.id_docente = ?
 ";
 
 $stmt = $conexion->prepare($query);
-$stmt->bind_param("ii", $id_actividad, $id_estudiante);
+$stmt->bind_param("iii", $id_actividad, $id_estudiante, $id_docente);
 $stmt->execute();
 $resultado = $stmt->get_result();
 $datos = $resultado->fetch_assoc();
@@ -80,9 +83,13 @@ $tipo_mensaje = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['calificar'])) {
     $calificacion = isset($_POST['calificacion']) ? floatval($_POST['calificacion']) : null;
     $retroalimentacion = isset($_POST['retroalimentacion']) ? trim($_POST['retroalimentacion']) : '';
-    $id_entrega = isset($_POST['id_entrega']) ? intval($_POST['id_entrega']) : 0;
+    // No confiar en un id_entrega enviado por el navegador.
+    $id_entrega = !empty($datos['id_entrega']) ? (int)$datos['id_entrega'] : 0;
     
-    if ($calificacion === null || $calificacion < 0 || $calificacion > 100) {
+    if ($id_entrega <= 0) {
+        $mensaje = 'No existe una entrega del estudiante para calificar.';
+        $tipo_mensaje = 'error';
+    } elseif ($calificacion === null || $calificacion < 0 || $calificacion > 100) {
         $mensaje = 'La calificación debe ser un número entre 0 y 100.';
         $tipo_mensaje = 'error';
     } else {
@@ -132,7 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['calificar'])) {
                     SELECT 
                         e.calificacion,
                         e.retroalimentacion,
-                        e.estado AS entrega_estado
+                        e.estado AS entrega_estado,
+                        e.calificado_en
                     FROM entregas e
                     WHERE e.id_entrega = ?
                 ";
@@ -147,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['calificar'])) {
                 $datos['calificacion'] = $updated_data['calificacion'];
                 $datos['retroalimentacion'] = $updated_data['retroalimentacion'];
                 $datos['entrega_estado'] = $updated_data['entrega_estado'];
+                $datos['calificado_en'] = $updated_data['calificado_en'];
                 
             } catch (Exception $e) {
                 $conexion->rollback();
@@ -168,6 +177,10 @@ function formatearTamañoArchivo($bytes) {
     }
     return round($bytes, 1) . ' ' . $unidades[$i];
 }
+
+$estado_visual = !empty($datos['entrega_estado']) ? $datos['entrega_estado'] : (!empty($datos['id_entrega']) ? 'Entregada' : ($datos['estado'] ?? 'Pendiente'));
+$es_calificada = ($estado_visual === 'Calificada');
+$fuera_de_tiempo = !empty($datos['fecha_entrega']) && !empty($datos['fecha_limite']) && strtotime($datos['fecha_entrega']) > strtotime($datos['fecha_limite']);
 
 $conexion->close();
 
@@ -727,6 +740,9 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
             background: #fee2e2 !important;
         }
         
+        .badge-entregada { background:#eff6ff; color:#2563eb; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600; }
+        .badge-tarde { background:#fef2f2; color:#dc2626; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600; }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .grid-info {
@@ -865,6 +881,13 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                         <span class="badge-materia">
                             <i class="fa-regular fa-bookmark"></i> <?php echo htmlspecialchars($datos['materia']); ?> - <?php echo htmlspecialchars($datos['curso_nombre']); ?>
                         </span>
+                        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <span class="<?php echo $es_calificada ? 'badge-calificado' : 'badge-entregada'; ?>">
+                                <i class="fa-solid <?php echo $es_calificada ? 'fa-circle-check' : 'fa-paper-plane'; ?>"></i>
+                                <?php echo htmlspecialchars($estado_visual); ?>
+                            </span>
+                            <?php if ($fuera_de_tiempo): ?><span class="badge-tarde"><i class="fa-regular fa-clock"></i> Fuera de tiempo</span><?php endif; ?>
+                        </div>
                     </div>
                 </div>
                 
@@ -892,7 +915,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
             <?php if (!empty($datos['id_adjunto'])): ?>
                 <div class="card-info">
                     <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #1e293b;">
-                        <i class="fa-regular fa-file"></i> Archivo entregado
+                        <i class="fa-regular fa-file"></i> Trabajo entregado
                     </h3>
                     <div class="card-archivo">
                         <div class="icono">
@@ -900,7 +923,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                         </div>
                         <div class="info">
                             <div class="nombre"><?php echo htmlspecialchars($datos['nombre_archivo']); ?></div>
-                            <div class="tamano"><?php echo formatearTamañoArchivo($datos['tamano_bytes']); ?></div>
+                            <div class="tamano"><?php echo htmlspecialchars($datos['tipo_archivo'] ?? 'Documento'); ?> · <?php echo formatearTamañoArchivo($datos['tamano_bytes']); ?><?php if (!empty($datos['fecha_entrega'])): ?> · <?php echo date('d/m/Y H:i', strtotime($datos['fecha_entrega'])); ?><?php endif; ?></div>
                         </div>
                         <a href="<?php echo $datos['url_archivo']; ?>" target="_blank" class="btn-descargar">
                             <i class="fa-regular fa-eye"></i> Ver archivo
@@ -929,7 +952,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
             <?php endif; ?>
 
             <!-- Formulario de calificación -->
-            <?php if ($datos['entrega_estado'] !== 'Calificada'): ?>
+            <?php if (!empty($datos['id_entrega'])): ?>
                 
                 <div class="form-calificar">
                     <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #1e293b;">
@@ -949,7 +972,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                                        min="0" 
                                        max="<?php echo $datos['puntaje_maximo']; ?>" 
                                        step="0.5"
-                                       value="<?php echo isset($_POST['calificacion']) ? htmlspecialchars($_POST['calificacion']) : ''; ?>"
+                                       value="<?php echo htmlspecialchars(isset($_POST['calificacion']) ? $_POST['calificacion'] : ($datos['calificacion'] ?? '')); ?>"
                                        required>
                                 <span class="max-label">/ <?php echo $datos['puntaje_maximo']; ?> puntos</span>
                             </div>
@@ -964,7 +987,7 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                             <label for="retroalimentacion">Retroalimentación</label>
                             <textarea id="retroalimentacion" 
                                       name="retroalimentacion" 
-                                      placeholder="Escribe aquí tu retroalimentación para el estudiante..."><?php echo isset($_POST['retroalimentacion']) ? htmlspecialchars($_POST['retroalimentacion']) : ''; ?></textarea>
+                                      placeholder="Escribe aquí tu retroalimentación para el estudiante..."><?php echo htmlspecialchars(isset($_POST['retroalimentacion']) ? $_POST['retroalimentacion'] : ($datos['retroalimentacion'] ?? '')); ?></textarea>
                         </div>
                         
                         <div class="btn-acciones">
@@ -972,50 +995,20 @@ $nombre_estudiante = $datos['estudiante_nombre'] . ' ' . $datos['estudiante_apel
                                 <i class="fa-solid fa-times"></i> Cancelar
                             </a>
                             <button type="submit" name="calificar" class="btn btn-primary">
-                                <i class="fa-regular fa-check-circle"></i> Guardar calificación
+                                <i class="fa-regular fa-check-circle"></i> <?php echo $es_calificada ? 'Actualizar calificación' : 'Guardar calificación'; ?>
                             </button>
                         </div>
                     </form>
                 </div>
                 
             <?php else: ?>
-                
-                <!-- Ya calificado -->
-                <div class="ya-calificado-msg">
-                    <i class="fa-regular fa-check-circle"></i>
-                    <h3>¡Esta entrega ya ha sido calificada!</h3>
-                    <p>La calificación fue registrada el <?php echo date('d M, Y H:i', strtotime($datos['calificado_en'] ?? 'now')); ?></p>
-                </div>
-                
                 <div class="card-info">
-                    <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #1e293b;">
-                        <i class="fa-regular fa-star"></i> Calificación asignada
-                    </h3>
-                    <div class="calificacion-mostrada">
-                        <?php echo number_format($datos['calificacion'], 1); ?> / <?php echo $datos['puntaje_maximo']; ?> puntos
-                    </div>
-                    
-                    <?php if (!empty($datos['retroalimentacion'])): ?>
-                        <div class="retroalimentacion-mostrada">
-                            <strong style="display: block; margin-bottom: 5px; color: #1e293b;">
-                                <i class="fa-regular fa-comment"></i> Retroalimentación:
-                            </strong>
-                            <p style="margin: 0; color: #475569;"><?php echo nl2br(htmlspecialchars($datos['retroalimentacion'])); ?></p>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                        <a href="ver_avances_estudiante.php?id=<?php echo $id_estudiante; ?>&id_curso=<?php echo $id_curso; ?>" class="btn btn-secondary">
-                            <i class="fa-solid fa-arrow-left"></i> Volver
-                        </a>
-                        <?php if (!empty($datos['id_adjunto'])): ?>
-                            <a href="<?php echo $datos['url_archivo']; ?>" target="_blank" class="btn btn-primary">
-                                <i class="fa-regular fa-eye"></i> Ver archivo
-                            </a>
-                        <?php endif; ?>
+                    <div style="text-align:center;padding:25px;color:#64748b;">
+                        <i class="fa-solid fa-circle-info" style="font-size:36px;color:#3b71f3;display:block;margin-bottom:10px;"></i>
+                        <h3 style="margin:0 0 6px;color:#1e293b;">Aún no hay una entrega registrada</h3>
+                        <p style="margin:0;">Cuando el alumno entregue la actividad podrás revisar el archivo, comentario y asignar una calificación.</p>
                     </div>
                 </div>
-                
             <?php endif; ?>
 
         </div>

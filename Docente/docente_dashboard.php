@@ -1,14 +1,18 @@
 <?php
 session_start();
 
-// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
-echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
-
 // Verificar que el usuario haya iniciado sesión y sea Docente
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+if (
+    !isset($_SESSION['usuario']) ||
+    ($_SESSION['usuario']['rol'] ?? '') !== 'Docente' ||
+    empty($_SESSION['usuario']['id_usuario'])
+) {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
+
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . json_encode((int)$_SESSION['usuario']['id_usuario']) . ';</script>';
 
 require_once '../Conexion/conexion.php';
 
@@ -120,6 +124,7 @@ if ($stmt) {
 $contenido_reciente = [];
 $stmt = $conexion->prepare("
     SELECT 
+        id_actividad,
         titulo,
         tipo,
         fecha_publicacion,
@@ -143,6 +148,7 @@ if ($stmt) {
 $proximas_actividades = [];
 $stmt = $conexion->prepare("
     SELECT 
+        id_actividad,
         titulo,
         fecha_limite,
         tipo
@@ -232,7 +238,9 @@ $conexion->close();
             <a href="crear_recurso.php" class="menu-item"><i class="fa-solid fa-medal"></i> Crear Recurso</a>
             <a href="mis_recursos.php" class="menu-item"><i class="fa-solid fa-folder-open"></i> Mis Recursos</a>
             <a href="crear_actividad.php" class="menu-item"><i class="fa-solid fa-clipboard-check"></i> Crear Actividad</a>
+            <a href="mis_actividades.php" class="menu-item"><i class="fa-solid fa-list-check"></i> Mis Actividades</a>
             <a href="crear_evaluacion.php" class="menu-item"><i class="fa-solid fa-clipboard-list"></i> Crear Evaluación</a>
+            <a href="mis_evaluaciones.php" class="menu-item"><i class="fa-solid fa-file-circle-check"></i> Mis Evaluaciones</a>
             <a href="crear_juego.php" class="menu-item"><i class="fa-solid fa-gamepad"></i> Crear Juego</a>
             <a href="ver_estudiantes.php" class="menu-item"><i class="fa-solid fa-users"></i> Ver Estudiantes</a>
             <a href="reporte.php" class="menu-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
@@ -322,23 +330,23 @@ $conexion->close();
                     <div class="quick-access-grid">
                         <a href="crear_recurso.php" class="quick-btn bg-purple-solid">
                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
-                            <span>Crear curso</span>
+                            <span>Crear recurso</span>
                         </a>
                         <a href="crear_actividad.php" class="quick-btn bg-green-solid">
                             <i class="fa-solid fa-clipboard-check"></i>
                             <span>Crear actividad</span>
                         </a>
+                        <a href="mis_actividades.php" class="quick-btn bg-blue-solid">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>Mis actividades</span>
+                        </a>
                         <a href="crear_evaluacion.php" class="quick-btn bg-yellow-solid text-dark-yellow">
                             <i class="fa-solid fa-clipboard-list"></i>
                             <span>Crear evaluación</span>
                         </a>
-                        <a href="ver_estudiantes.php" class="quick-btn bg-blue-solid">
-                            <i class="fa-solid fa-users"></i>
-                            <span>Ver estudiantes</span>
-                        </a>
-                        <a href="reporte.php" class="quick-btn bg-gray-solid">
-                            <i class="fa-solid fa-chart-column"></i>
-                            <span>Reportes</span>
+                        <a href="mis_evaluaciones.php" class="quick-btn bg-gray-solid">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                            <span>Mis evaluaciones</span>
                         </a>
                     </div>
                 </section>
@@ -347,7 +355,7 @@ $conexion->close();
                 <section class="section-container border-container">
                     <div class="section-header">
                         <h3 class="section-title">Contenido reciente</h3>
-                        <a href="#" class="link-blue">Ver todo</a>
+                        <a href="mis_actividades.php" class="link-blue">Ver actividades</a>
                     </div>
                     
                     <div class="content-list">
@@ -375,7 +383,7 @@ $conexion->close();
                     </div>
                     
                     <div class="text-center mt-15">
-                        <a href="#" class="link-blue view-all-link">Ver todo mi contenido</a>
+                        <a href="mis_actividades.php" class="link-blue view-all-link">Ver todas mis actividades</a>
                     </div>
                 </section>
 
@@ -432,7 +440,28 @@ $conexion->close();
                     </div>
 
                     <div class="text-center mt-15">
-                        <a href="#" class="link-blue view-all-link">Ver todas mis actividades</a>
+                        <a href="mis_actividades.php" class="link-blue view-all-link">Ver todas mis actividades</a>
+                    </div>
+                </aside>
+
+                <!-- Accesos a evaluaciones -->
+                <aside class="upcoming-activities border-container" style="margin-top:20px;">
+                    <div class="section-header">
+                        <h3 class="section-title">Mis evaluaciones</h3>
+                        <a href="mis_evaluaciones.php" class="link-blue">Ver todas</a>
+                    </div>
+
+                    <div style="padding:8px 0;">
+                        <p class="text-muted" style="margin:0 0 14px;">
+                            Consulta las evaluaciones que has creado y accede a su revisión y calificación.
+                        </p>
+
+                        <a href="mis_evaluaciones.php"
+                           class="link-blue view-all-link"
+                           style="display:inline-flex; align-items:center; gap:8px;">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                            Ir a mis evaluaciones
+                        </a>
                     </div>
                 </aside>
 

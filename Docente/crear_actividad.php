@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
-echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
-
 // Verificar que el usuario haya iniciado sesión y sea Docente
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+if (!isset($_SESSION['usuario']) || ($_SESSION['usuario']['rol'] ?? '') !== 'Docente' || empty($_SESSION['usuario']['id_usuario'])) {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
+
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . json_encode((int)$_SESSION['usuario']['id_usuario']) . ';</script>';
 
 require_once '../Conexion/conexion.php';
 
@@ -18,10 +18,17 @@ $nombre_docente = $_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['a
 
 // Consultar los cursos del docente para el select
 $query_cursos = "
-    SELECT c.id_curso, c.nombre
+    SELECT
+        c.id_curso,
+        c.nombre,
+        c.id_ciclo,
+        m.nombre AS materia,
+        CONCAT_WS(' - ', g.grado, g.nombre) AS grupo
     FROM cursos c
+    INNER JOIN materias m ON m.id_materia = c.id_materia
+    INNER JOIN grupos g ON g.id_grupo = c.id_grupo
     WHERE c.id_docente = ? AND c.estado = 'Activo'
-    ORDER BY c.nombre
+    ORDER BY m.nombre, g.grado, g.nombre, c.nombre
 ";
 $stmt_cursos = $conexion->prepare($query_cursos);
 $stmt_cursos->bind_param("i", $id_docente);
@@ -50,9 +57,36 @@ while ($row = $result_periodos->fetch_assoc()) {
     $periodos[] = $row;
 }
 
+// Consultar recursos activos del docente que aún no están asociados a una actividad.
+// Se mostrarán filtrados por curso en el formulario.
+$query_recursos = "
+    SELECT
+        r.id_recurso,
+        r.id_curso,
+        r.titulo,
+        r.tipo,
+        r.url_recurso
+    FROM recursos_educativos r
+    WHERE r.id_docente = ?
+      AND r.estado = 'Activo'
+      AND r.id_actividad IS NULL
+    ORDER BY r.titulo
+";
+
+$stmt_recursos = $conexion->prepare($query_recursos);
+$stmt_recursos->bind_param("i", $id_docente);
+$stmt_recursos->execute();
+$result_recursos = $stmt_recursos->get_result();
+
+$recursos = [];
+while ($row = $result_recursos->fetch_assoc()) {
+    $recursos[] = $row;
+}
+
 // Cerrar conexiones
 $stmt_cursos->close();
 $stmt_periodos->close();
+$stmt_recursos->close();
 $conexion->close();
 ?>
 
@@ -192,8 +226,14 @@ $conexion->close();
                                 <select id="id_curso" name="id_curso" class="clean-input" required>
                                     <option value="">Selecciona un curso</option>
                                     <?php foreach ($cursos as $curso): ?>
-                                        <option value="<?php echo $curso['id_curso']; ?>">
-                                            <?php echo htmlspecialchars($curso['nombre']); ?>
+                                        <option value="<?php echo (int)$curso['id_curso']; ?>">
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $curso['nombre']
+                                                . ' · ' . $curso['materia']
+                                                . (!empty($curso['grupo']) ? ' · ' . $curso['grupo'] : '')
+                                            );
+                                            ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -210,6 +250,35 @@ $conexion->close();
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- RECURSO DE APOYO -->
+                        <div class="form-group-clean">
+                            <label for="id_recurso">
+                                Recurso de apoyo <span style="font-weight:400; color:#64748b;">(opcional)</span>
+                            </label>
+
+                            <select id="id_recurso" name="id_recurso" class="clean-input" disabled>
+                                <option value="">Primero selecciona un curso</option>
+
+                                <?php foreach ($recursos as $recurso): ?>
+                                    <option
+                                        value="<?php echo (int)$recurso['id_recurso']; ?>"
+                                        data-curso="<?php echo $recurso['id_curso'] !== null ? (int)$recurso['id_curso'] : ''; ?>"
+                                        data-tipo="<?php echo htmlspecialchars($recurso['tipo']); ?>"
+                                    >
+                                        <?php
+                                        echo htmlspecialchars(
+                                            $recurso['titulo'] . ' · ' . $recurso['tipo']
+                                        );
+                                        ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+
+                            <small id="ayudaRecurso" style="display:block; margin-top:6px; color:#64748b;">
+                                Selecciona un recurso activo del mismo curso. El recurso quedará asociado a la actividad.
+                            </small>
                         </div>
 
                         <div class="form-toggle-row">
@@ -411,6 +480,68 @@ $conexion->close();
                 }
             });
         }
+
+
+    // Filtrar recursos según el curso seleccionado.
+    const selectCurso = document.getElementById('id_curso');
+    const selectRecurso = document.getElementById('id_recurso');
+
+    function filtrarRecursosPorCurso() {
+        if (!selectCurso || !selectRecurso) return;
+
+        const idCurso = selectCurso.value;
+        const opciones = Array.from(selectRecurso.options);
+
+        selectRecurso.value = '';
+
+        if (!idCurso) {
+            selectRecurso.disabled = true;
+            opciones.forEach((opcion, indice) => {
+                if (indice === 0) {
+                    opcion.hidden = false;
+                    opcion.textContent = 'Primero selecciona un curso';
+                } else {
+                    opcion.hidden = true;
+                }
+            });
+            return;
+        }
+
+        let disponibles = 0;
+
+        opciones.forEach((opcion, indice) => {
+            if (indice === 0) {
+                opcion.hidden = false;
+                opcion.textContent = 'Sin recurso';
+                return;
+            }
+
+            const cursoRecurso = opcion.dataset.curso || '';
+
+            // Un recurso con id_curso vacío se considera general;
+            // uno con id_curso debe coincidir con el curso seleccionado.
+            const visible = cursoRecurso === '' || cursoRecurso === idCurso;
+            opcion.hidden = !visible;
+
+            if (visible) {
+                disponibles++;
+            }
+        });
+
+        selectRecurso.disabled = false;
+
+        if (disponibles === 0) {
+            opciones[0].textContent = 'No hay recursos disponibles para este curso';
+        } else {
+            opciones[0].textContent = 'Sin recurso';
+        }
+    }
+
+    if (selectCurso) {
+        selectCurso.addEventListener('change', filtrarRecursosPorCurso);
+        filtrarRecursosPorCurso();
+    }
+
     });
 </script>
 

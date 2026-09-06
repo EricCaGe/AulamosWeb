@@ -64,3 +64,25 @@ puntos_por_acierto: 50
 intentos_maximos: 2
 mostrar_retroalimentacion: 1
 ----------------------------------------
+=== 2026-08-19 10:31:05 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'jfbjdjfj'
+descripcion: 'kdkfskfd'
+tema: 'nkfkndsfk'
+tiempo_limite: 120
+puntos_por_acierto: 2
+intentos_maximos: 1
+mostrar_retroalimentacion: 1
+----------------------------------------
+=== 2026-08-20 10:56:30 ===
+modo: 'Relacionar' (largo: 10)
+modalidad: 'Individual' (largo: 10)
+titulo: 'Verbs'
+descripcion: 'Juegos'
+tema: 'Do it'
+tiempo_limite: NULL
+puntos_por_acierto: 50
+intentos_maximos: 1
+mostrar_retroalimentacion: 1
+----------------------------------------

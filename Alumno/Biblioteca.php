@@ -252,6 +252,107 @@ $tiposMap = [
     >
 
     <style>
+
+        /* ACCESIBILIDAD - DISEÑO AULAMOS */
+        .accessibility-bar{
+            margin-top:34px;
+            padding:0;
+            background:transparent;
+            border:0;
+            display:flex;
+            flex-direction:column;
+            align-items:flex-start;
+            gap:0;
+        }
+        .acc-info{
+            display:flex;
+            align-items:flex-start;
+            gap:8px;
+            margin-bottom:2px;
+        }
+        .acc-icon-main{
+            color:#111827;
+            font-size:20px;
+            margin-top:2px;
+        }
+        .acc-info strong{
+            display:block;
+            color:#111827;
+            font-size:16px;
+            line-height:1.25;
+            font-weight:800;
+        }
+        .acc-info p{
+            margin:2px 0 0;
+            color:#1e3a5f;
+            font-size:15px;
+            line-height:1.35;
+        }
+        .acc-options{
+            display:flex;
+            flex-wrap:wrap;
+            gap:3px;
+            margin-top:1px;
+        }
+        .acc-opt-btn,.btn-open-config{
+            appearance:none;
+            -webkit-appearance:none;
+            border:1px solid #6b7280;
+            background:#f8fafc;
+            color:#111827;
+            border-radius:2px;
+            min-height:22px;
+            padding:1px 6px;
+            font-family:inherit;
+            font-size:13px;
+            line-height:18px;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:3px;
+            box-shadow:none;
+            transition:background .15s ease,border-color .15s ease;
+        }
+        .acc-opt-btn:hover,.btn-open-config:hover{
+            background:#eef2f7;
+            border-color:#334155;
+        }
+        .acc-opt-btn:focus-visible,.btn-open-config:focus-visible{
+            outline:3px solid #2563eb;
+            outline-offset:2px;
+        }
+        .acc-opt-btn i{font-size:12px}
+        .btn-open-config{margin-top:3px;background:#f8fafc}
+        .acc-opt-btn.activo{
+            background:#eaf2ff;
+            border-color:#2563eb;
+            color:#1d4ed8;
+        }
+        body.modo-oscuro .acc-info strong{color:#f8fafc}
+        body.modo-oscuro .acc-info p{color:#dbeafe}
+        body.modo-oscuro .acc-icon-main{color:#f8fafc}
+        body.modo-oscuro .acc-opt-btn,
+        body.modo-oscuro .btn-open-config{
+            background:#1f2937;
+            border-color:#64748b;
+            color:#f8fafc;
+        }
+        body.alto-contraste .acc-info strong,
+        body.alto-contraste .acc-info p,
+        body.alto-contraste .acc-icon-main{color:#ffff00!important}
+        body.alto-contraste .acc-opt-btn,
+        body.alto-contraste .btn-open-config{
+            background:#000!important;
+            color:#fff!important;
+            border-color:#fff!important;
+        }
+        @media(max-width:700px){
+            .accessibility-bar{margin-top:25px}
+            .acc-options{gap:5px}
+            .acc-opt-btn,.btn-open-config{font-size:12px}
+        }
+
         .recurso-card {
             width: 100%;
             font: inherit;
@@ -370,10 +471,7 @@ $tiposMap = [
 
         </nav>
 
-        <button class="btn-accessibility-main">
-            <i class="fa-solid fa-universal-access"></i>
-            Accesibilidad
-        </button>
+        <button class="btn-accessibility-main" onclick="toggleBarraAccesibilidad()"><i class="fa-solid fa-universal-access"></i> Accesibilidad</button>
 
         <div class="menu-spacer"></div>
 
@@ -425,6 +523,9 @@ $tiposMap = [
                 </div>
 
             </div>
+
+             <!-- NUEVA ACCESIBILIDAD -->
+    <link rel="stylesheet" href="../Accesibilidad/accesibilidad.css">
 
         </header>
 
@@ -673,85 +774,27 @@ $tiposMap = [
 
         <?php endif; ?>
 
-        <!-- =========================================
-             ACCESIBILIDAD
-        ========================================== -->
-        <footer class="accessibility-bar">
-
-            <div class="acc-info">
-
-                <i
-                    class="fa-solid fa-eye-low-vision acc-icon-main"
-                ></i>
-
-                <div>
-
-                    <strong>
-                        Accesibilidad siempre disponible
-                    </strong>
-
-                    <p>
-                        Personaliza tu experiencia
-                        en cualquier momento.
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="acc-options">
-
-                <button
-                    class="acc-opt-btn"
-                    id="btn-contrast"
-                    type="button"
-                >
-                    <i class="fa-solid fa-eye"></i>
-                    <span>Alto contraste</span>
-                </button>
-
-                <button
-                    class="acc-opt-btn"
-                    id="btn-darkmode"
-                    type="button"
-                >
-                    <i class="fa-solid fa-moon"></i>
-                    <span>Modo oscuro</span>
-                </button>
-
-                <button
-                    class="acc-opt-btn"
-                    id="btn-text-size"
-                    type="button"
-                >
-                    <i class="fa-solid fa-font"></i>
-                    <span>Texto grande</span>
-                </button>
-
-                <button
-                    class="acc-opt-btn"
-                    id="btn-leer"
-                    type="button"
-                >
-                    <i class="fa-solid fa-volume-high"></i>
-                    <span>Leer pantalla</span>
-                </button>
-
-            </div>
-
-            <button
-                class="btn-open-config"
-                id="btn-config"
-                type="button"
-            >
-                Abrir configuración
-            </button>
-
-        </footer>
+       
 
     </main>
 
 </div>
+
+        <!-- ========================================== -->
+        <!-- NUEVA BARRA DE ACCESIBILIDAD               -->
+        <!-- ========================================== -->
+        <?php include '../Accesibilidad/accesibilidad.php'; ?>
+
+    </main>
+</div>
+
+<!-- ========================================== -->
+<!-- BOTÓN FLOTANTE DE ACCESIBILIDAD            -->
+<!-- ========================================== -->
+<button class="btn-accesibilidad-flotante" id="btnAccesibilidadFlotante" onclick="toggleBarraAccesibilidad()">
+    <i class="fa-solid fa-universal-access"></i>
+</button>
+
 
 <?php
 include '../API/teclado_accesibilidad.php';
@@ -762,6 +805,9 @@ include '../API/teclado_accesibilidad.php';
 <script src="js/Biblioteca.js"></script>
 <script src="../Administrador/js/lector.js"></script>
 <script src="js/Inicio.js"></script>
+<!-- NUEVA ACCESIBILIDAD -->
+<script src="../Accesibilidad/lector.js"></script>
+<script src="../Accesibilidad/accesibilidad.js"></script>
 
 </body>
 </html>

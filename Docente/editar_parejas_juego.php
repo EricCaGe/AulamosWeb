@@ -1,13 +1,17 @@
 <?php
 session_start();
 
-// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
-echo '<script>window.idUsuario = ' . $_SESSION['usuario']['id_usuario'] . ';</script>';
-
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Docente') {
+if (
+    !isset($_SESSION['usuario']) ||
+    ($_SESSION['usuario']['rol'] ?? '') !== 'Docente' ||
+    empty($_SESSION['usuario']['id_usuario'])
+) {
     header('Location: ../InicioSesion/login.php');
     exit;
 }
+
+// Pasar el ID del usuario al JavaScript para accesibilidad por usuario
+echo '<script>window.idUsuario = ' . json_encode((int)$_SESSION['usuario']['id_usuario']) . ';</script>';
 
 require_once '../Conexion/conexion.php';
 
@@ -111,19 +115,30 @@ $tipo_mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['agregar_pareja'])) {
+        // Elemento A: SOLO TEXTO
         $elemento_a = trim($_POST['elemento_a'] ?? '');
-        $elemento_b = trim($_POST['elemento_b'] ?? '');
+
+        // Elemento B: SOLO IMAGEN
+        $elemento_b_imagen = trim($_POST['elemento_b_imagen'] ?? '');
+
+        // Mantener descripción / explicación
         $explicacion = trim($_POST['explicacion'] ?? '');
-        $categoria = trim($_POST['categoria'] ?? '');
-        $puntos = intval($_POST['puntos'] ?? 50);
-        $elemento_a_imagen = isset($_POST['elemento_a_imagen']) ? trim($_POST['elemento_a_imagen']) : null;
-        $elemento_b_imagen = isset($_POST['elemento_b_imagen']) ? trim($_POST['elemento_b_imagen']) : null;
+
+        // La categoría corresponde al tema seleccionado al crear el juego.
+        $categoria = trim($juego['tema'] ?? '');
+
+        // Los puntos deben respetar la configuración original del juego.
+        $puntos = (int)($juego['puntos_por_acierto'] ?? 50);
+
+        // Estos campos no se usan en esta pantalla
+        $elemento_a_imagen = null;
+        $elemento_b = null;
         
-        if (empty($elemento_a) && empty($elemento_a_imagen)) {
-            $mensaje = 'El elemento A es obligatorio (texto o imagen).';
+        if ($elemento_a === '') {
+            $mensaje = 'El elemento A es obligatorio y debe ser texto.';
             $tipo_mensaje = 'error';
-        } elseif (empty($elemento_b) && empty($elemento_b_imagen)) {
-            $mensaje = 'El elemento B es obligatorio (texto o imagen).';
+        } elseif ($elemento_b_imagen === '') {
+            $mensaje = 'El elemento B es obligatorio y debe contener una imagen.';
             $tipo_mensaje = 'error';
         } else {
             try {
@@ -730,7 +745,7 @@ function getIconoModo($modo) {
         <header class="content-header">
             <div class="welcome-text">
                 <h1>Editar parejas</h1>
-                <p>Agrega los elementos que relacionarán los estudiantes</p>
+                <p>Relaciona texto con imagen y conserva su descripción</p>
             </div>
             <div class="header-actions">
                 <button type="button" class="btn-assistant" onclick="window.location.href='../Alumno/ChatbotDocente.php?rol=docente'">
@@ -772,7 +787,7 @@ function getIconoModo($modo) {
                         <div class="sub">
                             <?php echo htmlspecialchars($juego['materia']); ?> · <?php echo htmlspecialchars($juego['curso']); ?>
                             <span style="margin-left: 12px;">
-                                <i class="<?php echo getIconoModo($juego['modo']); ?>"></i> <?php echo $juego['modo']; ?>
+                                <i class="<?php echo getIconoModo($juego['modo']); ?>"></i> <?php echo $juego['modo'] === 'Memoria' ? 'Memorama' : htmlspecialchars($juego['modo']); ?>
                             </span>
                             <span style="margin-left: 12px;">
                                 <i class="fa-regular fa-grip"></i> <?php echo count($parejas); ?> parejas
@@ -788,62 +803,133 @@ function getIconoModo($modo) {
                 <!-- Formulario para agregar -->
                 <div class="form-pareja">
                     <h4 style="margin: 0 0 15px 0; font-size: 16px; color: #1e293b;">
-                        <i class="fa-solid fa-plus"></i> Nueva pareja
+                        <i class="fa-solid fa-plus"></i> Nueva pareja Texto → Imagen
                     </h4>
                     <form method="POST" action="" id="formPareja">
+                        <!-- ELEMENTO A: SOLO TEXTO -->
                         <div class="form-group">
-                            <label>Elemento A <span class="required">*</span></label>
-                            <input type="text" name="elemento_a" id="elementoA" placeholder="Ej. Dog">
-                            
-                            <!-- Subida de imagen para Elemento A -->
-                            <div class="image-upload-container">
-                                <div class="upload-box" id="uploadBoxA">
-                                    <span class="placeholder" id="placeholderA">
-                                        <i class="fa-regular fa-image"></i>
-                                        Subir imagen
-                                    </span>
-                                    <input type="file" name="imagen_a" id="imagenA" accept="image/*" onchange="previsualizarImagen('A')">
-                                    <button type="button" class="btn-remove-image" id="removeA" onclick="eliminarImagen('A')">×</button>
-                                </div>
-                            </div>
-                            <input type="hidden" name="elemento_a_imagen" id="elementoAImagen" value="">
-                            <small style="color: #64748b; font-size: 11px;">Puedes usar texto o imagen (o ambos)</small>
+                            <label>
+                                Elemento A - Texto
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                name="elemento_a"
+                                id="elementoA"
+                                placeholder="Ej. Dog"
+                                required
+                            >
+
+                            <small style="color:#64748b; font-size:11px;">
+                                En el elemento A solamente se permite texto.
+                            </small>
                         </div>
-                        
+
                         <div class="conector">
                             <i class="fa-solid fa-arrow-down"></i>
                         </div>
-                        
+
+                        <!-- ELEMENTO B: SOLO IMAGEN -->
                         <div class="form-group">
-                            <label>Elemento B <span class="required">*</span></label>
-                            <input type="text" name="elemento_b" id="elementoB" placeholder="Ej. Perro">
-                            
-                            <!-- Subida de imagen para Elemento B -->
+                            <label>
+                                Elemento B - Imagen
+                                <span class="required">*</span>
+                            </label>
+
                             <div class="image-upload-container">
                                 <div class="upload-box" id="uploadBoxB">
+
                                     <span class="placeholder" id="placeholderB">
                                         <i class="fa-regular fa-image"></i>
                                         Subir imagen
                                     </span>
-                                    <input type="file" name="imagen_b" id="imagenB" accept="image/*" onchange="previsualizarImagen('B')">
-                                    <button type="button" class="btn-remove-image" id="removeB" onclick="eliminarImagen('B')">×</button>
+
+                                    <input
+                                        type="file"
+                                        name="imagen_b"
+                                        id="imagenB"
+                                        accept="image/jpeg,image/png,image/gif,image/webp"
+                                        onchange="previsualizarImagenB()"
+                                    >
+
+                                    <button
+                                        type="button"
+                                        class="btn-remove-image"
+                                        id="removeB"
+                                        onclick="eliminarImagenB()"
+                                    >
+                                        ×
+                                    </button>
                                 </div>
                             </div>
-                            <input type="hidden" name="elemento_b_imagen" id="elementoBImagen" value="">
-                            <small style="color: #64748b; font-size: 11px;">Puedes usar texto o imagen (o ambos)</small>
+
+                            <input
+                                type="hidden"
+                                name="elemento_b_imagen"
+                                id="elementoBImagen"
+                                value=""
+                            >
+
+                            <small style="color:#64748b; font-size:11px;">
+                                En el elemento B solamente se permite una imagen.
+                            </small>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label>Explicación</label>
-                            <textarea name="explicacion" placeholder="Ej. Dog significa perro en español."></textarea>
+                            <label>Descripción / Explicación</label>
+                            <textarea
+                                name="explicacion"
+                                placeholder="Ej. Dog significa perro en español."
+                            ></textarea>
+                            <small style="color:#64748b; font-size:11px;">
+                                Esta descripción se conserva como retroalimentación para el alumno.
+                            </small>
                         </div>
                         <div class="form-group">
-                            <label>Categoría</label>
-                            <input type="text" name="categoria" placeholder="Ej. Animals">
+                            <label>Categoría / Tema</label>
+
+                            <select
+                                name="categoria_visual"
+                                id="categoriaVisual"
+                                disabled
+                                style="
+                                    width:100%;
+                                    padding:8px 12px;
+                                    border:1px solid #e2e8f0;
+                                    border-radius:8px;
+                                    font-size:14px;
+                                    background:#f8fafc;
+                                    color:#1e293b;
+                                "
+                            >
+                                <option selected>
+                                    <?php echo htmlspecialchars(
+                                        !empty($juego['tema'])
+                                            ? $juego['tema']
+                                            : 'Sin tema'
+                                    ); ?>
+                                </option>
+                            </select>
+
+                            <small style="color:#64748b; font-size:11px;">
+                                Esta categoría corresponde al tema seleccionado al crear el juego.
+                            </small>
                         </div>
+
                         <div class="form-group">
-                            <label>Puntos</label>
-                            <input type="number" name="puntos" value="50" min="1">
+                            <label>Puntos por acierto</label>
+
+                            <input
+                                type="number"
+                                value="<?php echo (int)($juego['puntos_por_acierto'] ?? 50); ?>"
+                                readonly
+                                style="background:#f8fafc; cursor:not-allowed;"
+                            >
+
+                            <small style="color:#64748b; font-size:11px;">
+                                Este valor se toma de la configuración del juego y no puede modificarse aquí.
+                            </small>
                         </div>
                         <button type="submit" name="agregar_pareja" class="btn-agregar">
                             <i class="fa-solid fa-plus"></i> Agregar pareja
@@ -871,30 +957,55 @@ function getIconoModo($modo) {
                                     <span class="numero"><?php echo $index + 1; ?></span>
                                     <div class="contenido">
                                         <div class="elementos">
-                                            <!-- Elemento A -->
-                                            <?php if (!empty($pareja['elemento_a_imagen'])): ?>
-                                                <img src="<?php echo $pareja['elemento_a_imagen']; ?>" class="imagen-miniatura" alt="Imagen A">
-                                            <?php else: ?>
-                                                <span><?php echo htmlspecialchars($pareja['elemento_a_texto'] ?? 'Multimedia'); ?></span>
-                                            <?php endif; ?>
-                                            
-                                            <span class="flecha"><i class="fa-solid fa-arrow-right"></i></span>
-                                            
-                                            <!-- Elemento B -->
+                                            <!-- Elemento A: texto -->
+                                            <span>
+                                                <?php
+                                                    echo htmlspecialchars(
+                                                        $pareja['elemento_a_texto']
+                                                        ??
+                                                        'Sin texto'
+                                                    );
+                                                ?>
+                                            </span>
+
+                                            <span class="flecha">
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </span>
+
+                                            <!-- Elemento B: imagen -->
                                             <?php if (!empty($pareja['elemento_b_imagen'])): ?>
-                                                <img src="<?php echo $pareja['elemento_b_imagen']; ?>" class="imagen-miniatura" alt="Imagen B">
+                                                <img
+                                                    src="<?php echo htmlspecialchars($pareja['elemento_b_imagen']); ?>"
+                                                    class="imagen-miniatura"
+                                                    alt="Imagen B"
+                                                >
                                             <?php else: ?>
-                                                <span><?php echo htmlspecialchars($pareja['elemento_b_texto'] ?? 'Multimedia'); ?></span>
+                                                <span style="color:#dc2626;">
+                                                    Sin imagen
+                                                </span>
                                             <?php endif; ?>
                                         </div>
-                                        <?php if ($pareja['categoria']): ?>
+
+                                        <?php if (!empty($pareja['explicacion'])): ?>
                                             <div class="extra">
-                                                <i class="fa-regular fa-tag"></i> <?php echo htmlspecialchars($pareja['categoria']); ?>
-                                                <span style="margin-left: 10px;">
-                                                    <i class="fa-regular fa-star"></i> <?php echo $pareja['puntos']; ?> pts
-                                                </span>
+                                                <i class="fa-regular fa-comment-dots"></i>
+                                                <?php echo htmlspecialchars($pareja['explicacion']); ?>
                                             </div>
                                         <?php endif; ?>
+
+                                        <div class="extra">
+                                            <i class="fa-regular fa-tag"></i>
+                                            <?php echo htmlspecialchars(
+                                                !empty($pareja['categoria'])
+                                                    ? $pareja['categoria']
+                                                    : ($juego['tema'] ?? 'Sin tema')
+                                            ); ?>
+
+                                            <span style="margin-left: 10px;">
+                                                <i class="fa-regular fa-star"></i>
+                                                <?php echo (int)$pareja['puntos']; ?> pts
+                                            </span>
+                                        </div>
                                     </div>
                                     <form method="POST" style="margin: 0;" onsubmit="return confirm('¿Eliminar esta pareja?');">
                                         <input type="hidden" name="id_pareja" value="<?php echo $pareja['id_pareja']; ?>">
@@ -948,163 +1059,249 @@ function getIconoModo($modo) {
 <script>
 
 // =============================================
-// SUBIR IMAGEN CON AJAX (CORREGIDO)
+// SUBIR UNA SOLA IMAGEN PARA EL ELEMENTO B
 // =============================================
 
-function previsualizarImagen(lado) {
-    const input = document.getElementById('imagen' + lado);
-    const file = input.files[0];
-    
-    if (!file) return;
-    
-    // Validar tamaño
+function previsualizarImagenB() {
+    const input =
+        document.getElementById('imagenB');
+
+    const file =
+        input.files[0];
+
+    if (!file) {
+        return;
+    }
+
     if (file.size > 5 * 1024 * 1024) {
         alert('⚠️ La imagen no debe superar los 5MB.');
         input.value = '';
         return;
     }
-    
-    // Validar tipo
-    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    const tiposPermitidos = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp'
+    ];
+
     if (!tiposPermitidos.includes(file.type)) {
         alert('⚠️ Solo se permiten imágenes JPG, PNG, GIF o WEBP.');
         input.value = '';
         return;
     }
-    
-    const uploadBox = document.getElementById('uploadBox' + lado);
-    const placeholder = document.getElementById('placeholder' + lado);
-    const removeBtn = document.getElementById('remove' + lado);
-    const hiddenInput = document.getElementById('elemento' + lado + 'Imagen');
-    
-    // Mostrar preview
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        // Eliminar preview anterior si existe
-        const preview = uploadBox.querySelector('img.preview');
-        if (preview) preview.remove();
-        
-        // Crear preview
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.className = 'preview';
+
+    const uploadBox =
+        document.getElementById('uploadBoxB');
+
+    const placeholder =
+        document.getElementById('placeholderB');
+
+    const removeBtn =
+        document.getElementById('removeB');
+
+    const hiddenInput =
+        document.getElementById('elementoBImagen');
+
+    const previewAnterior =
+        uploadBox.querySelector('img.preview');
+
+    if (previewAnterior) {
+        previewAnterior.remove();
+    }
+
+    const reader =
+        new FileReader();
+
+    reader.onload = function (e) {
+        const img =
+            document.createElement('img');
+
+        img.src =
+            e.target.result;
+
+        img.className =
+            'preview';
+
         uploadBox.appendChild(img);
-        
-        // Ocultar placeholder
-        placeholder.style.display = 'none';
-        
-        // Mostrar botón eliminar
-        removeBtn.style.display = 'flex';
+
+        placeholder.style.display =
+            'none';
+
+        removeBtn.style.display =
+            'flex';
     };
+
     reader.readAsDataURL(file);
-    
-    // Subir archivo con AJAX - 🔥 RUTA CORREGIDA
-    const formData = new FormData();
+
+    const formData =
+        new FormData();
+
     formData.append('imagen', file);
-    formData.append('id_juego', <?php echo $id_juego; ?>);
-    formData.append('subir_imagen', '1');
-    
-    // Mostrar estado de carga
-    uploadBox.style.borderColor = '#f59e0b';
-    placeholder.textContent = '⏳ Subiendo...';
-    placeholder.style.display = 'flex';
-    placeholder.innerHTML = '⏳ Subiendo...';
-    
-    // 🔥 CAMBIAR: usar subir_imagen_juego.php en lugar de window.location.href
-    fetch('subir_imagen_juego.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Guardar ruta en el campo oculto
-            hiddenInput.value = data.ruta;
-            uploadBox.style.borderColor = '#22c55e';
-            placeholder.style.display = 'none';
-            
-            // Mostrar el nombre del archivo
-            const nombreArchivo = document.createElement('div');
-            nombreArchivo.className = 'nombre-archivo';
-            nombreArchivo.textContent = file.name;
-            nombreArchivo.id = 'nombreArchivo' + lado;
-            
-            // Eliminar nombre anterior si existe
-            const nombreAnterior = uploadBox.querySelector('#nombreArchivo' + lado);
-            if (nombreAnterior) nombreAnterior.remove();
-            
-            uploadBox.appendChild(nombreArchivo);
-            
-            console.log('✅ Imagen subida correctamente:', data.ruta);
-        } else {
-            alert('❌ Error al subir la imagen: ' + (data.message || 'Desconocido'));
-            uploadBox.style.borderColor = '#dc2626';
-            placeholder.textContent = '❌ Error';
-            placeholder.style.display = 'flex';
-            input.value = '';
+    formData.append(
+        'id_juego',
+        <?php echo $id_juego; ?>
+    );
+    formData.append(
+        'subir_imagen',
+        '1'
+    );
+
+    uploadBox.style.borderColor =
+        '#f59e0b';
+
+    fetch(
+        'subir_imagen_juego.php',
+        {
+            method: 'POST',
+            body: formData
         }
-    })
-    .catch(error => {
-        console.error('❌ Error de conexión:', error);
-        alert('❌ Error de conexión al subir la imagen. Verifica que el servidor esté funcionando.');
-        uploadBox.style.borderColor = '#dc2626';
-        placeholder.textContent = '❌ Error';
-        placeholder.style.display = 'flex';
-        input.value = '';
-    });
+    )
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(
+                    data.message ||
+                    'No se pudo subir la imagen.'
+                );
+            }
+
+            hiddenInput.value =
+                data.ruta;
+
+            uploadBox.style.borderColor =
+                '#22c55e';
+
+            const anterior =
+                uploadBox.querySelector(
+                    '.nombre-archivo'
+                );
+
+            if (anterior) {
+                anterior.remove();
+            }
+
+            const nombreArchivo =
+                document.createElement('div');
+
+            nombreArchivo.className =
+                'nombre-archivo';
+
+            nombreArchivo.textContent =
+                file.name;
+
+            uploadBox.appendChild(
+                nombreArchivo
+            );
+        })
+        .catch(error => {
+            console.error(error);
+
+            alert(
+                '❌ Error al subir la imagen: ' +
+                error.message
+            );
+
+            eliminarImagenB();
+        });
 }
 
-function eliminarImagen(lado) {
-    const uploadBox = document.getElementById('uploadBox' + lado);
-    const placeholder = document.getElementById('placeholder' + lado);
-    const removeBtn = document.getElementById('remove' + lado);
-    const hiddenInput = document.getElementById('elemento' + lado + 'Imagen');
-    const input = document.getElementById('imagen' + lado);
-    const nombreArchivo = uploadBox.querySelector('.nombre-archivo');
-    
-    // Eliminar preview
-    const preview = uploadBox.querySelector('img.preview');
-    if (preview) preview.remove();
-    
-    // Eliminar nombre del archivo
-    if (nombreArchivo) nombreArchivo.remove();
-    
-    // Resetear
+
+// =============================================
+// ELIMINAR IMAGEN DEL ELEMENTO B
+// =============================================
+
+function eliminarImagenB() {
+    const uploadBox =
+        document.getElementById('uploadBoxB');
+
+    const placeholder =
+        document.getElementById('placeholderB');
+
+    const removeBtn =
+        document.getElementById('removeB');
+
+    const hiddenInput =
+        document.getElementById('elementoBImagen');
+
+    const input =
+        document.getElementById('imagenB');
+
+    const preview =
+        uploadBox.querySelector('img.preview');
+
+    if (preview) {
+        preview.remove();
+    }
+
+    const nombreArchivo =
+        uploadBox.querySelector(
+            '.nombre-archivo'
+        );
+
+    if (nombreArchivo) {
+        nombreArchivo.remove();
+    }
+
     hiddenInput.value = '';
     input.value = '';
-    removeBtn.style.display = 'none';
-    placeholder.style.display = 'flex';
-    placeholder.innerHTML = '<i class="fa-regular fa-image"></i> Subir imagen';
-    uploadBox.style.borderColor = '#e2e8f0';
+
+    removeBtn.style.display =
+        'none';
+
+    placeholder.style.display =
+        'flex';
+
+    placeholder.innerHTML =
+        '<i class="fa-regular fa-image"></i> Subir imagen';
+
+    uploadBox.style.borderColor =
+        '#e2e8f0';
 }
 
+
 // =============================================
-// VALIDACIÓN DEL FORMULARIO
+// VALIDACIÓN
 // =============================================
 
-document.getElementById('formPareja').addEventListener('submit', function(e) {
-    const elementoA = document.getElementById('elementoA').value.trim();
-    const elementoAImagen = document.getElementById('elementoAImagen').value;
-    const elementoB = document.getElementById('elementoB').value.trim();
-    const elementoBImagen = document.getElementById('elementoBImagen').value;
-    
-    // Validar que al menos tenga texto o imagen
-    if (!elementoA && !elementoAImagen) {
-        e.preventDefault();
-        alert('⚠️ El Elemento A debe tener texto o una imagen.');
-        return false;
-    }
-    
-    if (!elementoB && !elementoBImagen) {
-        e.preventDefault();
-        alert('⚠️ El Elemento B debe tener texto o una imagen.');
-        return false;
-    }
-    
-    console.log('✅ Formulario validado correctamente');
-});
+document
+    .getElementById('formPareja')
+    .addEventListener(
+        'submit',
+        function (e) {
+            const elementoA =
+                document
+                    .getElementById('elementoA')
+                    .value
+                    .trim();
 
-console.log('📸 Página de edición de parejas con soporte de imágenes cargada');
+            const imagenB =
+                document
+                    .getElementById('elementoBImagen')
+                    .value
+                    .trim();
+
+            if (!elementoA) {
+                e.preventDefault();
+
+                alert(
+                    '⚠️ El Elemento A debe contener texto.'
+                );
+
+                return;
+            }
+
+            if (!imagenB) {
+                e.preventDefault();
+
+                alert(
+                    '⚠️ Debes subir una imagen para el Elemento B.'
+                );
+            }
+        }
+    );
+
 </script>
 
 <script src="jss/docente_dashboard.js"></script>

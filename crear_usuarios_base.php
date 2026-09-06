@@ -6,11 +6,11 @@
 require_once 'Conexion/conexion.php';
 
 // Datos del Administrador
-$admin_nombre = 'Eric';
-$admin_apellido_paterno = 'Candelaria';
-$admin_apellido_materno = 'García';
-$admin_correo = '230110496@itsoeh.edu.mx';
-$admin_password = 'Admin123!';
+$admin_nombre = 'Admin';
+$admin_apellido_paterno = 'Aulamos';
+$admin_apellido_materno = 'Aulamos';
+$admin_correo = 'adminaulamos@gmail.com';
+$admin_password = 'Aulamos2026!';
 $admin_password_hash = password_hash($admin_password, PASSWORD_DEFAULT);
 
 

@@ -92,18 +92,37 @@ if ($id_prueba_activa && $tiene_participantes) {
 $resultado = $conexion->query($sql);
 $total_errores = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
 
-// Total de interacciones chatbot
+// =====================================================
+// TOTAL DE INTERACCIONES CON EL CHATBOT
+// =====================================================
+
 if ($id_prueba_activa && $tiene_participantes) {
+
+    $sql = "
+        SELECT COUNT(*) AS total
+        FROM mensajes_chatbot m
+        INNER JOIN sesiones_chatbot s
+            ON m.id_sesion = s.id_sesion
+        WHERE s.id_usuario IN (
+            SELECT id_usuario
+            FROM participantes_prueba
+            WHERE id_prueba = $id_prueba_activa
+        )
+    ";
+
+} else {
+
     $sql = "
         SELECT COUNT(*) AS total
         FROM mensajes_chatbot
-        WHERE id_usuario IN (SELECT id_usuario FROM participantes_prueba WHERE id_prueba = $id_prueba_activa)
     ";
-} else {
-    $sql = "SELECT COUNT(*) AS total FROM mensajes_chatbot";
 }
+
 $resultado = $conexion->query($sql);
-$total_chatbot = $resultado ? $resultado->fetch_assoc()['total'] ?? 0 : 0;
+
+$total_chatbot = $resultado
+    ? ($resultado->fetch_assoc()['total'] ?? 0)
+    : 0;
 
 // =====================================================
 // PRUEBAS DE INVESTIGACIÓN (globales)
