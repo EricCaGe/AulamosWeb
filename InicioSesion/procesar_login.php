@@ -37,6 +37,7 @@ try {
             u.correo,
             u.password_hash,
             u.estado,
+             u.verificado,
             r.nombre AS rol
         FROM usuarios u
         INNER JOIN usuario_roles ur ON u.id_usuario = ur.id_usuario
@@ -72,7 +73,10 @@ try {
         header('Location: login.php?error=credenciales');
         exit;
     }
-
+if ($usuario['verificado'] == 0) {
+    header('Location: login.php?error=no_verificado');
+    exit;
+}
     // ========================================== */
     // INICIAR SESIÓN                            */
     // ========================================== */

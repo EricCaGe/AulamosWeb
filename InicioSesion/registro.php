@@ -55,27 +55,34 @@
                     </button>
                 </div>
 
-                <!-- MOSTRAR ERRORES -->
                 <?php if (isset($_GET['error'])): ?>
-                    <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc2626;">
-                        <?php 
-                            $error = $_GET['error'];
-                            if ($error === 'campos_vacios') {
-                                echo '❌ Todos los campos son obligatorios.';
-                            } elseif ($error === 'correo_existe') {
-                                echo '❌ Este correo ya está registrado.';
-                            } elseif ($error === 'correo_invalido') {
-                                echo '❌ El correo no es válido.';
-                            } elseif ($error === 'password_corta') {
-                                echo '❌ La contraseña debe tener al menos 8 caracteres.';
-                            } elseif ($error === 'rol_invalido') {
-                                echo '❌ Rol no válido.';
-                            } else {
-                                echo '❌ Error al registrar. Intenta de nuevo.';
-                            }
-                        ?>
-                    </div>
-                <?php endif; ?>
+    <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc2626;">
+        <?php 
+            $error = $_GET['error'];
+            if ($error === 'campos_vacios') {
+                echo '❌ Todos los campos son obligatorios.';
+            } elseif ($error === 'correo_existe') {
+                echo '❌ Este correo ya está registrado.';
+            } elseif ($error === 'correo_invalido') {
+                echo '❌ El correo no es válido.';
+            } elseif ($error === 'password_corta') {
+                echo '❌ La contraseña debe tener al menos 8 caracteres.';
+            } elseif ($error === 'password_mayuscula') {
+                echo '❌ La contraseña debe tener al menos 1 mayúscula.';
+            } elseif ($error === 'password_minuscula') {
+                echo '❌ La contraseña debe tener al menos 1 minúscula.';
+            } elseif ($error === 'password_numero') {
+                echo '❌ La contraseña debe tener al menos 1 número.';
+            } elseif ($error === 'password_especial') {
+                echo '❌ La contraseña debe tener al menos 1 carácter especial (-_!@#$%^&*).';
+            } elseif ($error === 'rol_invalido') {
+                echo '❌ Rol no válido.';
+            } else {
+                echo '❌ Error al registrar. Intenta de nuevo.';
+            }
+        ?>
+    </div>
+<?php endif; ?>
 
                 <!-- Selector de Rol -->
                 <div class="role-selector">
@@ -111,7 +118,7 @@
                         <label for="registro-apellido-materno">Apellido Materno</label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-user input-icon" aria-hidden="true"></i>
-                            <input type="text" id="registro-apellido-materno" name="apellido_materno" placeholder="Tu apellido materno" required>
+                            <input type="text" id="registro-apellido-materno" name="apellido_materno" placeholder="Tu apellido materno (opcional)">
                         </div>
                     </div>
 

@@ -72,7 +72,37 @@
                         ✅ ¡Cuenta creada exitosamente! Ahora inicia sesión.
                     </div>
                 <?php endif; ?>
+<?php if (isset($_GET['verificacion']) && $_GET['verificacion'] === 'enviada'): ?>
+    <div style="background: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #22c55e;">
+        ✅ ¡Registro exitoso! Te hemos enviado un correo de verificación. Revisa tu bandeja de entrada.
+    </div>
+<?php endif; ?>
 
+<?php if (isset($_GET['verificacion']) && $_GET['verificacion'] === 'error'): ?>
+    <div style="background: #fef3c7; color: #92400e; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f59e0b;">
+        ⚠️ Registro exitoso, pero no se pudo enviar el correo de verificación. Contacta al administrador.
+    </div>
+<?php endif; ?>
+<?php if (isset($_GET['error'])): ?>
+    <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc2626;">
+        <?php 
+            $error = $_GET['error'];
+            if ($error === 'credenciales') {
+                echo '❌ Correo o contraseña incorrectos.';
+            } elseif ($error === 'inactivo') {
+                echo '⚠️ Tu cuenta está inactiva. Contacta al administrador.';
+            } elseif ($error === 'bloqueado') {
+                echo '⚠️ Tu cuenta está bloqueada. Contacta al administrador.';
+            } elseif ($error === 'no_verificado') {
+                echo '⚠️ Tu cuenta no ha sido verificada. Revisa tu correo electrónico para activarla.';
+            } elseif ($error === 'sesion') {
+                echo '❌ Error al iniciar sesión. Intenta de nuevo.';
+            } else {
+                echo '❌ Error al iniciar sesión.';
+            }
+        ?>
+    </div>
+<?php endif; ?>
                 <!-- Selector de Rol -->
                 <div class="role-selector">
                     <div class="role-row">

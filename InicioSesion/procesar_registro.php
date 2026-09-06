@@ -5,6 +5,14 @@
 
 require_once '../Conexion/conexion.php';
 
+// Cargar PHPMailer
+require '../PHPMailer-master/Exception.php';
+require '../PHPMailer-master/PHPMailer.php';
+require '../PHPMailer-master/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 // Verificar que se envió el formulario
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -21,7 +29,7 @@ $apellido_paterno = trim($_POST['apellido_paterno'] ?? '');
 $apellido_materno = trim($_POST['apellido_materno'] ?? '');
 
 // Validar que los campos no estén vacíos
-if (empty($correo) || empty($password) || empty($nombre) || empty($apellido_paterno) || empty($apellido_materno)) {
+if (empty($correo) || empty($password) || empty($nombre) || empty($apellido_paterno)) {
     header('Location: registro.php?error=campos_vacios');
     exit;
 }
@@ -37,9 +45,34 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// Validar longitud de contraseña (mínimo 8 caracteres)
+// ========================================== */
+// VALIDACIÓN DE CONTRASEÑA (REQUISITOS)
+// ========================================== */
+
+$specialChars = '/[!@#$%^&*_\-]/';
+
 if (strlen($password) < 8) {
     header('Location: registro.php?error=password_corta');
+    exit;
+}
+
+if (!preg_match('/[A-Z]/', $password)) {
+    header('Location: registro.php?error=password_mayuscula');
+    exit;
+}
+
+if (!preg_match('/[a-z]/', $password)) {
+    header('Location: registro.php?error=password_minuscula');
+    exit;
+}
+
+if (!preg_match('/[0-9]/', $password)) {
+    header('Location: registro.php?error=password_numero');
+    exit;
+}
+
+if (!preg_match($specialChars, $password)) {
+    header('Location: registro.php?error=password_especial');
     exit;
 }
 
@@ -62,7 +95,6 @@ try {
     // INSERTAR USUARIO                          */
     // ========================================== */
     
-    // Encriptar contraseña
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
     
     $stmt = $conexion->prepare("
@@ -73,8 +105,9 @@ try {
             correo, 
             password_hash, 
             estado,
+            verificado,
             fecha_registro
-        ) VALUES (?, ?, ?, ?, ?, 'Activo', NOW())
+        ) VALUES (?, ?, ?, ?, ?, 'Activo', 0, NOW())
     ");
     $stmt->bind_param("sssss", $nombre, $apellido_paterno, $apellido_materno, $correo, $password_hash);
     $stmt->execute();
@@ -82,31 +115,123 @@ try {
     $stmt->close();
     
     // ========================================== */
-    // ASIGNAR ROL (MANUAL)                       */
+    // ASIGNAR ROL                               */
     // ========================================== */
     
-    // Asignar ID de rol manualmente según lo que seleccionó el usuario
     if ($rol === 'Alumno') {
-        $id_rol = 1;  // ID fijo para Alumno
+        $id_rol = 1;
     } else {
-        $id_rol = 2;  // ID fijo para Docente
+        $id_rol = 2;
     }
     
-    // Asignar rol al usuario
     $stmt = $conexion->prepare("INSERT INTO usuario_roles (id_usuario, id_rol) VALUES (?, ?)");
     $stmt->bind_param("ii", $id_usuario, $id_rol);
     $stmt->execute();
     $stmt->close();
     
     // ========================================== */
+    // GENERAR TOKEN DE VERIFICACIÓN             */
+    // ========================================== */
+    
+    $token = bin2hex(random_bytes(32));
+    
+    $stmt = $conexion->prepare("UPDATE usuarios SET token_verificacion = ? WHERE id_usuario = ?");
+    $stmt->bind_param("si", $token, $id_usuario);
+    $stmt->execute();
+    $stmt->close();
+    
+    // ========================================== */
+    // ENVIAR CORREO DE VERIFICACIÓN             */
+    // ========================================== */
+    
+    $mail = new PHPMailer(true);
+    $correo_enviado = false;
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = '230110496@itsoeh.edu.mx';
+        $mail->Password   = 'sbob byyx xbvt nbec';  // ← Tu contraseña de aplicación
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        $mail->setFrom('230110496@itsoeh.edu.mx', 'AULAMOS');
+        $mail->addAddress($correo, $nombre . ' ' . $apellido_paterno);
+        $mail->addReplyTo('230110496@itsoeh.edu.mx', 'AULAMOS');
+
+        $enlace_verificacion = "http://localhost/AulamosWeb/InicioSesion/verificar_correo.php?token=" . $token;
+
+        $mail->isHTML(true);
+        $mail->Subject = '✅ Verifica tu cuenta - AULAMOS';
+        $mail->Body = "
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: #5a189a; color: white; padding: 20px; text-align: center; }
+                    .content { padding: 20px; background: #f9f9f9; }
+                    .btn { 
+                        display: inline-block; 
+                        padding: 12px 30px; 
+                        background: #5a189a; 
+                        color: white; 
+                        text-decoration: none; 
+                        border-radius: 8px;
+                        margin: 20px 0;
+                    }
+                    .footer { text-align: center; padding: 10px; color: #666; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        <h1>AULAMOS</h1>
+                        <p>Verificación de cuenta</p>
+                    </div>
+                    <div class='content'>
+                        <p>Hola <strong>" . htmlspecialchars($nombre) . "</strong>,</p>
+                        <p>Gracias por registrarte en <strong>AULAMOS</strong>. Para activar tu cuenta, haz clic en el siguiente enlace:</p>
+                        <p style='text-align: center;'>
+                            <a href='" . $enlace_verificacion . "' class='btn'>Verificar mi cuenta</a>
+                        </p>
+                        <p>O copia y pega este enlace en tu navegador:</p>
+                        <p style='background: #eee; padding: 10px; word-break: break-all; font-size: 12px;'>
+                            " . $enlace_verificacion . "
+                        </p>
+                        <p><strong>Este enlace expirará en 24 horas.</strong></p>
+                        <p>Si no creaste una cuenta en AULAMOS, ignora este mensaje.</p>
+                    </div>
+                    <div class='footer'>
+                        <p>&copy; 2024 AULAMOS - Todos los derechos reservados</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        ";
+        $mail->AltBody = "Verifica tu cuenta en: " . $enlace_verificacion;
+
+        $mail->send();
+        $correo_enviado = true;
+        
+    } catch (PHPMailerException $e) {
+        error_log("Error al enviar correo de verificación: " . $mail->ErrorInfo);
+        $correo_enviado = false;
+    }
+    
+    // ========================================== */
     // REDIRIGIR AL LOGIN                        */
     // ========================================== */
     
-    header('Location: login.php?registro=exitoso');
+    if ($correo_enviado) {
+        header('Location: login.php?registro=exitoso&verificacion=enviada');
+    } else {
+        header('Location: login.php?registro=exitoso&verificacion=error');
+    }
     exit;
     
 } catch(Exception $e) {
-    // Error de base de datos
     error_log("Error en registro: " . $e->getMessage());
     header('Location: registro.php?error=sesion');
     exit;

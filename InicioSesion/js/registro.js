@@ -126,12 +126,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 apellidoPaterno.style.borderColor = '';
             }
             
-            if (!apellidoMaterno || apellidoMaterno.value.trim() === '') {
-                errores.push('El apellido materno es obligatorio.');
-                apellidoMaterno.style.borderColor = '#dc2626';
-            } else {
-                apellidoMaterno.style.borderColor = '';
-            }
+            if (apellidoMaterno && apellidoMaterno.value.trim() === '') {
+    apellidoMaterno.style.borderColor = '';
+}
             
             if (!email || email.value.trim() === '') {
                 errores.push('El correo electrónico es obligatorio.');
